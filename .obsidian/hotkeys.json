@@ -1,0 +1,24 @@
+{
+  "editor:table-row-after": [
+    {
+      "modifiers": [
+        "Ctrl"
+      ],
+      "key": "N"
+    }
+  ],
+  "editor:insert-mathblock": [
+    {
+      "modifiers": [
+        "Ctrl"
+      ],
+      "key": "M"
+    }
+  ],
+  "obsidian-completr:completr-insert-selected-suggestion": [
+    {
+      "modifiers": [],
+      "key": "Tab"
+    }
+  ]
+}
