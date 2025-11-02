@@ -4,7 +4,8 @@
   "obsidian-vimrc-support",
   "vim-im-select",
   "surfing",
-  "obsidian-latex-suite",
   "obsidian-completr",
-  "obsidian-git"
+  "obsidian-git",
+  "obsidian-latex-suite",
+  "obsidian-image-layouts"
 ]
