@@ -26,12 +26,19 @@
     \frac{d}{dx}\int_{u(x)}^{v(x)} f(t)\,dt
     = f\!\big(v(x)\big)\,v'(x) \;-\; f\!\big(u(x)\big)\,u'(x).
     $$
-## 积分技巧
+## 概念和记号
 
-### 杂类
+**Lower / Upper Sum**：取区间的最小值/最大值为代表做黎曼和。
+**Average Value** $\text{av}(f) = \frac{1}{b-a}\int^{b}_{a}f(x)dx$ 。
 
-定积分：注意是否区间关于 0 对称而且被积函数是奇函数。
+## 积分应用
 
-### 换元（Substitution）
+求体积
+- 对截面进行积分 $V=\int \text{截面面积}(x)dx$
+- 旋转体可看成圆柱面的累加：$\int 2\pi \times\text{半径}(x)\times高度(x)dx$
+  - 其中半径是 $x$ 到旋转轴的距离，高度为 $x$ 处的被旋转面的截线长
 
-### 分部积分（Integration by Parts）
+求弧长
+$$
+\text{arc length} = \int^{b}_{a} \sqrt{ 1+ \left( \frac{dy}{dx} \right)^2 }dx
+$$

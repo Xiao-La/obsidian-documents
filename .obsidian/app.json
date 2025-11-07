@@ -1,5 +1,12 @@
 {
   "vimMode": true,
   "alwaysUpdateLinks": true,
-  "attachmentFolderPath": "笔记依赖/图片"
+  "attachmentFolderPath": "笔记依赖/图片",
+  "pdfExportSettings": {
+    "includeName": true,
+    "pageSize": "Letter",
+    "landscape": false,
+    "margin": "0",
+    "downscalePercent": 100
+  }
 }
