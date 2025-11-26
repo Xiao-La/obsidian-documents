@@ -77,8 +77,8 @@
 **Solubility of Ionic Compounds**
 - Common Soluble Compounds:
   - $\ce{NO_{3}- / CH_{3}COO-}$: No exception
-  -  $\ce{Cl- / Br- / I- :Ag+, Hg_{2}2+, Pb^2+}$  Precipitation
-  - $\ce{SO_{4}^2-  : Sr^2+, Ba^2, Hg_{2}+, Pb^2+}$ Precipitation
+  -  $\ce{Cl- / Br- / I- :Ag+, Hg_{2}^2+, Pb^2+}$  Precipitation
+  - $\ce{SO_{4}^2-  : Sr^2+, Ba^2+, Hg_{2}+, Pb^2+}$ Precipitation
 - Common Insoluble Compounds
   - $\ce{S^2- / OH- : NH_{4}+, \text{alkali metal cations}, Ca^2+, Sr^2+, Ba^2+}$ Soluble
   - $\ce{CO_{3}^2- / PO_{4}^3- : NH_{4}+, \text{alkali metal cations}}$ Soluble

@@ -7,6 +7,7 @@
 函数增（Increase）和减（Decrease）：$f'(x)>0$ 或 $f'(x)<0$。
 Concave Up 和 Concave Down：$f''(x)>0$ 或 $f''(x)<0$。
 拐点（Inflection Point）：左右两边 $f''(x)$ 符号不同（注意不要求 $f''(x)$ 存在）。
+反函数（Inverse Function）：对一对一函数（One-to-one Function）来说，存在反函数 $y=f^{-1}(x)$，使得 $f(y)=x$。 
 ## 定理总结
 		
 - **夹逼定理（The Sandwich Theorem）**：
@@ -84,3 +85,7 @@ Concave Up 和 Concave Down：$f''(x)>0$ 或 $f''(x)<0$。
 **线性化（Linearization）**：切线。
 
 **画函数图像**：注意单调性和极值 / 凸性和拐点 / 渐近线。
+
+**三角函数和反三角函数导数公式表：** [[Derivative-1]]
+
+对**向量值函数（Vector-Valued Functions）** 求导：只需对向量的各组成部分分别求导。
