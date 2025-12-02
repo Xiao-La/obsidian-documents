@@ -53,14 +53,25 @@ $$
 $$
 A=\int^{b}_{a}2\pi f(x)\sqrt{ 1+[f'(x)]^2 } dx
 $$
-- Pappus’s Theorem for Surface Areas：$A=2\pi \rho L$，即弧长乘质心 到转轴的距离
+- Pappus’s Theorem for Surface Areas：$A=2\pi \rho L$，即弧长乘质心到转轴的距离
+
 求平面图形质心
 $$
-\bar{x}= \frac{\int xdm}{\int dm},\bar{y}= \frac{\int ydm}{\int dm}
+\bar{x}= \frac{\int \tilde{x}dm}{\int dm},\bar{y}= \frac{\int \tilde{y}dm}{\int dm}
 $$
 - 若密度分布不均匀，有密度分布函数 $\delta$，则 $dm=\delta dA$。
+- 若求两个函数包着的区域质心，即 $y=f(x)-g(x)$，则可以将 $\tilde{y}$ 写成 $\frac{1}{2}(f(x)+g(x))$：
+  $$
+\bar{x}= \frac{1}{M} \int \delta x (f(x)-g(x))dx
+$$
+$$
+\begin{align}
+\bar{y}&= \frac{1}{M} \int \frac{f(x)+g(x)}{2} \delta  (f(x)-g(x))dx\\
+&= \frac{1}{M} \int \frac{\delta}{2}[f^2(x)-g^2(x)]dx
+\end{align}
+$$
 
 求几何中心（即 $\delta$ 是常数的情况）
 $$
-\bar{x}= \frac{\int xdA}{A}, y=\frac{\int ydA}{A}
+\bar{x}= \frac{\int \tilde{x}dA}{A}, y=\frac{\int \tilde{y}dA}{A}
 $$

@@ -2,14 +2,27 @@
 ## 定义总结
 
 函数连续（Continuous）的定义： $\lim_{ x \to c }f(x)=f(c)$
+
 导数（Derivative）的定义：$\lim_{ h \to 0 } \frac{f(x+h)-f(x)}{h}$
+
 关键点（Critical Points）：导数为 $0$ 或导数未定义的点。
+
 函数增（Increase）和减（Decrease）：$f'(x)>0$ 或 $f'(x)<0$。
+
 Concave Up 和 Concave Down：$f''(x)>0$ 或 $f''(x)<0$。
+
 拐点（Inflection Point）：左右两边 $f''(x)$ 符号不同（注意不要求 $f''(x)$ 存在）。
+
+一对一函数（One-to-one Function）：$f(x_{1})=f(x_{2})\implies x_{1}=x_{2}$（一个充分条件是 $f$ 严格单调） 
+
 反函数（Inverse Function）：对一对一函数（One-to-one Function）来说，存在反函数 $y=f^{-1}(x)$，使得 $f(y)=x$。 
+
+小 o 记号（little-oh Notation）：$f=o(g)$（“$f$ is little-oh of $g$”），当  $f$ 的阶比 $g$ 的阶更小，即 $\lim\limits_{x\to\infty}\frac{f(x)}{g(x)}=0$
+
+大 O 记号（big-oh Notation）： $f=O(g)$（“$f$ is big-oh of $g$”），当的阶小于或等于 $g$  的阶，即 $\lim\limits_{x\to\infty}\frac{f(x)}{g(x)}\le M$
+
 ## 定理总结
-		
+
 - **夹逼定理（The Sandwich Theorem）**：
   - 适用条件：存在 $a\in\mathbb{R}$，在 $a$ 的某去心邻域内有
     $$
@@ -59,7 +72,20 @@ Concave Up 和 Concave Down：$f''(x)>0$ 或 $f''(x)<0$。
 - **费马引理（Fermat's Lemma）：**
   - 适用条件：$f$ 在某开区间 $I$ 上定义，$c\in I$ 为内点；$f$ 在 $c$ 处可导；$c$ 是 $f$ 的局部极值点（极大或极小）。
   - 结论：$f'(c)=0$。
-
+- **洛必达法则（L’Hôpital’s rule）：**
+  - 适用条件：设 $f,g$ 在点 $a$ 的某去心邻域内可导，且
+    $$
+    \lim_{x\to a} f(x)=\lim_{x\to a} g(x)=0 \quad\text{或}\quad \lim_{x\to a} f(x)=\pm\infty,\ \lim_{x\to a} g(x)=\pm\infty,
+    $$
+    并且 $g'(x)\ne 0$（在该邻域内），极限
+    $$
+    \lim_{x\to a}\frac{f'(x)}{g'(x)}
+    $$
+    存在（有限或为 $\pm\infty$）。
+  - 结论：
+    $$
+    \lim_{x\to a}\frac{f(x)}{g(x)} \;=\; \lim_{x\to a}\frac{f'(x)}{g'(x)}.
+    $$
 ## 经典反例：
 
 1. $f(x)=\begin{cases}x^2\sin \left( \frac{1}{x} \right) & x\neq 0 \\ 0 & x=0\end{cases}$
