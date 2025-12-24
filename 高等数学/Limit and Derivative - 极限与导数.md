@@ -86,7 +86,7 @@ Concave Up 和 Concave Down：$f''(x)>0$ 或 $f''(x)<0$。
     $$
     \lim_{x\to a}\frac{f(x)}{g(x)} \;=\; \lim_{x\to a}\frac{f'(x)}{g'(x)}.
     $$
-## 经典反例：
+## 经典反例
 
 1. $f(x)=\begin{cases}x^2\sin \left( \frac{1}{x} \right) & x\neq 0 \\ 0 & x=0\end{cases}$
 	$f(x)$ 连续且处处可导，但 $f'(x)$ 在 $0$ 处不连续，因为 $\lim_{ x \to 0 }f'(x)$ 不存在。
@@ -115,3 +115,39 @@ Concave Up 和 Concave Down：$f''(x)>0$ 或 $f''(x)<0$。
 **三角函数和反三角函数导数公式表：** [[Derivative-1]]
 
 对**向量值函数（Vector-Valued Functions）** 求导：只需对向量的各组成部分分别求导。
+
+## 泰勒公式
+
+泰勒公式（Taylor Formula）给出 $f(x)$ 在 $x_{0}$ 处的多项式近似：
+
+$$
+\sum^{\infty}_{i=0} \frac{f^{(i)}(x_{0})(x-x_{0})^i}{i!}
+$$
+麦克劳林级数（Maclaurin series）是在 $0$ 处的泰勒公式。 
+一些常见函数的麦克劳林展开：
+$$
+\sin x=x- \frac{x^3}{3!}+ \frac{x^5}{5!} - \frac{x^7}{7!}+\cdots (x\to 0)
+$$
+$$
+\cos x=1-\frac{x^2}{2!}+\frac{x^4}{4!}- \frac{x^6}{6!} + \cdots(x\to 0)
+$$
+$$
+e^x=1+x+\frac{x^2}{2!}+\frac{x^3}{3!}+\cdots(x\to 0)
+$$
+这三个容易直观理解。
+$$
+\tan x=x+\frac{1}{3}x^3+\frac{2}{15}x^5+\cdots(x\to 0)
+$$
+这个需要死记硬背。
+注意，上面这些公式在其定义域内都收敛。
+$$
+\frac{1}{1-x}=1+x+x^2+x^3+\cdots(x\to 0)
+$$
+$$
+\frac{1}{1+x}=1-x+x^2-x^3+\cdots(x \to 0)
+$$
+$$
+\ln(1+x)=x- \frac{x^2}{2}+ \frac{x^3}{3}-\frac{x^4}{4} + \cdots (x \to 0)
+$$
+这几个都可以互推。
+注意，前两个公式收敛需要 $|x|<1$，最后一个公式收敛需要 $-1<x\leq 1$。

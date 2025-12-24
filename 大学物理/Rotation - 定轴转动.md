@@ -7,7 +7,7 @@
 | $a=\frac{dv}{dt}$   | $\alpha=\frac{d\omega}{dt}$ |
 | $m$                 | $I$                         |
 | $F_{net}=ma$        | $\tau_{net} = I\alpha$      |
-| $W=\int F\ dx$      | $W = \int I\ d\theta$       |
+| $W=\int F\ dx$      | $W = \int \tau\ d\theta$    |
 | $K=\frac{1}{2}mv^2$ | $K=\frac{1}{2}I\omega^2$    |
 | $P=Fv$              | $P=\tau\omega$              |
 | $W=\Delta K$        | $W = \Delta K$              |

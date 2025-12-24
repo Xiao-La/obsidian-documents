@@ -34,7 +34,7 @@ $$
 三粒子系统：$U=-\frac{Gm_{1}m_{2}}{r_{12}}-\frac{Gm_{1}m_{3}}{r_{13}}-\frac{Gm_{2}m_{3}}{r_{23}}$。
 逃逸速度 （Escape Speed）指脱离引力场需要的速度：
 $$
-E=K+E=\frac{1}{2}mv^2 - \frac{Gm_{1}m_{2}}{r}=0 \implies v=\sqrt{ \frac{2GM}{r} }
+E=K+U=\frac{1}{2}mv^2 - \frac{Gm_{1}m_{2}}{r}=0 \implies v=\sqrt{ \frac{2GM}{r} }
 $$
 
 ### 开普勒三大定律

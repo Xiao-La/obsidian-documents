@@ -1,4 +1,4 @@
-[[Limit and Derivative - 极限与导数]]
+前置： [[Limit and Derivative - 极限与导数]]
 定积分的定义：对黎曼和 $\sum^{n}_{i=1}f\left( a+ \frac{b-a}{n} i \right) \times \frac{b-a}{n}$ 取极限。
 ## 定理总结
 
@@ -34,6 +34,20 @@
 **Average Value** $\text{av}(f) = \frac{1}{b-a}\int^{b}_{a}f(x)dx$ 。
 **Improper Integral：**$\int^{\infty}_{a}f(x)dx=\lim_{ t \to \infty}\int^{t}_{a}f(x)dx$
 **Centroid：** 几何中心，即质量均匀的物体的质心
+**Improper Integral（反常积分）：**
+1. Type 1： $\int_{b}^{\infty}ydx=\lim_{ a \to \infty } \int _b^a  ydx$
+2. Type 2：定义在 $\left [ b,a \right)$ 上的函数 $y(x)$ ， $\int_{b}^a ydx= \lim_{ c \to a^- } \int_{b}^c ydx$
+
+## 判断反常积分敛散性
+
+1. 对于可积函数，积出来之后根据反常积分的定义，判断极限是否存在即可。
+2. 若其恒小于一个收敛的反常积分，则该积分也收敛。
+3. 若其恒大于一个发散的反常积分，则该积分也发散。
+4. 若在端点处 $f$ 和 $g$ 同阶，即其比值的极限存在，则 $f$ 和 $g$ 同敛散。
+    具体而言，比如要判断 $0$ 处端点是否可积，则可以用泰勒近似找一个同阶的幂函数，然后用下面的特例来判断即可；比如要判断无穷远处是否可积，则可以用抓大头的想法找一个同阶的幂函数，然后用下面的特例来判断即可。
+5. 特例：
+   $\int_{0}^t \frac{1}{x^p}dx$ 收敛当且仅当  $p<1$；$\int_{t}^{\infty} \frac{1}{x^p}dx$ 收敛当且仅当 $p>1$。
+
 ## 积分应用
 
 求体积
@@ -75,3 +89,26 @@ $$
 $$
 \bar{x}= \frac{\int \tilde{x}dA}{A}, y=\frac{\int \tilde{y}dA}{A}
 $$
+
+求定积分的数值估计
+**The Trapezoidal Rule：** 用梯形近似面积。
+
+$$
+T= \frac{\Delta x}{2}(y_{0}+2y_{1}+2y_{2}+\dots +2y_{n-1}+y_{n})
+$$
+误差：$$
+|E_{T}| \leq \frac{M(b-a)^3}{12n^2}
+$$
+其中 $M$ 是 $f''$ 的上界。
+
+**Simpson’s Rule：** 用抛物线近似面积。
+
+$$
+S=\frac{\Delta x}{3}(y_{0}+4y_{1}+2y_{2}+\dots+2y_{n-2}+4y_{n-1}+y_{n})
+$$
+其中 $n$ 为偶数。
+误差：
+$$
+|E_{S}| \leq \frac{M(b-a)^5}{180n^4}
+$$
+其中 $M$ 是 $f^{(4)}$ 的上界。

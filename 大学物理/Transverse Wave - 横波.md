@@ -1,4 +1,4 @@
-
+[[Oscillations - 振动]]
 **横波（Transverse Wave）** 指质点振动方向与波传播方向相反的波。
 
 向右传播的波可以写成 $y(x,t)=f(x - vt)$ 的形式。
@@ -76,3 +76,5 @@ $$
 ![[Wave-4.png]]
 3. 两边都是软边界的情况，需要 $L=n \frac{\lambda}{2}$：
 ![[Wave-5.png]]
+
+注意，所谓 $\text{nth harmonic}$ ，可以理解成谐波的频率 $f_{n}=nf_{1}$，其中 $f_{1}$ 为 $\text{Foundamental Frequency}$；所谓 $\text{nth lowest harmonic}$，对一边硬边界一边软边界的情况，则取第 $n$ 个可以形成谐波的频率。

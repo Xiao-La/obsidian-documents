@@ -1,3 +1,4 @@
+前置：[[Antiderivative and Integral - 积分]]
 自然对数（Natural Logarithm）的定义：
 $$
 \ln x=\int_{1}^x \frac{1}{t}dt
