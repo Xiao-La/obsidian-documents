@@ -151,3 +151,55 @@ $$
 $$
 也就是说，不存在第一类永动机。
 自由膨胀（Free Expansion）中，$Q=W=0$。
+
+### 热机
+
+利用循环过程做功，这需要过程的 $\text{p-V}$ 图线是顺时针方向的闭合曲线。
+![[Thermodynamics-1.png]]
+
+热机效率 $\varepsilon= \frac{|W|}{|Q_{H}|}=1-\frac{|Q_{L}|}{|Q_{H}|}$。
+对于理想卡诺热机：
+![[Thermodynamics-2.png]]
+对整个过程，$|Q|=|W|=Q_{\text{in}}-Q_{\text{out}}$。而且通过绝热过程的方程可推 $\frac{V_{2}}{V_{1}}=\frac{V_{3}}{V_{4}}$。
+有 $W=RT_{H}\ln \frac{V_{2}}{V_{1}}-RT_{L} \frac{V_{3}}{V_{4}}=R(T_{H}-T_{C})\ln \frac{V_{2}}{V_{1}}$，$Q_{H}=RT_{H}\ln \frac{V_{2}}{V_{1}}$。
+那么 $0\leq \varepsilon = 1- \frac{T_{C}}{T_{H}}<1$ 。
+
+卡诺指出，不同的热机在冷源和热源温度一致时，卡诺热机的效率是最高的。
+### 制冷机
+![[Thermodynamics-3.png]]
+$K= \frac{|Q_{L}|}{|W|}=\frac{|Q_{L}|}{|Q_{H}|-|Q_{L}|}= \frac{T_{L}}{T_{H}-T_{L}}$。
+
+
+### 热力学第二定律
+
+克劳修斯表述：热量不能自发地从低温物体传递到高温物体。
+
+开尔文表示：不可能从单一热源吸取热量并将其完全转化为有用的功而不产生其他影响。
+
+实质：自发发生的热现象有方向性，一切与热现象的实际过程都是不可逆的。
+
+#### 熵
+
+定义熵变（Entropy Change）：
+
+$$dS=\frac{dQ_{\text{rev}}}{T}$$
+那么理想气体可逆过程的熵变：
+$$
+\Delta S= \int \frac{dE+dW}{T}= \int \frac{nC_{v}}{T}dT + \int \frac{nR}{V}dV=nC_{v} \ln \frac{T_{2}}{T_{1}} + nR \ln \frac{V_{2}}{V_{1}}
+$$
+一些特例：
+1. 等压过程（Isobaric Process）：$\Delta S=nC_{p} \ln \frac{T_{2}}{T_{1}}$。
+2. 等温过程（Isothermal Process）：$\Delta S= nR\ln \frac{V_{2}}{V_{1}}$ 。
+3. 绝热过程（Adiabatic Process）：$\Delta S=0$。
+4. 等容过程（Isochoric Process）：$\Delta S = nC_{v} \ln \frac{T_{2}}{T_{1}}=nC_{v} \ln \frac{p_{2}}{p_{1}}$。
+5. 相变（Phase Change）：$\Delta S=\frac{\Delta Q}{T}=\frac{Lm}{T}$。
+6. 同相变温（Same Phase, Change in Temperature）：$\Delta S= \int \frac{dQ}{T}=\int \frac{cm}{T}dT=cm\ln \frac{T_{2}}{T_{1}}$
+**熵增定律（热力学第二定律）：** 绝热过程中 $S_{f}-S_{i}\geq 0$，当且仅当过程可逆时取等。
+推论：孤立系统的熵永远不减，达到平衡态时熵达到最大值。
+
+熵的统计解释：
+$$
+S=k\ln W
+$$
+其中 $W$ 为微观状态数（Microstates）。
+实际计算使用斯特林近似：$\ln N!\sim N(\ln N)-N$

@@ -1,6 +1,6 @@
 前置： [[Transverse Wave - 横波]]
 
-**纵波（longitudinal Wave）** 指质点振动方向与波传播方向相同的波。
+**纵波（Longitudinal Wave）** 指质点振动方向与波传播方向相同的波。
 
 **声波（Sound Waves）** 是一种常见的纵波。
 声波的波速：
@@ -61,7 +61,7 @@ $$
 
 ### 节拍
 
-两列波 $s_{1}=s_{m}\cos \omega_{1}, s_{2}=s_{m} \cos \omega_{2}$，那么它们的叠加 $s = 2s_{m} \cos \frac{\omega_{1}-\omega_{2}}{2}  \cos \frac{\omega_{1}+\omega_{2}}{2}$
+两列波 $s_{1}=s_{m}\cos \omega_{1}t, s_{2}=s_{m} \cos \omega_{2}t$，那么它们的叠加 $s = 2s_{m} \cos (\frac{\omega_{1}-\omega_{2}}{2}t)  \cos (\frac{\omega_{1}+\omega_{2}}{2}t)$
 叠加会形成这样的波形：
 ![[Wave-7.png]]
 $\omega_{\text{beat}}=|\omega_{1}-\omega_{2}|, f_{\text{beat}}=|f_{1}-f_{2}|$

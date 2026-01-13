@@ -32,7 +32,6 @@
 
 **Lower / Upper Sum**：取区间的最小值/最大值为代表做黎曼和。
 **Average Value** $\text{av}(f) = \frac{1}{b-a}\int^{b}_{a}f(x)dx$ 。
-**Improper Integral：**$\int^{\infty}_{a}f(x)dx=\lim_{ t \to \infty}\int^{t}_{a}f(x)dx$
 **Centroid：** 几何中心，即质量均匀的物体的质心
 **Improper Integral（反常积分）：**
 1. Type 1： $\int_{b}^{\infty}ydx=\lim_{ a \to \infty } \int _b^a  ydx$
@@ -54,7 +53,7 @@
 - Washer Method: 对截面进行积分 $V=\int \text{截面面积}(x)dx$
 - Shell Method: 旋转体可看成圆柱面的累加：$\int 2\pi \times\text{半径}(x)\times高度(x)dx$
   - 其中半径是 $x$ 到旋转轴的距离，高度为 $x$ 处的被旋转面的截线长
-- Pappus’s Theorem for Volumes: $V=2\pi \rho A$，即旋转面面积乘质心到转轴的距离
+- Pappus’s Theorem for Volumes: $V=2\pi \rho A$，即旋转面面积乘质心走的距离
 
 求弧长
 $$
@@ -67,7 +66,7 @@ $$
 $$
 A=\int^{b}_{a}2\pi f(x)\sqrt{ 1+[f'(x)]^2 } dx
 $$
-- Pappus’s Theorem for Surface Areas：$A=2\pi \rho L$，即弧长乘质心到转轴的距离
+- Pappus’s Theorem for Surface Areas：$A=2\pi \rho L$，即弧长乘质心走的距离
 
 求平面图形质心
 $$

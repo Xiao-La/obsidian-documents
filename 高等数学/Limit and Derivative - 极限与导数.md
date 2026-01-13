@@ -51,6 +51,7 @@ Concave Up 和 Concave Down：$f''(x)>0$ 或 $f''(x)<0$。
 - **罗尔定理（Rolle's Theorem）：**
   - 适用条件：$f$ 在 $[a,b]$ 上连续、在 $(a,b)$ 内可导，且 $f(a)=f(b)$。
   - 结论：存在 $c\in(a,b)$ 使 $f'(c)=0$。
+  - 常用来证明等式。
 
 - **拉格朗日中值定理（The Mean Value Theorem, Lagrange MVT）：**
   - 适用条件：$f$ 在 $[a,b]$ 上连续、在 $(a,b)$ 内可导。
@@ -58,6 +59,7 @@ Concave Up 和 Concave Down：$f''(x)>0$ 或 $f''(x)<0$。
     $$
     f'(c)=\frac{f(b)-f(a)}{b-a}.
     $$
+  - 常用来证明不等式。
 
 - **柯西中值定理（Cauchy Mean Value Theorem, CMVT）：**
   - 适用条件：$f,g$ 在 $[a,b]$ 上连续、在 $(a,b)$ 内可导，且 $g(b)\ne g(a)$。

@@ -144,7 +144,7 @@ Q=nC_{p}\Delta T= (\frac{C_{p}}{R}) p\Delta V
 $$
 从而有
 $$
-E_{\text{int}}=Q-W=\left( \frac{C_{v}}{R} \right)p\Delta V=nC_{v}\Delta T
+\Delta E_{\text{int}}=Q-W=\left( \frac{C_{v}}{R} \right)p\Delta V=nC_{v}\Delta T
 $$ 
 #### 绝热（Adiabatic）
 $$
@@ -154,6 +154,10 @@ $$W=-\Delta E_{\text{int}}=-nC_{v}\Delta T=\frac{C_{v}}{R}(p_{i}V_{i}-p_{f}V_{f}
 绝热过程的过程方程为
 $$
 pV^\gamma=1
+$$
+或 
+$$
+TV^{\gamma-1}=1
 $$
 其中 $\gamma=\frac{C_{p}}{C_{v}}>1$ ，那么绝热过程的曲线比等温过程的曲线更陡峭。
 
