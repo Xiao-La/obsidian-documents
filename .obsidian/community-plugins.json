@@ -8,5 +8,7 @@
   "obsidian-git",
   "obsidian-latex-suite",
   "obsidian-image-layouts",
-  "obsidian-pandoc"
+  "obsidian-pandoc",
+  "pseudocode-in-obs",
+  "obsidian-paste-image-rename"
 ]
