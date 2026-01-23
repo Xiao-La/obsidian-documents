@@ -142,13 +142,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "大学物理/Rotation - 定轴转动.md",
+                "file": "计算机/Harvard CS50 - AI/1 - Knowledge.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Rotation - 定轴转动 的大纲"
+              "title": "1 - Knowledge 的大纲"
             }
           },
           {
@@ -180,7 +180,7 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "31271abb7afa9ba4",
+  "active": "27e09d2e6f85f1b4",
   "lastOpenFiles": [
     "计算机/Harvard CS50 - AI/0 - Search.md",
     "计算机/Harvard CS50 - AI/1 - Knowledge.md",
