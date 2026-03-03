@@ -1,14 +1,13 @@
-
 ### Search Problem
 
-Concepts: Agent, State (Initial State), Actions, Transition Model, State Space, Goal Test, Path Cost.
+Concepts: Agent（智能体）, State（状态） (Initial State（初始状态）), Actions（动作）, Transition Model（转移模型）, State Space（状态空间）, Goal Test（目标测试）, Path Cost（路径代价）.
 
->  **Transition Model:** A function $\text{Result(s, a)}$ returns the state resulting from performing action $\text{a}$ in state $\text{s}$.
+>  **Transition Model（转移模型）:** A function $\text{Result(s, a)}$ returns the state resulting from performing action $\text{a}$ in state $\text{s}$.
 ### Solving Search Problem
 
-Concepts: Solution (Optimal Solution), Node, Frontier
+Concepts: Solution（解） (Optimal Solution（最优解）), Node（节点）, Frontier（前沿/边界）
 
->  **Frontier:** the mechanism that “manages” the _nodes_. 
+>  **Frontier（前沿/边界）:** the mechanism that “manages” the _nodes_. 
 
 Search Processes: Repeat
 1. If the frontier is empty: Stop. There is no solution to the problem.
@@ -16,59 +15,59 @@ Search Processes: Repeat
 3. If the node contains the goal state: Return the solution. Stop.
     Else,
     - Expand the node (find all the new nodes that could be reached from this node), and add resulting nodes to the frontier.
-    * Add the current node to the explored set.
-### Depth-First Search, DFS
+    * Add the current node to the explored set（已探索集合）.
+### Depth-First Search, DFS（深度优先搜索）
 
-DFS uses a **stack** as the frontier.
+DFS uses a **stack（栈）** as the frontier.
 
-### Breadth-First Search, BFS
+### Breadth-First Search, BFS（广度优先搜索）
 
-BFS uses a **queue** as the frontier.
+BFS uses a **queue（队列）** as the frontier.
 
->  Guaranteed to find the optimal solution.
+>  Guaranteed to find the optimal solution（保证找到最优解）.
 
-### Greedy Best-First Search, GBFS
+### Greedy Best-First Search, GBFS（贪心最佳优先搜索）
 
-Concepts: Uninformed / Informed Search Algorithm.
+Concepts: Uninformed / Informed Search Algorithm（无信息/有信息〔启发式〕搜索算法）.
 
->  **Informed Search Algorithm**: Consider additional knowledge to improve its performance.
+>  **Informed Search Algorithm（有信息/启发式搜索算法）**: Consider additional knowledge to improve its performance.
 
 GBFS expands node with lowest value of $h(n)$.
 
 $h(n)=\text{estimate cost to goal}$
 
->  Not guaranteed to find the optimal solution.
+>  Not guaranteed to find the optimal solution（不保证找到最优解）.
 
-### A* Search
+### A* Search（A* 搜索）
 
 A* search expands node with lowest value of $h(n)+g(n)$. 
 
 $g(n)=\text{cost to reach node}$ 
 
-- $h(n)$ is **admissive（可接受的）** if $0\leq h(n)\leq h^*(n)$ ($h^*(n)$ is the real cost to goal).
+- $h(n)$ is **admissive（可采纳）** if $0\leq h(n)\leq h^*(n)$ ($h^*(n)$ is the real cost to goal).
 - $h(n)$ is **consistent（一致的）** if $h(n)\leq h(n')+\text{cost}(n\to n')$.
 
->  A* search is optimal if $h(n)$ is admissive and consistent.
-### Minimax & Alpha-Beta Pruning
+>  A* search is optimal（最优） if $h(n)$ is admissive and consistent.
+### Minimax & Alpha-Beta Pruning（极大极小与 α-β 剪枝）
 
 Concepts: Adversarial Search（对抗搜索）
-#### Game
+#### Game（博弈）
 
-- Initial State $S_{0}$
-- $\text{Player}(s)$, $\text{Actions}(s)$, $\text{Result}(s, a)$, $\text{Terminal}(s)$, $\text{Utility}(s)$
-#### Minimax
+- Initial State $S_{0}$（初始状态）
+- $\text{Player}(s)$（玩家）, $\text{Actions}(s)$（动作）, $\text{Result}(s, a)$（结果/转移）, $\text{Terminal}(s)$（终止）, $\text{Utility}(s)$（效用）
+#### Minimax（极大极小）
 
 Given a state $s$
 
-- The **maximizing player** picks action $a$ in $\text{Actions}(s)$ that produces the highest value of $\text{Min-Value}(\text{Result}(s, a))$.
-- The **minimizing player** picks action _a_ in $\text{Actions}(s)$ that produces the lowest value of $\text{Max-Value}(\text{Result}(s, a))$.
+- The **maximizing player（最大化玩家）** picks action $a$ in $\text{Actions}(s)$ that produces the highest value of $\text{Min-Value}(\text{Result}(s, a))$.
+- The **minimizing player（最小化玩家）** picks action _a_ in $\text{Actions}(s)$ that produces the lowest value of $\text{Max-Value}(\text{Result}(s, a))$.
 
-#### Alpha-Beta Pruning
+#### Alpha-Beta Pruning（α-β 剪枝）
 
 Keep tracking: 
-- $\alpha$: The lower bound of the score that the maximizing player can reach.
-- $\beta$: The upper bound of the score that the minimizing player can reach.
-If $\alpha \geq \beta$ happens for a node, there is no need to expand the node any more.
+- $\alpha$: The lower bound（下界） of the score that the maximizing player can reach.
+- $\beta$: The upper bound（上界） of the score that the minimizing player can reach.
+If $\alpha \geq \beta$ holds for a node, there is no need to expand the node any more.
 ![[0 - Search-2.png]]
 
 ```pseudo

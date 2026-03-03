@@ -4,11 +4,12 @@
   "obsidian-vimrc-support",
   "vim-im-select",
   "surfing",
-  "obsidian-completr",
   "obsidian-git",
   "obsidian-latex-suite",
   "obsidian-image-layouts",
   "obsidian-pandoc",
   "pseudocode-in-obs",
-  "obsidian-paste-image-rename"
+  "obsidian-paste-image-rename",
+  "better-export-pdf",
+  "obsidian-latex"
 ]

@@ -23,11 +23,7 @@ $$
 $$
 - 以下公式最好直接背，因为三角换元容易造成难以处理的绝对值：
   $$
-\begin{align}
 \frac{1}{\sqrt{ x^2\pm a^2}} = \ln|x+\sqrt{ x^2\pm a^2 }|
-
-\end{align}
-
 $$
 ### 换元（Substitution）
 

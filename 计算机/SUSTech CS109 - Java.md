@@ -8,7 +8,7 @@ Java 之父：James Gosling。
 Java 从源代码到运行：
 1. 编译器：编译源代码到**字节码**。`javac Main.java`
 2. 解释器（JVM）：读取，识别，**解释**，运行字节码。`java Main`
-3. 
+
 JVM：Java Virtual Machine，运行程序的虚拟机。
 JRE：Java Runtime Environment = JVM + 核心类库。
 JDK：Java Development Kit = JRE + 开发工具
