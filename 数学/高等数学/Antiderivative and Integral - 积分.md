@@ -1,6 +1,15 @@
 前置： [[Limit and Derivative - 极限与导数]]
+## 概念与定义
+
 定积分的定义：对黎曼和 $\sum^{n}_{i=1}f\left( a+ \frac{b-a}{n} i \right) \times \frac{b-a}{n}$ 取极限。
-## 定理总结
+**Lower / Upper Sum**：取区间的最小值/最大值为代表做黎曼和。
+**Average Value** $\text{av}(f) = \frac{1}{b-a}\int^{b}_{a}f(x)dx$ 。
+**Centroid：** 几何中心，即质量均匀的物体的质心
+**Improper Integral（反常积分）：**
+1. Type 1： $\int_{b}^{\infty}ydx=\lim_{ a \to \infty } \int _b^a  ydx$
+2. Type 2：定义在 $\left [ b,a \right)$ 上的函数 $y(x)$ ， $\int_{b}^a ydx= \lim_{ c \to a^- } \int_{b}^c ydx$
+
+## 定理
 
 - 积分中值定理（First Mean Value Theorem for Integrals）：
   - 适用条件：$f$ 在 $[a,b]$ 上连续。
@@ -28,14 +37,6 @@
     \frac{d}{dx}\int_{u(x)}^{v(x)} f(t)\,dt
     = f\!\big(v(x)\big)\,v'(x) \;-\; f\!\big(u(x)\big)\,u'(x).
     $$
-## 概念和记号
-
-**Lower / Upper Sum**：取区间的最小值/最大值为代表做黎曼和。
-**Average Value** $\text{av}(f) = \frac{1}{b-a}\int^{b}_{a}f(x)dx$ 。
-**Centroid：** 几何中心，即质量均匀的物体的质心
-**Improper Integral（反常积分）：**
-1. Type 1： $\int_{b}^{\infty}ydx=\lim_{ a \to \infty } \int _b^a  ydx$
-2. Type 2：定义在 $\left [ b,a \right)$ 上的函数 $y(x)$ ， $\int_{b}^a ydx= \lim_{ c \to a^- } \int_{b}^c ydx$
 
 ## 判断反常积分敛散性
 

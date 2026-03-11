@@ -4,21 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "6fcc980939c44041",
+        "id": "8fb93226bc904903",
         "type": "tabs",
         "children": [
           {
-            "id": "dc6d014d580a6753",
+            "id": "e30d54648188a3f3",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "大学物理/下/Electrostatics - 静电学.md",
+                "file": "数学/线性代数/The Properties of Matrices - 矩阵的性质.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Electrostatics - 静电学"
+              "title": "The Properties of Matrices - 矩阵的性质"
             }
           }
         ]
@@ -78,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 457.5
+    "width": 314.5
   },
   "right": {
     "id": "f29a0e88d7772e16",
@@ -180,53 +180,54 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "31271abb7afa9ba4",
+  "active": "e30d54648188a3f3",
   "lastOpenFiles": [
-    "未命名.base",
-    "大学物理/下/Electrostatics - 静电学.md",
-    "a.txt",
-    "preamble.sty",
-    "科学与文明史概论/History.md",
-    "科学与文明史概论/Insights.md",
-    "生命科学概论/Cell Biology - 细胞生物学.md",
-    "科学与文明史概论",
-    "数学/线性代数/Matrices and System of Linear Equations -  矩阵与线性方程组.md",
-    "数学/线性代数/Determinant - 行列式.md",
-    "数学/线性代数/Linear Transformation - 线性变换.md",
     "数学/线性代数/Problem Set - 题集.md",
-    "大学物理/上/Gravitation - 引力.md",
-    "大学物理/上/Oscillations - 振动.md",
-    "大学物理/上/Equilibrium and Elasticity - 平衡和弹性.md",
-    "杂类文档/Magic.md",
-    "杂类文档/SE III Debate Listening.md",
-    "杂类文档/Draft.md",
-    "大学物理/上/Rotation - 定轴转动.md",
-    "大学物理/上/Kinetic Theory of Gases - 气体动力学理论.md",
-    "大学物理/下",
-    "大学物理/上",
+    "数学/线性代数/The Properties of Matrices - 矩阵的性质.md",
+    "数学/线性代数/Matrices and System of Linear Equations -  矩阵与线性方程组.md",
+    "数学/线性代数/The Transpose of Matrices -  矩阵的转置.md",
+    "数学/线性代数/Determinant - 行列式.md",
+    "数学/高等数学/Antiderivative and Integral - 积分.md",
+    "计算机/SUSTech CS109 - Java.md",
+    "计算机/SUSTech CS104 - Logic/Propositional Logic - 命题逻辑.md",
     "数学/高等数学/Sequence and Series - 数列与级数.md",
+    "笔记依赖/图片/Propositional Logic - 命题逻辑-1.png",
+    "笔记依赖/图片/Propositional Logic - 命题逻辑.png",
+    "计算机/SUSTech CS104 - Logic/Prerequisite Knowledge - 预备知识.md",
+    "计算机/Harvard CS50 - AI/1 - Knowledge.md",
+    "生命科学概论/Brain and Mind - 脑与心智.md",
+    "大学物理/下/Electrostatics - 静电学.md",
+    "科学与文明史概论/History.md",
+    "生命科学概论/Cell Biology - 细胞生物学.md",
+    "数学/高等数学/Integral Techniques - 积分技巧.md",
+    "数学/高等数学/Limit and Derivative - 极限与导数.md",
+    "笔记依赖/图片/Brain and Mind - 脑与心智.png",
+    "大学物理/上/Oscillations - 振动.md",
+    "大学物理/上/Gravitation - 引力.md",
+    "大学物理/上/Equilibrium and Elasticity - 平衡和弹性.md",
+    "大学物理/上/Rolling and Precession - 滚动和进动.md",
+    "大学物理/上/Rotation - 定轴转动.md",
+    "笔记依赖/图片/Electrostatics - 静电学.png",
+    "大学物理/上/Thermodynamics - 热力学.md",
+    "杂类文档/Magic.md",
+    "笔记依赖/图片/Prerequisite Knowledge - 预备知识.png",
     "数学/高等数学/Transcendental Function - 超越函数.md",
     "数学/高等数学/Differential Equation - 微分方程.md",
-    "数学/高等数学/Limit and Derivative - 极限与导数.md",
-    "计算机/SUSTech CS104 - Logic/1.md",
-    "计算机/Harvard CS50 - AI/1 - Knowledge.md",
-    "计算机/SUSTech CS109 - Java.md",
+    "未命名.base",
+    "a.txt",
+    "preamble.sty",
+    "科学与文明史概论",
+    "大学物理/下",
+    "大学物理/上",
     "计算机/SUSTech CS104 - Logic",
     "生命科学概论",
-    "计算机/Harvard CS50 - AI/0 - Search.md",
-    "数学/高等数学/Antiderivative and Integral - 积分.md",
     "笔记依赖/图片/2 - Uncertainty.png",
     "笔记依赖/图片/Pasted image 20260219173941.png",
     "笔记依赖/伪代码",
     "笔记依赖/图片/0 - Search-2.png",
     "笔记依赖/图片/0 - Search-1.png",
     "笔记依赖/图片/0 - Search.png",
-    "笔记依赖/图片/Pasted image 20260121221627.png",
     "计算机/MIT Missing Semester",
-    "笔记依赖/图片/CS109 - 5.png",
-    "笔记依赖/图片/CS109 - 4.png",
-    "笔记依赖/图片/CS109 - 3.png",
-    "笔记依赖/图片/CS109 - 2.png",
     "未命名.canvas"
   ]
 }

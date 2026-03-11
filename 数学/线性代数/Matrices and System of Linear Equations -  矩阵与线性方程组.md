@@ -1,18 +1,10 @@
-## 概念与记号
+## 矩阵基本概念
 
 $m$ 行 $n$ 列的矩阵可记成 $\mathbf{A}=[a_{ij}]_{m\times n}$
 
-单位矩阵/恒等矩阵（Identity Matrix）：记作 $\mathbf{I}_{n}$ ，其中  $a_{i,i}=1$，其他为 $0$ 的方矩阵。
-
-置换矩阵（Permutation Matrix）：每行每列都恰有一个 $1$ 的矩阵，用它去乘另一个矩阵，可以交换矩阵的某些行（相当于对单位矩阵交换某些行），对应一种初等行变换。
-
-定义矩阵 $\mathbf{E}_{ij}(l)(i \neq j)$ 为将 $\mathbf{I}_{n}$ 中的 $(i,j)$ 位置替换为 $l$ 得到的矩阵，则它乘以另一个矩阵相当于把该矩阵的第 $j$ 行乘以 $l$ 加到第 $i$ 行上去，对应一种初等行变换。
-
-矩阵的逆（Inverse）：$\mathbf{A}$ 的逆记作 $\mathbf{A}^{-1}$，符合 $\mathbf{A}^{-1}\mathbf{A}=\mathbf{I}$。
-矩阵的转置（Transpose）：$\mathbf{A}$ 的转置记作 $\mathbf{A}^T$ ，其中 $a_{ij}'= a_{ji}$。
-
 矩阵的线性运算（加减，数乘）和向量是一样的，直接对对应的分量（Entry）运算。
 
+单位矩阵/恒等矩阵（Identity Matrix）：记作 $\mathbf{I}_{n}$ ，其中 $a_{i,i}=1$，其他为 $0$ 的方矩阵。
 ## 矩阵乘法 (Matrix Multiplication)
 
 $n\times m$ 和 $m \times p$ 的矩阵可以相乘得到一个 $n\times p$ 的矩阵，矩阵 $\mathbf{A}$ 和矩阵 $\mathbf{B}$ 相乘，得到矩阵 $\mathbf{C}$ 中的第 $i$ 行第 $j$ 列的数为
@@ -53,69 +45,22 @@ $$
 
 方矩阵的幂： $\mathbf{A}^0=\mathbf{I}_{n}, \mathbf{A}^k=\mathbf{A}^{k-1}\mathbf{A}$。
 一个矩阵与单位矩阵相乘会得到它自己，与零矩阵相乘会得到零矩阵。
-## 矩阵的逆（Inverse）
 
-方矩阵的逆，指与它相乘为单位矩阵的矩阵。
-#### 求二阶矩阵的逆
-$$
-\mathbf{A}=\begin{bmatrix}
-a & b \\
-c & d
-\end{bmatrix}
-$$
- 的逆为 
- $$
-\mathbf{A}^{-1}=\frac{1}{\det(\mathbf{A})} \begin{bmatrix}
-d & -b \\
--c & a
-\end{bmatrix}
-$$
-#### 求三阶矩阵的逆
-$$
-\mathbf{A}=\begin{bmatrix}
-a_{11} & a_{12} & a_{13} \\
-a_{21} & a_{22} & a_{23} \\
-a_{31} & a_{32} & a_{33}
-\end{bmatrix}
-$$
-需要先构造余子式的矩阵
-$$
-\mathbf{M}= \begin{bmatrix}
-M_{11} & M_{12} & M_{13} \\
-M_{21} & M_{22} & M_{23} \\
-M_{31} & M_{32} & M_{33}
-\end{bmatrix}
-$$
-再交替添负号
-$$
-\mathbf{C}=\begin{bmatrix}
-M_{11} & -M_{12} & M_{13} \\
--M_{21} & M_{22} & -M_{23} \\
-M_{31} & -M_{32} & M_{33}
-\end{bmatrix}
-$$
-最后做转置
-$$
-\mathbf{C}^T=\begin{bmatrix}
-M_{11} & -M_{21} & M_{31} \\
--M_{12} & M_{22} & -M_{32} \\
-M_{13} & -M_{23} & M_{33}
-\end{bmatrix}
-$$
-那么
-$$
-\mathbf{A}^{-1}=\frac{1}{\det(\mathbf{A})}\mathbf{C}^T
-$$
-即 $a_{ij}'=\frac{1}{\det(\mathbf{A})}M_{ji} (-1)^{i+j}$ 。
+### 基于乘法的特殊变换矩阵
+
+置换矩阵（Permutation Matrix）：每行每列都恰有一个 $1$ 的矩阵。用它左乘另一个矩阵，可以交换矩阵的某些行。
+
+**初等矩阵：**
+- 可交换两行的置换矩阵。
+- 将 $\mathbf{I}_{n}$ 中的 $(i,j)$ 位置替换为 $l$ 得到的矩阵。用它左乘另一个矩阵，可以把该矩阵的第 $j$ 行乘以 $l$ 加到第 $i$ 行上去。
+- 将单位矩阵中第 $i$ 行的 $1$ 替换为 $k$ 的到的矩阵。用它左乘以另一个矩阵，可以把该矩阵的第 $i$ 行乘以 $k$。
+>  【左行右列】以上如果换成右乘这些变换矩阵，会变成初等列变换。
+
+
 ## 线性方程组（Linear System）
 
-用矩阵可以表示线性方程组，解 $n$ 阶方程组就可以通过求 $n$ 阶方矩阵的逆得到。
+用矩阵可以表示线性方程组：$\mathbf{A}\mathbf{x}=\mathbf{b}$，其中 $\mathbf{A}$ 为线性方程组的系数矩阵（Coefficient Matrix）。 
 
-$$
-\mathbf{A}\mathbf{x}=\mathbf{b}
-\implies \mathbf{x}=\mathbf{A}^{-1}\mathbf{b}
-$$
-其中 $\mathbf{A}$ 为线性方程组的系数矩阵（Coefficient Matrix）。 
 将线性方程组的系数矩阵右侧添加常数列，就构成了增广矩阵（Augmented Matrix），记作 $[\mathbf{A}|\mathbf{b}]$。
 
 ### 行观点和列观点
@@ -123,11 +68,12 @@ $$
 若线性方程组至少有一组解，则称其为相容的（Consistent），反之则为不相容的（Inconsistent）。
 - 行观点（Row Picture）：每个方程表示一个平面。线性方程组相容，当且仅当所有平面有非空交。
 - 列观点（Column Picture）：方程组表示了向量的线性组合。线性方程组相容，当且仅当常数列表示的向量落在系数列表示的向量张成的空间。
-
 ### 线性方程组的奇异性
 
 奇异（Singular）：没有解或无穷多组解。
 非奇异 （Nonsingular）：有且仅有一组解。
+从而可以定义矩阵的奇异性： $\mathbf{A}$ 是非奇异矩阵当且仅当 $\forall \mathbf{b},\mathbf{A}\mathbf{x}=\mathbf{b}$ 非奇异。
+## 高斯消元与 LU 分解
 
 ### 高斯消元法
 
@@ -140,4 +86,33 @@ $$
 2. 回代（Back Substitution）。
 
 >  每一行中第一个非零的元素称为主元（Pivots）。
+
+### LU 分解 （LU factorization）
+
+假设矩阵 $\mathbf{A}$ 进行高斯消元之后得到上三角矩阵（Upper triangular matrix） $\mathbf{U}$，则它可以分解为：
+$$
+\mathbf{A}=\mathbf{L}\mathbf{U}
+$$
+其中 $\mathbf{L}$ 是下三角矩阵（Lower triangle matrix），对角元素为 $1$。高斯消元的乘子（Multiplier）记录在对角线（Diagonal）的下方。
+- $l_{ij}$ 表示高斯消元中的步骤：$E_{i} \leftarrow E_{i}-l_{ij}E_{j}$。
+$\mathbf{U}$ 是上三角矩阵，对角元素为主元。
+
+>  若发现高斯消元中需要进行交换两行的操作，则引入 $\mathbf{A}'=\mathbf{P}\mathbf{A}$，然后再对 $\mathbf{A}'$ 进行高斯消元。一般的，有：
+>  $$
+\mathbf{P}\mathbf{A}=\mathbf{L}\mathbf{U}
+$$
+
+若已知 LU 分解，则可以把方程 $\mathbf{A}\mathbf{x}=\mathbf{b}$ 转换为：
+$$
+\begin{cases}
+ \mathbf{U}\mathbf{x}=\mathbf{c} \\
+\mathbf{Lc}=\mathbf{b}
+\end{cases}
+$$
+这两个方程都是行阶梯形的，非常好解。
+
+>  LU 分解的唯一性：若 $\mathbf{A}=\mathbf{L}_{1}\mathbf{U}_{1}=\mathbf{L}_{2}\mathbf{U}_{2}$，且 $\mathbf{L}_{1}, \mathbf{L}_{2}$ 的对角元素都是 $1$，则 $\mathbf{L}_{1}=\mathbf{L}_{2}, \mathbf{R}_{1}=\mathbf{R}_{2}$。
+
+>  LDU 分解：使用对角矩阵 $\mathbf{D}$ （对角元素为主元）使得 $\mathbf{L}, \mathbf{U}$ 的对角元素都是 $1$。
+
 

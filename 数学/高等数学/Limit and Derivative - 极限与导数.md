@@ -1,5 +1,5 @@
 
-## 定义总结
+## 概念与定义
 
 函数连续（Continuous）的定义： $\lim_{ x \to c }f(x)=f(c)$
 
@@ -21,7 +21,7 @@ Concave Up 和 Concave Down：$f''(x)>0$ 或 $f''(x)<0$。
 
 大 O 记号（big-oh Notation）： $f=O(g)$（“$f$ is big-oh of $g$”），当的阶小于或等于 $g$  的阶，即 $\lim\limits_{x\to\infty}\frac{f(x)}{g(x)}\le M$
 
-## 定理总结
+## 定理
 
 - **夹逼定理（The Sandwich Theorem）**：
   - 适用条件：存在 $a\in\mathbb{R}$，在 $a$ 的某去心邻域内有
