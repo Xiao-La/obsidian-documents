@@ -25,3 +25,9 @@ $$
 $$
 A=\frac{1}{2}\int_{\theta_{1}}^{\theta_{2}} r^2d\theta
 $$
+### 求弧长
+
+$$
+L= \int_{\theta_{1}}^{\theta_{2}} \sqrt{ r^{2}+\left( \frac{dr}{d\theta} \right)^{2} } d\theta
+$$
+

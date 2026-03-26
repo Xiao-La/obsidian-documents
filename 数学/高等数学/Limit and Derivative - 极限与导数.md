@@ -120,10 +120,18 @@ Concave Up 和 Concave Down：$f''(x)>0$ 或 $f''(x)<0$。
 
 ## 泰勒公式
 
-泰勒公式（Taylor Formula）给出 $f(x)$ 在 $x_{0}$ 处的多项式近似：
+若函数 $f$ 在包含 $a$ 的开区间 $I$ 上存在各阶导数，则对任意正整数 $n$ 及任意 $x\in I$，有泰勒展开
 
+$$f(x)=\left(\sum^{n}_{i=0}\frac{f^{(i)}(a)(x-a)^i}{i!}\right)+R_n(x)$$
+
+余项 $R_n(x)=\dfrac{f^{(n+1)}(c)}{(n+1)!}(x-a)^{n+1}$，其中 $c$ 位于 $a$ 与 $x$ 之间。
+**余项估计定理（Remainder Estimation Theorem）：** 若存在正常数 $M$ 使得
+$$|f^{(n)}(x)|\leq M$$
+对每个 $n\geq 0$ 成立，则该级数收敛到 $f(x)$。
+
+若此时 $R_{n}\to 0$ 当 $n\to \infty$ 对 $x \in I$ 恒成立，则 $f$ 在 $x=a$ 处的泰勒展开收敛到 $f$，记作
 $$
-\sum^{\infty}_{i=0} \frac{f^{(i)}(x_{0})(x-x_{0})^i}{i!}
+f(x)=\sum^{\infty}_{i=0} \frac{f^{(i)}(a)(x-a)}{i!}
 $$
 麦克劳林级数（Maclaurin series）是在 $0$ 处的泰勒公式。 
 一些常见函数的麦克劳林展开：
@@ -153,3 +161,7 @@ $$
 $$
 这几个都可以互推。
 注意，前两个公式收敛需要 $|x|<1$，最后一个公式收敛需要 $-1<x\leq 1$。
+特别的，
+$$
+\ln(\cos x)=\ln\left( 1-\frac{x^2}{2}+o(x^2) \right)=-\frac{x^2}{2}+o(x^2)
+$$

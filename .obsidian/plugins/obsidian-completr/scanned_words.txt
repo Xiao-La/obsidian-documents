@@ -6701,6 +6701,7 @@ Dipole
 Detect
 Definition
 Disjunction
+Differentiation
 Columns
 CA
 Co
@@ -66812,6 +66813,7 @@ triangular
 triangle
 transduction
 tree
+term
 xM
 xu
 xa

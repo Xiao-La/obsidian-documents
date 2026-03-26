@@ -71,3 +71,80 @@ $$
 \Phi = \vec{E} \cdot \vec{A}=|\vec{E}||\vec{A}|\cos \theta
 $$
 对于一个闭合曲面（高斯曲面，Gaussian Surface），里面放一个正电荷，则总电通量必然为正；放一个负电荷，则总电通量必然为负。
+$$
+\Phi = \oint \vec{E} \cdot d\vec{A}
+$$
+对于一个球：
+$$
+\Phi=\oint \frac{1}{4\pi\varepsilon_{0}} \frac{q}{r^{2}}dA=\frac{1}{4\pi \varepsilon_{0}} \frac{q}{r^{2}}4\pi r^{2}=\frac{q}{\varepsilon_{0}}
+$$
+进一步推广，得到 **高斯定律（Gauss's Law）**：对于高斯曲面，它内部所包的电荷为 $q_{\text{enc}}$。则
+$$
+\Phi= \frac{q_{\text{enc}}}{\varepsilon_{0}}
+$$
+或
+$$
+\varepsilon_{0} \oint \vec{E}\cdot d\vec{A}=q_{\text{enc}}
+$$
+![[Electrostatics - 静电学-1.png|364]]
+例如无穷大均匀带电面的电场，满足 $q_{\text{enc}}=\sigma A=\varepsilon_{0} \oint EdA=\varepsilon_{0} E (2A)\implies E=\frac{\sigma}{2\varepsilon_{0}}$。
+从而平行板电容器的电场 $E=\frac{\sigma}{\varepsilon_{0}}$。 
+导体表面的电场也为 $E=\frac{\sigma}{\varepsilon_{0}}$ 。
+高斯定律主要适用于对称/近似无穷大的情况。
+
+对称：球对称，柱对称，平移对称，面对称。对不同的面选不一样的高斯曲面，一般是一个球或者圆柱。
+
+注意导体内部的电场恒为 $0$，也就是说，任取一个导体内的高斯曲面，它所包的电荷量都为 $0$。
+
+### 电势（Electric Potential）
+
+电势能 $\Delta U=-W=-q_{0}\int_{i}^f \vec{E}\cdot d\vec{s}$。
+定义电势 $V=\frac{U}{q_{0}}$，故有 $\Delta V=-\int_{i}^f \vec{E}\cdot d\vec{s}$。电势的单位为伏特（Volt）。
+定义无穷远处的电势为 $0$，且大地的电势为 $0$，则：
+$$
+V=-\int_{\infty}^f  \vec{E} \cdot d\vec{s}
+$$
+从这个式子可以得到：
+$$
+\vec{E_{s}}=-\frac{\partial V}{\partial s}
+$$
+也就是说，电场方向与电势降低的方向相同。在三维空间中：
+$$
+\vec{E}=-\left( \frac{\partial}{\partial x} \hat{i}+ \frac{\partial}{\partial y}\hat{j}+\frac{\partial}{\partial z}\hat{k}\right)V
+=- \vec{\nabla} V
+$$
+点电荷的电势：
+$$
+V=\frac{1}{4\pi \varepsilon_{0} } \frac{q}{r}
+$$
+那么求电势的两种方法：
+- 若电场不好求，用叠加原理： $$
+V=\int dV=\frac{1}{4\pi\varepsilon_{0}} \int \frac{dq}{r}
+$$
+- 若电场好求，用定义：$$
+V=-\int_{\infty}^f  \vec{E} \cdot d\vec{s}
+$$
+电势相等的点组成**等势面（Equipotential surface）**，等势面与电场线垂直。
+由于金属内部电场为 $0$，金属都是**等势体**。
+
+假设某导体由一个小球（$Q_{1},R_{1}$）和一个大球（$Q_{2},R_{2}$）组成，则有
+$$
+\begin{cases}
+\frac{kQ_{1}}{R_{1}}=\frac{kQ_{2}}{R_{2}} (\text{电势相等}) \\
+4\pi R_{1}^2 E_{1}=\frac{Q_{1}}{\varepsilon_{0}}(\text{对小球列高斯定理}) \\
+4\pi R_{2}^{2}E_{2}=\frac{Q_{2}}{\varepsilon_{0}}(\text{对大球列高斯定理})
+\end{cases}
+$$
+则可以推出 $E_{1}R_{1}=E_{2}R_{2}$，且 $\sigma_{1}R_{1}=\sigma_{2}R_{2}$。可以理解为，导体中，表面曲率半径小的地方，所带的电荷更多，电场也更大。
+
+#### 电偶极子的电势
+
+![[Electrostatics - 静电学-2.png|204]] 
+$$
+\begin{align}
+V&=V_{(+)}+V_{(-)}=k\left( \frac{q}{r_{(+)}}-\frac{q}{r_{(-)}} \right) \\
+&=kq \frac{r_{(-)}-r_{(+)}}{r_{(+)}r_{{(-)}}}\\
+&\xlongequal{r\gg d} kq \frac{d\cos\theta}{r^{2}}\\
+&= \frac{1}{4\pi\varepsilon_{0}} \frac{p\cos\theta}{r^{2}}
+\end{align}
+$$

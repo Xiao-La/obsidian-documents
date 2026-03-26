@@ -116,3 +116,20 @@ $$
 >  LDU 分解：使用对角矩阵 $\mathbf{D}$ （对角元素为主元）使得 $\mathbf{L}, \mathbf{U}$ 的对角元素都是 $1$。
 
 
+
+
+### 解一般的方程组 Ax=b
+
+>  行最简形（Reduced row echelon form）：主元都是 $1$，且每个主元位置所在列都只有这个主元不为 $0$。
+
+一般的，对于 $\mathbf{A}\mathbf{x}=\mathbf{0}$，可以用初等行变换得到行最简形 $\mathbf{R}\mathbf{x}=\mathbf{0}$。
+把变量分为主元变量和自由变量。
+将自由变量其中一个赋值为 $1$，其他赋值为 $0$，会得到（ # 自由变量 ）个特解，它们的线性组合即为所有解 （也就是零空间 $N(\mathbf{A})$）。
+
+对一般的方程组 $\mathbf{A}\mathbf{x}=\mathbf{b}, \mathbf{b} \neq \mathbf{0}$，其中 $\mathbf{A}$ 为 $m\times n$ 矩阵：
+- $\mathbf{A}\mathbf{x}=\mathbf{b}\to \mathbf{U}\mathbf{x}=\mathbf{c}\to \mathbf{R}\mathbf{x}=\mathbf{d}$，有 $r$ 个主元行和 $r$ 个主元列，则 $\mathbf{A}$ 的秩（Rank）为 $r$。$\mathbf{U}$ 和 $\mathbf{R}$ 的最后 $m-r$ 行都是 $0$。故当且仅当 $\mathbf{c}$ 和 $\mathbf{d}$ 的最后 $m-r$ 个分量为 $0$ 时，原方程有解。
+  >  也就是说，原方程有解有 $m-r$ 个条件。
+- 完整的解集为： $\mathbf{x}=\mathbf{x}_{p}+\mathbf{x}_{n}$，其中 $\mathbf{x}_{p}$ 为使得所有自由变量为 $0$ 的 $\mathbf{A}\mathbf{x}=\mathbf{b}$ 的特解，$\mathbf{x}_{n}\in N(\mathbf{A})$（也就是解 $\mathbf{A}\mathbf{x}=\mathbf{0}$ 时将自由变量其中一个赋值为 $1$，其他赋值为 $0$，得到的 $n-r$ 个特解的线性组合）。
+  >  也就是说， $N(\mathbf{A})$ 有 $n-r$ 个特解。
+  
+  

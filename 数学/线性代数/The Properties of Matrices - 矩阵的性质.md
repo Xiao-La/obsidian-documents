@@ -17,6 +17,12 @@ $$
 性质：
 -  $(\mathbf{A}\mathbf{B})^{-1}=\mathbf{B}^{-1}\mathbf{A}^{-1}$。  
 - $(\mathbf{A}_{1}\dots \mathbf{A}_{n})^{-1}=\mathbf{A}_{n}^{-1}\mathbf{A}_{n-1}^{-1}\dots \mathbf{A}_{1}^{-1}$
+
+矩阵的左/右逆（Left/Right Inverse）：对 $m\times n$ 矩阵 $\mathbf{A}$，若存在 $\mathbf{B}$ 使得 $\mathbf{A}\mathbf{B}=\mathbf{I}_{m}$，则称 $\mathbf{B}$ 为 $\mathbf{A}$ 的右逆矩阵，$\mathbf{A}$ 为 $\mathbf{B}$ 的左逆矩阵。
+
+对一个 $m\times n$ 矩阵，它存在右逆等价于 $r=m$（行满秩，也说明 $C(\mathbf{A})=\mathbb{R}^m$）。类似的，存在左逆等价于 $r=n$（列满秩，也说明 $C(\mathbf{A}^T)=\mathbb{R}^n$）。推论：矩阵可逆的条件为 $r=m=n$。
+
+左右逆的最佳选择（Best Choices）$\mathbf{B}=(\mathbf{A}^T\mathbf{A})^{-1}\mathbf{A}^T, \mathbf{C}=\mathbf{A}^T(\mathbf{A}\mathbf{A}^T)^{-1}$。
 #### 高斯-约旦方法（Gauss-Jordan method）求逆
 
 $$
@@ -59,6 +65,8 @@ $$
  > - $\mathbf{A}\text{ is invertible}\Leftarrow \mathbf{A}\text{ has a full set of pivots} \Leftarrow \mathbf{A}\mathbf{x}=\mathbf{O}\text{ only has zero solution} \Leftarrow  \mathbf{A}\text{ is nonsingular}$
  > - $\mathbf{A}\text{ is invertible} \Rightarrow \mathbf{x}=\mathbf{A}^{-1}\mathbf{b}$  
 
+
+- $\mathbf{A}\text{ is invertible} \Leftrightarrow \mathbf{A}\mathbf{x}=\mathbf{0}\text{ only has zero solution}$ 
 #### 求二阶矩阵的逆
 
 $$
@@ -124,6 +132,7 @@ $$
 对称矩阵（Symmetric Matrix）：满足  $\mathbf{A}^T=\mathbf{A}$ 的矩阵 $\mathbf{A}$ 称为对称矩阵。
 - 对称矩阵的逆还是对称矩阵。
 - $\mathbf{R}\mathbf{R}^T$ 为对称矩阵。 
+- $\mathbf{S}=\mathbf{L}\mathbf{D}\mathbf{L}^T$。
 
 定理：若 $\mathbf{A}^T=\mathbf{A}$ 可以被在不用行交换的情况下分解为 $\mathbf{L}\mathbf{D}\mathbf{U}$，则有 $\mathbf{L}^T=\mathbf{U}$。
 
@@ -146,3 +155,27 @@ $$
 =\mathbf{A}=\begin{bmatrix}\mathbf{a}_{1}\mathbf{B} \\ \mathbf{a}_{2}\mathbf{B} \\ \vdots \\\mathbf{a}_{n}\mathbf{B}\end{bmatrix}
 $$
 注意分块的矩阵尺寸要保证可乘。
+
+## 矩阵的秩
+
+线性相关（Linear Dependent）：设 $\mathbf{v}_{1}, \mathbf{v}_{2},\dots \mathbf{v}_{n}\in V$，若 $c_{1}\mathbf{v}_{1}+c_{2}\mathbf{v}_{2}+\dots+c_{n}\mathbf{v}_{n}=\mathbf{0}$ 当且仅当 $c_{1}=c_{2}=\dots =c_{n}=0$，则称这组向量线性无关。否则，称为线性相关。
+- 线性相关：存在 $c_{i}\neq 0$ 使得 $c_{i}\mathbf{v}_{i}=\sum _{j\neq i} c_{j}\mathbf{v}_{j}$，即 $\mathbf{v}_{i}=\sum_{j\neq i} \frac{c_{j}}{c_{i}}\mathbf{v}_{j}$ ，即存在一个向量可以表示为其他向量的线性组合。
+
+判断向量是否线性相关等价于判断 $\begin{bmatrix}\mathbf{v}_{1} & \mathbf{v}_{2}  & \dots & \mathbf{v}_{n}\end{bmatrix}\mathbf{x}=\mathbf{0}$ 是否存在非零解。
+$\mathbf{A}$ 的列线性无关当且仅当 $N(\mathbf{A})=\{ \mathbf{0} \}$。
+
+>  零向量与任何向量线性相关。
+>  行阶梯矩阵的非零行之间是线性无关的。
+>  在 $\mathbb{R}^{2}$ 中，两个向量线性相关说明它们同一条直线上，三个向量之间一定是线性相关的。
+>  在 $\mathbb{R}^m$ 中，任何 $n(n>m)$ 个向量必然线性相关。
+
+
+矩阵 $\mathbf{A}$ 的秩（Rank）：
+- 主元的个数，记作 $r$ 或 $\text{rank}(\mathbf{A})$。
+- 极大的线性无关（Linearly Independent）的行的个数。
+
+关于秩的一些性质：
+- $r\leq \min(m,n)$
+- $r(\mathbf{A}\mathbf{B})\leq \min(r(\mathbf{A}), r(\mathbf{B}))$
+
+**秩一矩阵（Rank 1 matrix）** 可以拆成一个列向量乘一个行向量。这是因为，它的列空间的维数 $\text{dim} C(\mathbf{A})=\text{rank}(\mathbf{A})=1$。

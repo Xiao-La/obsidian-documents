@@ -93,7 +93,7 @@ $$
 f:A_{1}\times A_{2}\times\dots \times A_{n}\to B
 $$
 对于 $f:X\to Y$：
-- 单射（injective, one-to-one）：$\forall x_{1},x_{2} \in X, f(x_{1})=f(x_{2})\implies x_{1}=x_{2}$。
+- 单射（Injective, one-to-one）：$\forall x_{1},x_{2} \in X, f(x_{1})=f(x_{2})\implies x_{1}=x_{2}$。
 - 满射（Surjective, onto）：$\forall y \in Y, \exists x \in X s.t. f(x)=y$
 - 双射（Bijective, one-to-one correspondence）：既满足单射也满足满射。
 
@@ -105,7 +105,7 @@ $$
 - 归纳定义（Inductive Definiton）。例如定义 $\mathbb{N}$：$0\in \mathbb{N}$，且 $n \in \mathbb{N}\implies n+1 \in \mathbb{N}$，且只有前两个规则产生的元素才属于 $\mathbb{N}$。
 - 归纳证明（Proof by Induction）。若要证明 $P(x) \forall x$：
   - 先证明 $P(n_{0})$ 成立（Base case）。
-  - 归纳假设：假设 $P(k)$ 对 $k\geq n_{0}$ 成立。
+  - 归纳假设：假设 $P(k)$ 对 $k= n_{0}$ 成立。
   - 归纳：证明 $P(k+1)$ 成立。
 - 递归定义（Recursive Definition）：
 $$
