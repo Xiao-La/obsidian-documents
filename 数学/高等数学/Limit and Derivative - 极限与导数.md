@@ -149,6 +149,9 @@ $$
 \tan x=x+\frac{1}{3}x^3+\frac{2}{15}x^5+\cdots(x\to 0)
 $$
 这个需要死记硬背。
+$$
+\tan^{-1}x=x-\frac{x^3}{3}+\frac{x^5}{5}+\cdots(x\to 0)
+$$
 注意，上面这些公式在其定义域内都收敛。
 $$
 \frac{1}{1-x}=1+x+x^2+x^3+\cdots(x\to 0)
@@ -164,4 +167,11 @@ $$
 特别的，
 $$
 \ln(\cos x)=\ln\left( 1-\frac{x^2}{2}+o(x^2) \right)=-\frac{x^2}{2}+o(x^2)
+$$
+用广义二项式定理求幂级数：
+$$
+\begin{align}
+(1+x)^{\alpha}&=\sum_{k=0}^{\infty}\binom{\alpha}{k}x^k \\
+&=\sum_{k=0}^{\infty} \frac{\alpha(\alpha-1)(\alpha-2)\cdots (\alpha-k+1)}{k!}x^k
+\end{align}
 $$

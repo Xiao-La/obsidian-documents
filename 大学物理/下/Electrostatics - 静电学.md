@@ -148,3 +148,9 @@ V&=V_{(+)}+V_{(-)}=k\left( \frac{q}{r_{(+)}}-\frac{q}{r_{(-)}} \right) \\
 &= \frac{1}{4\pi\varepsilon_{0}} \frac{p\cos\theta}{r^{2}}
 \end{align}
 $$
+## 电容器（Capacitor）
+
+电容（Capacitance）$C$ 的单位为法拉（Farad, F）。
+$$
+q=CV
+$$

@@ -134,6 +134,7 @@ $$
 >  - $R=\infty$。
 >  其中 $R$ 称为幂级数的收敛半径（Radius of Convergence），收敛的区间称为收敛区间（Interval of Convergence）。
 
+
 **幂级数乘法定理（The Series Multiplication Theorem for Power Series）:** 若 $\sum a_{n}x^{n}$ 和 $\sum b_{n}x^n$ 都对 $|x|<R$ 绝对收敛，则
 $$
 \left( \sum a_{n}x^{n} \right)\left( \sum b_{n}x^{n} \right)=\sum c_{n}x^{n}

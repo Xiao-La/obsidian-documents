@@ -172,7 +172,7 @@ $\mathbf{A}$ 的列线性无关当且仅当 $N(\mathbf{A})=\{ \mathbf{0} \}$。
 
 矩阵 $\mathbf{A}$ 的秩（Rank）：
 - 主元的个数，记作 $r$ 或 $\text{rank}(\mathbf{A})$。
-- 极大的线性无关（Linearly Independent）的行的个数。
+- 极大的线性无关（Linearly Independent）的行/列的个数。
 
 关于秩的一些性质：
 - $r\leq \min(m,n)$
