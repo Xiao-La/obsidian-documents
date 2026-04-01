@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "大学物理/下/Electrostatics - 静电学.md",
+                "file": "计算机/SUSTech CS104 - Logic/Propositional Logic - 命题逻辑.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Electrostatics - 静电学"
+              "title": "Propositional Logic - 命题逻辑"
             }
           }
         ]
@@ -78,8 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 314.5,
-    "collapsed": true
+    "width": 314.5
   },
   "right": {
     "id": "f29a0e88d7772e16",
@@ -183,26 +182,29 @@
   },
   "active": "738cca22e01532e4",
   "lastOpenFiles": [
-    "数学/线性代数/Vector Space - 向量空间.md",
-    "数学/线性代数/Matrices and System of Linear Equations -  矩阵与线性方程组.md",
+    "笔记依赖/图片/Propositional Logic - 命题逻辑-6.png",
+    "计算机/Harvard CS50 - AI/1 - Knowledge.md",
+    "计算机/Harvard CS50 - AI/3 - Optimization.md",
+    "计算机/SUSTech CS104 - Logic/Propositional Logic - 命题逻辑.md",
     "数学/线性代数/The Properties of Matrices - 矩阵的性质.md",
+    "数学/线性代数/Problem Set - 题集.md",
+    "数学/线性代数/Linear Transformation - 线性变换.md",
+    "数学/线性代数/Determinant - 行列式.md",
+    "数学/线性代数/Matrices and System of Linear Equations -  矩阵与线性方程组.md",
+    "数学/线性代数/Vector Space - 向量空间.md",
+    "数学/高等数学/Antiderivative and Integral - 积分.md",
+    "数学/高等数学/Integral Techniques - 积分技巧.md",
+    "科学与文明史概论/Insights.md",
+    "科学与文明史概论/History.md",
+    "大学物理/下/Electrostatics - 静电学.md",
+    "笔记依赖/图片/Electrostatics - 静电学-3.png",
+    "笔记依赖/图片/Electrostatics - 静电学-3.png",
     "数学/高等数学/Polar Coordinates - 极坐标.md",
     "数学/高等数学/Limit and Derivative - 极限与导数.md",
     "数学/高等数学/Sequence and Series - 数列与级数.md",
-    "数学/高等数学/Integral Techniques - 积分技巧.md",
-    "数学/高等数学/Antiderivative and Integral - 积分.md",
-    "数学/线性代数/Determinant - 行列式.md",
-    "数学/线性代数/Linear Transformation - 线性变换.md",
-    "数学/线性代数/Problem Set - 题集.md",
-    "计算机/SUSTech CS104 - Logic/Propositional Logic - 命题逻辑.md",
     "计算机/Harvard CS50 - AI/0 - Search.md",
-    "计算机/Harvard CS50 - AI/1 - Knowledge.md",
-    "计算机/Harvard CS50 - AI/3 - Optimization.md",
     "计算机/SUSTech CS104 - Logic/Prerequisite Knowledge - 预备知识.md",
     "生命科学概论/Development & Regenerative Biology - 发育与再生生物学.md",
-    "大学物理/下/Electrostatics - 静电学.md",
-    "科学与文明史概论/Insights.md",
-    "科学与文明史概论/History.md",
     "生命科学概论/Brain and Mind - 脑与心智.md",
     "大学物理/上/Transverse Wave - 横波.md",
     "大学物理/上/Thermodynamics - 热力学.md",
@@ -215,11 +217,8 @@
     "计算机/Harvard CS50 - AI/2 - Uncertainty.md",
     "笔记依赖/图片/Brain and Mind - 脑与心智-1.png",
     "笔记依赖/图片/Electrostatics - 静电学-1.png",
-    "计算机/SUSTech CS109 - Java.md",
     "杂类文档/Homeworks",
     "笔记依赖/图片/Propositional Logic - 命题逻辑-1.png",
-    "笔记依赖/图片/Propositional Logic - 命题逻辑.png",
-    "笔记依赖/图片/Brain and Mind - 脑与心智.png",
     "未命名.base",
     "a.txt",
     "preamble.sty",

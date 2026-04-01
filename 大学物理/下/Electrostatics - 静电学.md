@@ -150,7 +150,53 @@ V&=V_{(+)}+V_{(-)}=k\left( \frac{q}{r_{(+)}}-\frac{q}{r_{(-)}} \right) \\
 $$
 ## 电容器（Capacitor）
 
-电容（Capacitance）$C$ 的单位为法拉（Farad, F）。
+电容（Capacitance）$C$ 的单位为法拉（Farad, F）。定义式：
 $$
-q=CV
+C=\frac{q}{V}
 $$
+可以推导出平行板电容器的电容 $C=\frac{\varepsilon_{0}A}{d}$，圆柱形电容器的电容 $C=2\pi\varepsilon_{0} \frac{L}{\ln(b / a)}$，球形电容器的电容 $C=4\pi\varepsilon_{0} \frac{ab}{b-a}$。当球形电容器 $b\to \infty$，相当于一个孤立的球体，那么 $C=4\pi\varepsilon_{0} a$。
+电容器的串联：
+
+$$
+\begin{align}
+&V_{\text{1}}+V_{\text{2}}=V\\
+&Q_{1}= Q_{2}=Q \\
+\implies & \frac{1}{C_{1}}+\frac{1}{C_{2}}=\frac{1}{C}
+\end{align}
+$$
+多个电容的串联：$\frac{1}{C}=\sum \frac{1}{C_{i}}$。
+并联：
+$$
+\begin{align}
+&V_{1}=V_{2}=V \\
+&Q_{1}+Q_{2}=Q \\
+\implies &C_{1}+C_{2}=C
+\end{align}
+$$
+多个电容的并联：$C=\sum C_{i}$。
+电容器储存的电势能：
+$$
+\begin{align}
+&W=\int vdq=\frac{1}{C}\int qdq=\frac{Q^{2}}{2C}\\
+\implies& U=\frac{Q^{2}}{2C}=\frac{1}{2}CV^{2}=\frac{1}{2}QV
+\end{align}
+$$
+能量密度 
+$$
+u=\frac{U}{Ad}=\frac{\frac{1}{2}CV^{2}}{Ad}=\frac{1}{2}\varepsilon_{0}E^{2}
+$$
+![[Electrostatics - 静电学-3.png]]
+若存在电介质（dielectric）：
+$$
+E= \frac{\sigma-\sigma_{i}}{\varepsilon_{0}}=\frac{E_{0}}{\frac{\sigma}{\sigma-\sigma_{i}}}=\frac{E_{0}}{\kappa}
+$$
+其中 $\kappa=\frac{\sigma}{\sigma-\sigma _{i}}>1$ 为介电常数（dielectric constant）。 
+将原来公式中的 $\varepsilon_{0}$ 替换为 $\kappa\varepsilon_{0}$ 即为有电介质的情况。
+例如，有电介质的情况下的高斯定理：
+$$
+\varepsilon_{0} \oint \kappa \vec{E}\cdot d\vec{A}=q(\text{free charge})
+$$
+有电介质的电容：$C=\kappa  \frac{Q}{V}$。
+注意是 $V$ 不变还是 $Q$ 不变。
+- 若 $V$ 不变，$C=\kappa C_{0}$，$Q=CV$ 变大。
+- 若 $Q$ 不变，$C=\kappa C_{0}$，$V=\frac{Q}{C}$ 变小。

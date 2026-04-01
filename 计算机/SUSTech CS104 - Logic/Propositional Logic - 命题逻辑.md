@@ -126,7 +126,7 @@ $\leftrightarrow$ 的真值表：
 
 **证明蕴含关系：**
 - 列真值表，说明 $\Sigma ^v=1$ 的行中都有 $A^v=1$。
-- 反证法，假设存在 $v$ 使得 $\Sigma^v=1$ 但是 $A^v=0$，导出矛盾
+- 反证法，假设存在 $v$ 使得 $\Sigma^v=1$ 但是 $A^v=0$，导出矛盾。
 **证明不蕴含关系：**
 - 找到一种赋值 $v$ 使得 $\Sigma^v=1$ 但是 $A^{v}=0$。
 
@@ -148,3 +148,58 @@ $$
 要证明一个集合不完备，可以考虑证明该集合构造出来的式子具有一些特性，然后说明用某个其他连接词构造的式子不具备这个特性，从而证明后者无法用前者表示。
 
 定理：任意的 $n$ 元布尔函数都可以只用一个完备集合中的连接词定义。
+
+### 形式推演系统
+
+形式证明系统（Formal Proof System）
+- 语言 (符号，字母表，wff)
+- 推理（公理，推理规则）
+
+由前提 $\Sigma$ 可以推出结论 $A$ 记作：
+$$
+\Sigma \vdash A
+$$
+#### Hilbert-style System
+$$
+\mathscr{H}
+$$
+线性。
+
+**语言：**
+- 字母表： $\Sigma=\{ (,),\neg, \to, p, q, r, \dots \}$
+- 公式：与 wff 类似的定义。
+
+**公理（Axioms）：**
+- $A\to(B\to A)$
+- $(A\to(B\to C))\to((A\to B)\to(A\to C))$
+- $(\neg A\to \neg B)\to(B\to A)$
+*注意这里是语法和符号上的公理，和语义无关。*
+
+**推理规则（Inference rule）：**
+- 分离规则（Modus ponens, MP）：$\displaystyle \dfrac{(A \to B,\, A)}{B}$
+
+**证明（Proof）**：
+- 一个有限序列 $A_{1}, A_{2}, \dots, A_{n}$。
+- 对于任意 $i\leq n$，$A_{i}$ 是以下三种情况之一：
+    - 是  $\mathscr{H}$ 中的一个公理（或定理）。
+    - 是 $A_{j}(j<i)$。
+    - 是通过 MP 从 $A_{j}, A_{k}(j, k<i)$ 推导出来的。
+- 这里我们称 $A_{n}$ 是 $\mathscr{H}$ 中的一个定理（Theorem）。
+- 这个序列就是 $A_{n}$ 的一个证明。
+- $A_{n}$ 可被证明记作 $\vdash A_{n}$。
+
+例如 $A\to A$ 的证明：
+![[Propositional Logic - 命题逻辑-6.png|496]]
+
+**（可靠性定理）若 $\vdash A$，则 $\vDash A$ 。**
+也就是说，任何 Hilbert 系统证明出来的结论都是永真式。
+- 可以对证明序列的长度 $\mathscr{l}$ 归纳来证明此定理。
+
+
+#### Natural Deduction System
+
+树状。
+
+#### Resolution
+
+用于反证法。
