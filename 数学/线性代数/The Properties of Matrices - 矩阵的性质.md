@@ -20,7 +20,8 @@ $$
 
 矩阵的左/右逆（Left/Right Inverse）：对 $m\times n$ 矩阵 $\mathbf{A}$，若存在 $\mathbf{B}$ 使得 $\mathbf{A}\mathbf{B}=\mathbf{I}_{m}$，则称 $\mathbf{B}$ 为 $\mathbf{A}$ 的右逆矩阵，$\mathbf{A}$ 为 $\mathbf{B}$ 的左逆矩阵。
 
-对一个 $m\times n$ 矩阵，它存在右逆等价于 $r=m$（行满秩，也说明 $C(\mathbf{A})=\mathbb{R}^m$）。类似的，存在左逆等价于 $r=n$（列满秩，也说明 $C(\mathbf{A}^T)=\mathbb{R}^n$）。推论：矩阵可逆的条件为 $r=m=n$。
+对一个 $m\times n$ 矩阵，它存在右逆等价于 $r=m$（行满秩，也说明 $C(\mathbf{A})=\mathbb{R}^m$）。类似的，存在左逆等价于 $r=n$（列满秩，也说明 $C(\mathbf{A}^T)=\mathbb{R}^n$）。记忆： $\begin{bmatrix}1  & 0\end{bmatrix}\begin{bmatrix}1 \\ 0\end{bmatrix}=\mathbf{I}_{1}$。
+推论：矩阵可逆的条件为 $r=m=n$。
 
 左右逆的最佳选择（Best Choices）$\mathbf{B}=(\mathbf{A}^T\mathbf{A})^{-1}\mathbf{A}^T, \mathbf{C}=\mathbf{A}^T(\mathbf{A}\mathbf{A}^T)^{-1}$。
 #### 高斯-约旦方法（Gauss-Jordan method）求逆
@@ -67,6 +68,9 @@ $$
 
 
 - $\mathbf{A}\text{ is invertible} \Leftrightarrow \mathbf{A}\mathbf{x}=\mathbf{0}\text{ only has zero solution}$ 
+- $\mathbf{A}\text{ is invertible} \Leftrightarrow\text{rank}(A)=n$
+- $\mathbf{A}\text{ is invertible} \Leftrightarrow N(A)=\{ 0 \}$
+- $\mathbf{A}\text{ is invertible} \Leftrightarrow\text{The columns/rows of A is linear independent}$
 #### 求二阶矩阵的逆
 
 $$
@@ -179,3 +183,16 @@ $\mathbf{A}$ 的列线性无关当且仅当 $N(\mathbf{A})=\{ \mathbf{0} \}$。
 - $r(\mathbf{A}\mathbf{B})\leq \min(r(\mathbf{A}), r(\mathbf{B}))$
 
 **秩一矩阵（Rank 1 matrix）** 可以拆成一个列向量乘一个行向量。这是因为，它的列空间的维数 $\text{dim} C(\mathbf{A})=\text{rank}(\mathbf{A})=1$。
+
+若 $P$ 是一个可逆矩阵，则 $r(\mathbf{P}\mathbf{A})=r(\mathbf{A}\mathbf{P})=r(\mathbf{A})$。
+
+若 $AB=O$，则有 $C(A) \subseteq N(B)$，则有 $\text{rank}(A)\leq n-\text{rank(B)}$，也就是：
+$$
+\text{rank}(A)+\text{rank}(B)\leq n
+$$
+一般的，有$$\text{rank}(AB)=\text{rank}(B)-\text{dim}(N(A)\cap C(B))\geq\text{rank}(B)-\text{dim}N(A)=\text{rank}(B)-\text{rank(A)}+n$$ 故而有
+$$
+\text{rank}(A)+\text{rank}(B)-n\leq\text{rank}(AB)
+$$
+
+一些题目中的结论： $\text{rank}(A^TA)=\text{rank}(A)$， $\text{rank}(A+B)\leq\text{rank}(A)+\text{rank}(B)$。

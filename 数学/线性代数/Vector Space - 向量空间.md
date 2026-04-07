@@ -49,7 +49,7 @@
 
 定理：$\mathbf{v}_{1},\mathbf{v}_{2},\dots \mathbf{v}_{n}\in \mathbb{R}^n$ 是 $\mathbb{R}^{n}$ 的一组基，当且仅当 $\mathbf{A}=[\mathbf{v}_{1}\dots \mathbf{v}_{n}]$ 可逆。
 
-例如，对于多项式集 $\mathbb{R}[x]_{\leq n}=\{ a_{0}+a_{1}x+\dots+a_{n}x^{n} | a_{1},a_{2},\dots,a_{n}\in \mathbb{R}\}$，一组基为 $1,x,x^{2},x^{3},\dots,x^{n}$。
+对于多项式集 $\mathbb{R}[x]_{\leq n}=\{ a_{0}+a_{1}x+\dots+a_{n}x^{n} | a_{1},a_{2},\dots,a_{n}\in \mathbb{R}\}$，一组基为 $1,x,x^{2},x^{3},\dots,x^{n}$。
 
 定理：若向量空间 $V$ 存在两组基 $\mathbf{v}_{1},\mathbf{v}_{2},\dots,\mathbf{v}_{n}$ 和 $\mathbf{w}_{1},\mathbf{w}_{2},\dots,\mathbf{w}_{n}$，则 $m=n$。这里 $n$ 定义为向量空间 $V$ 的维数（dimension）$\text{dim}V$。
 
@@ -81,3 +81,11 @@ $$
 C(\mathbf{A^T}) \perp N(\mathbf{A})
 $$
 
+高斯-约旦消元法求解四大基本子空间：$\begin{bmatrix}A|I\end{bmatrix}\to \begin{bmatrix}R|E\end{bmatrix}$
+
+|基本子空间|维数|提取方法|
+|---|---|---|
+|**行空间 $C(A^T)$**| $r$ |直接取 $R$ 的 $r$ 个非零行向量|
+|**列空间 $C(A)$**| $r$ |找 $R$ 中的主元列，取**原矩阵 $A$** 中对应的列|
+|**零空间 $N(A)$**| $n-r$ |利用 $R$ 求解 $Rx=0$ 的基础解系|
+|**左零空间 $N(A^T)$**| $m-r$ |取 $E$ 中对应 $R$ 里全零行所在位置的那几行|

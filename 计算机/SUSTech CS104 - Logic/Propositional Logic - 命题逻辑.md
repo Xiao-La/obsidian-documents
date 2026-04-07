@@ -179,23 +179,33 @@ $$
 - 分离规则（Modus ponens, MP）：$\displaystyle \dfrac{(A \to B,\, A)}{B}$
 
 **证明（Proof）**：
-- 一个有限序列 $A_{1}, A_{2}, \dots, A_{n}$。
+- 以 $\Sigma$ 为前提（Premises）对 $A$ 的一个证明，是一个有限序列 $A_{1}, A_{2}, \dots, A_{n}$。
 - 对于任意 $i\leq n$，$A_{i}$ 是以下三种情况之一：
-    - 是  $\mathscr{H}$ 中的一个公理（或定理）。
+    - 是  $\mathscr{H}$ 中的一个公理，或一个 $\Sigma$ 中的一个公式。
     - 是 $A_{j}(j<i)$。
     - 是通过 MP 从 $A_{j}, A_{k}(j, k<i)$ 推导出来的。
 - 这里我们称 $A_{n}$ 是 $\mathscr{H}$ 中的一个定理（Theorem）。
-- 这个序列就是 $A_{n}$ 的一个证明。
-- $A_{n}$ 可被证明记作 $\vdash A_{n}$。
+- $A_{n}$ 可被证明记作 $\Sigma\vdash A_{n}$。
+- 若 $\Sigma=\varnothing$，则简记为 $\vdash A_{n}$。
 
-例如 $A\to A$ 的证明：
+例如 (Theorem H1) $A\to A$ 的证明：
 ![[Propositional Logic - 命题逻辑-6.png|496]]
 
-**（可靠性定理）若 $\vdash A$，则 $\vDash A$ 。**
+**（可靠性定理/Soundness）若 $\vdash A$，则 $\vDash A$ 。**
 也就是说，任何 Hilbert 系统证明出来的结论都是永真式。
-- 可以对证明序列的长度 $\mathscr{l}$ 归纳来证明此定理。
+- 可以对证明序列的长度 $\mathscr{l}$ 归纳来证明此类定理。
+  - Base case：长度为 $1$ 的情况。
+  - I.H.：假设对 $k<n$ 成立。
+  - Inductive step：证明对 $n$ 成立。
 
+**（单调性定理/Monotonicity）** 若 $\Sigma\vdash A$，则 $\Sigma \cup \{ B \} \vdash A$。
 
+**导出规则（Derived rules）：** 从 MP 出发可以证明的一些推导规则，用于简化证明。
+- Deduction Rule：$$
+\Sigma\cup \{ A \} \vdash B \text{ iff } \Sigma \vdash A\to B
+$$
+例如 (Theorem H2) $(A\to B)\to((B\to C)\to(A\to C))$ 的证明：
+![[Propositional Logic - 命题逻辑-8.png|516]]
 #### Natural Deduction System
 
 树状。
