@@ -12,7 +12,7 @@ $$
 
 数列**有界（Bound）** 的定义为数列同时有上界（Upper Bound）和下界（Lower Bound）。
 - 上界的定义： $a_{n}\leq M, \forall n \in \mathbb{N}^+$，则 $M$ 为上界。最小的 $M$ 称为最小上界（Least Lower Bound）。
-- 下界的定义类似。
+
 
 数列**单调（Monotonic）** 的定义为数列不降（Nondecreasing）或不升（Nonincreasing）。
 
@@ -80,6 +80,7 @@ $$
 \sum a_{n} \text{ 收敛} \Longleftrightarrow \int _{N}^{\infty}f(x)dx \text{ 收敛}
 $$
 推论： $p-\text{series}$ $\sum_{n=1}^{\infty} \frac{1}{n^{p}}$ 当 $p>1$ 时收敛，当 $p\leq 1$ 时发散。这个和反常积分判断敛散性是一样的。
+推论：$\sum\frac{1}{n\ln n}$ 是发散的。
 
 在积分判别法中，余项的上下界：
 $$
@@ -123,6 +124,7 @@ $$
 **绝对收敛数列重排定理（The Rearrangement Theorem for Absolutely Convergent Series）：** 若 $\sum a_{n}$ 绝对收敛，且 $b_{n}$ 是 $a_{n}$ 的任意重排，则 $\sum a_{n}=\sum b_{n}$。
 >  若 $\sum a_{n}$ 条件收敛，则它重排之后极限与原来不一定相同。
 
+
 ### 幂级数
 
 **幂级数收敛定理（The Convergence Theorem for Power Series）：** 对级数 $\sum c_{n}x^n$：
@@ -155,3 +157,23 @@ $$
 $$
 \int f(x)\,dx= \sum c_{n} \frac{(x-a)^{n+1}}{n+1}+C
 $$
+#### 求幂级数
+
+[[Limit and Derivative - 极限与导数]]
+
+利用核心公式：
+$$
+\frac{1}{1-x}=\sum_{n=0}^{\infty} x^n
+$$
+$$
+-\ln(1-x)=\sum_{n=1}^{\infty} \frac{x^n}{n}
+$$
+这两个式子是求导的关系。
+
+例：
+- 求 $\sum \frac{1}{(n+1)2^n}$。
+   - 令 $f(x)= \sum \frac{1}{n+1} x^n$。故 $xf(x)=\sum \frac{x^{n+1}}{n+1}$，于是 $(xf(x))'=\sum x^n=\frac{1}{1-x}-1$，积分回去就有 $xf(x)=-\ln(1-x)-x$。代入 $x=\frac{1}{2}$ 得 $\sum \frac{1}{(n+1)2^n}=f\left( \frac{1}{2}\right)=2\ln(2)-1$。
+   - 也可以直接配凑出 $-\ln(1-x)$ 的展开。
+
+-  求 $\sum \frac{n}{2^n}$ 。
+  - 令 $f(x)=\sum nx^n$。故 $\frac{f(x)}{x}= \sum nx^{n-1}$，于是 $\int \frac{f(x)}{x}dx=\sum x^n= \frac{1}{1-x}-1$。于是有 $\frac{f(x)}{x}=\frac{1}{(1-x)^{2}}$ 。代入  $x=\frac{1}{2}$ 得 $\sum \frac{n}{2^n}=2$。

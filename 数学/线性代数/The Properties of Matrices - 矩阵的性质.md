@@ -123,7 +123,9 @@ $$
 $$
 \mathbf{A}^{-1}=\frac{1}{\det(\mathbf{A})}\mathbf{C}^T
 $$
+
 即 $a_{ij}'=\frac{1}{\det(\mathbf{A})}M_{ji} (-1)^{i+j}$ 。
+（证明见行列式）
 ## 矩阵的转置
 
 矩阵的转置（Transpose）：矩阵 $\mathbf{A}$ 的转置记作 $\mathbf{A}^T$ ，其中 $a_{ij}'= a_{ji}$。相当于把行换成列，列换成行。转置的性质：
@@ -186,7 +188,7 @@ $\mathbf{A}$ 的列线性无关当且仅当 $N(\mathbf{A})=\{ \mathbf{0} \}$。
 
 若 $P$ 是一个可逆矩阵，则 $r(\mathbf{P}\mathbf{A})=r(\mathbf{A}\mathbf{P})=r(\mathbf{A})$。
 
-若 $AB=O$，则有 $C(A) \subseteq N(B)$，则有 $\text{rank}(A)\leq n-\text{rank(B)}$，也就是：
+若 $AB=O$，则有 $C(B) \subseteq N(A)$，则有 $\text{rank}(B)\leq n-\text{rank(A)}$，也就是：
 $$
 \text{rank}(A)+\text{rank}(B)\leq n
 $$
@@ -196,3 +198,4 @@ $$
 $$
 
 一些题目中的结论： $\text{rank}(A^TA)=\text{rank}(A)$， $\text{rank}(A+B)\leq\text{rank}(A)+\text{rank}(B)$。
+$Ax=b$ 有解等价于 $A$ 与 $\begin{bmatrix}A |b\end{bmatrix}$ 的秩相等。

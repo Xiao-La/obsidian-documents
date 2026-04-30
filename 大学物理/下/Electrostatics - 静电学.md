@@ -27,10 +27,6 @@ $$
 $$
 其中 $q_{0}$ 为一个正的试探电荷，$\vec{F}$ 为它受到的电场力的作用。
 
-![[Electrostatics - 静电学.png|298]]
-则可以推出：
-- 当 $y\gg d$ 时， $E(y)= \frac{\vec{p}}{2\pi \varepsilon_{0}y^3}$。
-- 当 $x\gg d$ 时，$E(x)=- \frac{\vec{p}}{4\pi \varepsilon_{0}x^3}$。
 求解一般带电物体产生的电场，可以定义电荷的线密度 $\lambda$ /面密度 $\sigma$ /体密度 $\rho$，将 $dQ$ 写成与坐标有关的形式，然后写出各方向上电场的分量，就会变成一个积分问题。
 复杂积分考试时通常会给公式。
 
@@ -57,6 +53,11 @@ $$
 $$
 E=\frac{1}{2\pi \varepsilon_{0}} \frac{p}{z^{3}}\text{(electric dipole)}
 $$
+
+![[Electrostatics - 静电学.png|298]]
+则可以推出：
+- 当 $y\gg d$ 时， $E(y)= \frac{\vec{p}}{2\pi \varepsilon_{0}y^3}$。
+- 当 $x\gg d$ 时，$E(x)=- \frac{\vec{p}}{4\pi \varepsilon_{0}x^3}$。 
 并且有 $\vec{\tau}=\vec{p}\times \vec{E}$，$U=-W=-\int \tau d\theta=-\vec{p}\cdot \vec{E}$。
 微波炉的原理就是水分子作为电偶极子会在电场中旋转产生动能。
 

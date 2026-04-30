@@ -74,7 +74,8 @@ R_{\theta}=2P_{\theta}-I=\begin{bmatrix}
 \end{bmatrix}
 $$
 
-这里的变换矩阵和**基的选取**有关。若 $\mathbf{T}:V\to V$ 是一个线性变换，而 $A$ 是 $\mathbf{T}$ 在基 $\mathbf{v}_{1}, \dots, \mathbf{v}_{n}$ 下的矩阵表示，$B$ 是 $\mathbf{T}$  在基 $\mathbf{w}_{1},\dots, \mathbf{w}_{n}$ 下的矩阵表示。
+这里的变换矩阵和**基的选取**有关。
+线性变换的变换基（Change of basis）：若 $\mathbf{T}:V\to V$ 是一个线性变换，而 $A$ 是 $\mathbf{T}$ 在基 $\mathbf{v}_{1}, \dots, \mathbf{v}_{n}$ 下的矩阵表示，$B$ 是 $\mathbf{T}$  在基 $\mathbf{w}_{1},\dots, \mathbf{w}_{n}$ 下的矩阵表示。
 若 $\begin{bmatrix}\mathbf{w}_{1} \dots \mathbf{w}_{n}\end{bmatrix}=\begin{bmatrix}\mathbf{v}_{1}\dots \mathbf{v}_{n}\end{bmatrix}S$，则有 $B=S^{-1}AS$。
 这里的 $S$ 称为过渡矩阵/基变换矩阵。它表示了如何将基 $\mathbf{w}$ 翻译为基 $\mathbf{v}$ 视角下的坐标。于是在 $\mathbf{w}$ 视角下的线性变换就是先用 $S$ 转成 $\mathbf{v}$ 视角进行线性变换，然后在用 $S^{-1}$ 转换回来。
 
