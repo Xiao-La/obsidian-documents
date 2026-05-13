@@ -179,7 +179,7 @@ RL 电路：
 
 电感器件的磁场中可以存储能量：
 $$
- d \frac{U_{B}}{dt}=iL \frac{di}{dt}
+  \frac{dU_{B}}{dt}=iL \frac{di}{dt}
 $$
 $$
 \implies U_{B}= \frac{1}{2}Li^{2}

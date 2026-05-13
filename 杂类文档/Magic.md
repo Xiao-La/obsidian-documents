@@ -29,3 +29,4 @@
    - Use duplicates(6) to make a "thinking card".
    - Set up the bottom number(17) and naturally adjust it.
    - Ireland shuffle to reverse the order.
+   - Weaker version: use a borrowed deck, count and adjust.

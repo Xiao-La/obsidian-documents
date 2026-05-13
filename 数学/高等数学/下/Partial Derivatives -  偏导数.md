@@ -197,3 +197,13 @@ $$
 几何解释：在 $g_{1}=0$，$g_{2}=0$ 的交线 $C$ 上， $\nabla g_{1}$ 与 $C$ 垂直，$\nabla g_{2}$ 也与 $C$ 垂直。于是 $\nabla f$ 要处在它们构成的平面内，才能使 $\nabla f$ 垂直于曲线 $C$ 的切向量。
 
 
+### 二元函数的泰勒公式
+
+在 $(a,b)$ 处的 $n+1$ 阶泰勒公式：
+![[Partial Derivatives -  偏导数.png]]
+把这里的 $h,k$ 换成 $x,y$，可以写出在原点处的 $n+1$ 阶泰勒公式：
+![[Partial Derivatives -  偏导数-1.png]]
+也就是说
+$$
+f(x,y)=\left( \sum_{k=0}^{n} \frac{1}{n!}\left( x \frac{ \partial  }{ \partial x } +y \frac{ \partial  }{ \partial y }  \right)^{k}f   \right)+ \left( \frac{1}{(n+1)!}\left( x\frac{ \partial  }{ \partial x } +y\frac{ \partial  }{ \partial y }  \right)^{n+1} f\right)_{(cx, cy)} 
+$$ 
