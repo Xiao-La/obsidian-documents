@@ -134,3 +134,63 @@ $$
 
 **可满足性（Satisfiability）：** 与命题逻辑类似。一个阐释 $\mathcal{I}$ 和环境 $E$ 满足 $\alpha$，记作 $\mathcal{I}\vDash_{E}\alpha$，当且仅当 $\alpha^{(\mathcal{I},E)}=1$。否则为不满足，记作 $\mathcal{I}\not\vDash_{E}\alpha$。
 若对任何 $E$ 都有 $\mathcal{I}\vDash_{E}\alpha$，则称 $\mathcal{I}$ 满足 $\alpha$，记作 $\mathcal{I}\vDash\alpha$。
+拓展到一组公式：$\mathcal{I}\vDash_{E}\Sigma$。这里记号 $\vDash$ 代表满足。
+
+语义蕴含（Semantic Entailment）的定义：对于 FOL 中的公式组 $\Sigma$ 和公式 $\alpha$，有 $\Sigma\vDash\alpha$ 当且仅当：
+- 对任意诠释 $\mathcal{I}$ 和环境 $E$，若 $\mathcal{I}\vDash_{E}\Sigma$ 则 $\mathcal{I}\vDash_{E}\alpha$。
+这里记号 $\vDash$ 表示蕴含。
+
+在 FOL 中，一个公式 $\alpha$ 是：
+- 永真的（Valid）：$\mathcal{I}_{E}\vDash\alpha$ 对任意 $\mathcal{I},E$。类似与 PL 中的永真式（Tautology）
+- 可满足的（Satisfiable）：存在一组诠释和环境满足 $\alpha$。
+- 不可满足的（Unsatisfiable）：不存在诠释和环境满足 $\alpha$。
+$\emptyset\vDash\alpha$ 表示 $\alpha$ 是正当的/永真式。
+例如：
+$$
+\exists y\forall x R(x,y)\to \forall x\exists yR(x,y)
+$$
+$$
+\exists x(P(x)\to \forall xP(x))
+$$
+**FOL 的不可判定性（Undecidability）**：给定一个公式，不可能用某个程序判断它是否是永真式。（可以表示为停机问题）
+而 PL 可以决定，因为可以用真值表判定。
+
+### ND 证明
+
+替换（Substitution）：
+$$
+\alpha[t/x]
+$$
+表示将公式 $\alpha$ 中的**自由变元** $x$ 替换为 $t$。
+为了避免语义的改变（Capture），需要替换为新的变量（Fresh Variable），也就是在 $\alpha$ 中没有出现过的变量。
+
+推理规则：
+- $\forall e$：
+$$
+\dfrac{\forall x\,\alpha}{\alpha[t/x]}
+$$
+- $\exists i$：
+$$
+\dfrac{\alpha[t/x]}{\exists x\,\alpha}
+$$
+- $\forall i$：
+$$
+\dfrac{
+\boxed{
+\begin{aligned}
+y\text{ fresh} \\
+\vdots \\
+\alpha [y/x]
+\end{aligned}}
+}{\forall x \, \alpha}
+$$
+这里 fresh variable 不可以出现在 subproof 之外。最好不要出现在任何的 $\alpha$ 和 $\Sigma$ 中。
+例如：![[FOL - 一阶逻辑-4.png]]
+- $\exists e$：
+$$
+\dfrac{(\exists x\,\alpha)_\,\boxed{\begin{align}
+\alpha[u / x], u\text{ fresh} \\
+\vdots \\
+\beta
+\end{align}} }{\beta}
+$$

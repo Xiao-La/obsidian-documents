@@ -45,3 +45,14 @@ Gametophyte 配子体
 Alternation between generations
 - 配子体世代（n，单倍体 Haploid）Gametophyte Generation（减数分裂产生孢子到配子形成）
 - 孢子体时代（2n，二倍体 Diploid）Sporophyte Generation（受精形成合子到再次发生减数分裂） 
+
+
+三种主要的植物产物：
+- 酚类
+- 生物碱
+- 萜类
+Morphine Endorphin...（常见例子）
+
+植物产品的作用
+- 有益防御
+- 和人类的苦味感受器类似

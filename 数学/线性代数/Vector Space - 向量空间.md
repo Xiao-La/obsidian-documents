@@ -46,6 +46,7 @@
 - 一组线性无关的向量 $v_{1},v_{2},\dots,v_{n}$ 。
 - $V$ 为这些向量张成的空间。
 这里 $n=\text{dim}V$。
+记得验证空间非空。
 
 定理：$\mathbf{v}_{1},\mathbf{v}_{2},\dots \mathbf{v}_{n}\in \mathbb{R}^n$ 是 $\mathbb{R}^{n}$ 的一组基，当且仅当 $\mathbf{A}=[\mathbf{v}_{1}\dots \mathbf{v}_{n}]$ 可逆。
 

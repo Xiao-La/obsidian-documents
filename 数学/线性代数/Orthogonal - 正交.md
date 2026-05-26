@@ -88,7 +88,7 @@ $$
 $$
 \lVert Qx \rVert=\lVert x \rVert  
 $$
-正是因为，$(Qx)^T(Qx)=x^TQ^TQx=x^Tx$。
+这是因为，$(Qx)^T(Qx)=x^TQ^TQx=x^Tx$。
 更一般地，它会保持内积不变/夹角不变：
 $$
 (Qx)^T(Qy)=x^Ty
