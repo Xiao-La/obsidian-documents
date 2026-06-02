@@ -22,7 +22,7 @@ $$
 $$
 \int_{C} \mathbf{F}(\mathbf{r}(t))\cdot\mathbf{r}'(t)dt
 $$
-若 $\mathbf{F}=\left< M,N \right>$ 也可以进一步写成
+若 $\mathbf{F}=\left< M,N \right>$ 也可以进一步写成点乘 $\mathbf{F}\cdot \left< dx,dy \right>$ 的形式
 $$
 \int_{C}(Mdx+Ndy)
 $$
@@ -31,7 +31,7 @@ $$
 $$
 \oint_{C} \mathbf{F}\cdot \mathbf{n}ds=\oint_{C}(Mdy-Ndx)
 $$
-
+可以写成点乘 $\mathbf{F}\cdot \left< dy,-dx \right>$。 计算方式同样可以参数化。
 
 保守场 （Conservative Field）：在保守场 $\mathbf{F}$ 中，沿着一条路径的积分之和起点和终点有关，也就是说，存在一个标量的势函数（Potential Function） $f$，使得
 $$
@@ -51,9 +51,9 @@ $$
 \frac{ \partial {P} }{ \partial y } =\frac{ \partial Q }{ \partial x } 
 $$
 进一步的，若区域是**单连通的**，则这个条件是充要的。
-定义：一个式子 $Mdx+Ndy+Pdz$ 为恰当微分形式，若存在 $f$ 使得：
+定义：一个式子 $Mdx+Ndy+Pdz$ 为恰当（Exact）微分形式，若存在 $f$ 使得：
 $$
-df=Mdx+Ndy+Pdz
+df=Mdx+Ndy+Pdz=\frac{ \partial f }{ \partial x } dx+\frac{ \partial f }{ \partial y } dy+\frac{ \partial f }{ \partial z } dz
 $$
 这里 $f$ 就是势函数。
 对恰当微分形式进行线积分，由线积分基本定理，只需终点处的势函数值减去起点处的势函数值。
@@ -63,16 +63,40 @@ $$
 $$
 保守场的一个充要条件：对任意回路积分为 $0$。
 
+定义场 $\mathbf{F}=\left< M,N \right>$ 的流量密度（circulation density）：
+$$
+\frac{ \partial N }{ \partial x } -\frac{ \partial M }{ \partial y } = (\nabla \times\mathbf{F}) \cdot \mathbf{k}
+$$
+也被称为旋度的 k 分量 the k-component of the curl，记作 $(\text{curl } \mathbf{F})\cdot \mathbf{k}$
+定义散度（Divergence）：
+$$
+\frac{ \partial M }{ \partial x } +\frac{ \partial N }{ \partial y } =\nabla \cdot \mathbf{F}
+$$
+
+
 格林公式（Green's Theorem）：在满足以下条件时：
 - $C$ 必须是一条 **分段光滑（Piecewise smooth）** 的 **简单闭曲线（Simple closed curve）**。
 - $C$ 所包围的区域 $R$ 必须是一个有界的闭区域，且其内部不能包含任何向量场无定义的奇点。
 - 向量场 $\mathbf{F} = \langle M, N \rangle$ 的分量函数 $M(x, y)$ 和 $N(x, y)$，以及它们的一阶偏导数 $\frac{\partial M}{\partial x}, \frac{\partial M}{\partial y}, \frac{\partial N}{\partial x}, \frac{\partial N}{\partial y}$，在包含 $R$ 的某个**开区域**上必须是处处连续（Continuous）的。
 - 曲线 $C$ 的方向必须是**正向（逆时针方向）**。判别法：当你沿着曲线 $C$ 的前进方向行走时，被包围的区域 $R$ 必须始终位于你的左手边。如果题目给出的是顺时针方向，积分结果必须乘以 $-1$。
-那么有：
-$$\oint_C M \, dx + N \, dy = \iint_R \left( \frac{\partial N}{\partial x} - \frac{\partial M}{\partial y} \right) dA$$
-或通量-散度（Divergence）形式：
-$$\oint_C M \, dy - N \, dx = \iint_R \left( \frac{\partial M}{\partial x} + \frac{\partial N}{\partial y} \right) dA$$
-（这个形式也恰是算通量的公式 $\oint_{C}\left< M,N \right>\cdot \mathbf{n}ds=\oint_{C}Mdy-Ndx$。
+那么有环流量-旋度（Circulation-Curl）形式：
+$$\oint_{C}\mathbf{F}\cdot \mathbf{T}ds=\oint_C M \, dx + N \, dy = \iint_R \left( \frac{\partial N}{\partial x} - \frac{\partial M}{\partial y} \right) dA$$
+这个旋度可以写成
+$$
+ (\nabla \times \mathbf{F})\cdot \mathbf{k}=\left| \begin{matrix} \frac{ \partial  }{ \partial x }  & \frac{ \partial  }{ \partial y }  \\
+M & N \end{matrix} \right|
+$$
+或通量-散度（Flux-Divergence）形式：
+$$\oint_{C}\mathbf{F}\cdot \mathbf{n}ds=\oint_C M \, dy - N \, dx = \iint_R \left( \frac{\partial M}{\partial x} + \frac{\partial N}{\partial y} \right) dA$$
+这个散度可以写成
+$$
+\nabla \cdot \mathbf{F}
+$$
+
+我们令 $M=\frac{1}{2}x,N=\frac{1}{2}y$，那么某个区域的面积有这样的计算公式
+$$
+A=\iint_{R} dA=\frac{1}{2}\oint_{C}xdy-ydx
+$$
 
 ## 面积分
 
@@ -80,16 +104,31 @@ $$\oint_C M \, dy - N \, dx = \iint_R \left( \frac{\partial M}{\partial x} + \fr
 $$
 \mathbf{r}(u,v)=x(u,v)\mathbf{i}+y(u,v)\mathbf{j}+z(u,v)\mathbf{k}
 $$
+曲面平滑（Smooth）的定义：
+1. 偏导向量 $\mathbf{r}_u = \frac{\partial \mathbf{r}}{\partial u}$ 和 $\mathbf{r}_v = \frac{\partial \mathbf{r}}{\partial v}$ 必须处处**连续 (Continuous)** 。 
+2. 它们的叉乘（向量积）**$\mathbf{r}_u \times \mathbf{r}_v$ 在区域内部绝不能为零向量 $\mathbf{0}$** 。
 在线积分中，弧长与参数的微小量的换算为 $ds=\lvert \mathbf{r}'(t) \rvert dt$。在面积分中，考虑在两个参量上走一小步，形成的微小平行四边形面积为两个切向量的叉乘，故而面积与参数的微小量的换算为：
 $$
 d\sigma=\lvert \mathbf{r}_{u}\times \mathbf{r}_{v} \rvert  du dv
 $$
 其中  $\mathbf{r}_{u},\mathbf{r}_{v}$ 为 $\mathbf{r}$ 对 $u,v$ 求偏导的结果。
 
-这里若 $z=f(x,y)$，则有 $\mathbf{r}=\left< x,y,f \right>$，$\mathbf{r}_{x}=\left< 1,0,f_{x} \right>,\mathbf{r}_{y}=\left< 0,1,f_{y} \right>$，故而 $\mathbf{r}_{u}\times r_{v}=\left< -f_{x},-f_{y},1 \right>$，有结论：
+这里若 $z=f(x,y)$，则有 $\mathbf{r}=\left< u,v,f(u,v) \right>$，$\mathbf{r}_{u}=\left< 1,0,f_{x} \right>,\mathbf{r}_{v}=\left< 0,1,f_{y} \right>$，故而 $\mathbf{r}_{u}\times r_{v}=\left< -f_{x},-f_{y},1 \right>$，有结论：
 $$
 d\sigma=\sqrt{ f_{x}^{2}+f_{y}^{2}+1 }dudv
 $$
+所以 
+$$
+A=\iint_{R} d\sigma=\iint_{R} \sqrt{ f_{x}^{2}+f_{y}^{2}+1 }dxdy
+$$
+另外，若 $F(x,y,z)=c$，可以推导出：
+$$A = \iint_R \frac{|\nabla F|}{|\nabla F \cdot \mathbf{p}|} \, dA$$
+其中 $\mathbf{p}=\mathbf{i},\mathbf{j}\text{ or }\mathbf{k}$。
+这相当于投影到某个平面去求，代数推导是，比如假设 $z=h(x,y)$，则 $h_{x}= - \frac{F_{x}}{F_{z}},h_{y}=- \frac{F_{y}}{F_{z}}$，再代入：
+$$
+d\sigma=\sqrt{ \left( - \frac{F_{x}}{F_{z}} \right)^{2}+ \left( -\frac{F_{y}}{F_{z}} \right)^{2}+1 }dxdy= \frac{\lvert \nabla F \rvert }{\lvert F_{z} \rvert }dA
+$$
+
 
 另外：对曲面求通量，有
 $$

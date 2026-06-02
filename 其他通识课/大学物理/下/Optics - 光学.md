@@ -146,7 +146,7 @@ $$ I = I_0 \left[ \frac{\sin(\beta/2)}{\beta/2} \right]^2 = I_0 \left[ \frac{\si
 狭缝越窄，衍射现象越明显（光散得越开）。
 1.  **极宽极限 ($a \gg \lambda$)：** 衍射角极小，不发生明显的衍射散布，光斑与狭缝形状一致，退化为**几何光学**直线传播。
 2.  **极窄极限 ($a \approx \lambda$)：** 第一暗纹在 $90^{\circ}$，中央明纹无限宽敞，充满背后的整个空间。
-这里为你整理的光学重点复习笔记，涵盖了相图原理、单缝衍射计算以及实际双缝干涉（缺级现象）。
+
 
 ### 双缝干涉+衍射
 
@@ -167,7 +167,7 @@ $$ I = I_0 \left[ \frac{\sin(\beta/2)}{\beta/2} \right]^2 = I_0 \left[ \frac{\si
     ![[Optics - 光学-7.png|290]]
 ### 圆孔衍射
 
-这两张幻灯片进入了波动光学中非常实用、也是考试必考的一个知识点：**圆孔衍射（Circular Aperture Diffraction）与分辨本领（Resolvability）**。
+**圆孔衍射（Circular Aperture Diffraction）与分辨本领（Resolvability）**。
 
 与矩形单缝不同，光波通过圆形孔径时，会在屏幕上形成中心高亮、周围环绕极弱同心亮环的衍射图样。
 *   **爱里斑 (Airy Disk):** 衍射图样中央最亮、最大的圆斑。

@@ -7,7 +7,7 @@ $$
  若 $f(x,y)$ 在原点之外是严格大于零的，称它为正定的（Positive Definite）。
  配方之后可以知道，这个二次型正定当且仅当：$$
 a>0\
-,,\, ac>b^{2}
+,\, ac>b^{2}
 $$
 类似的，也有负定（Negative Definite）的情况：
 $$
@@ -40,4 +40,180 @@ $$
 
 ### 正定矩阵
 
-若 $f=x^TAx$ 是一个正定二次型，则把 $A$ 叫做正定矩阵。
+若 $f=x^TAx$ 是一个**正定二次型**，则把对称矩阵 $A$ 叫做**正定矩阵**。有时记作 $A>0$。
+对对称矩阵 $A$，TFAE：
+1.  $x^TAx>0\forall x\neq 0$
+2. 所有特征值 $\lambda_{1},\dots,\lambda_{n}>0$
+3. 左上角 $k\times k$ 的行列式 $\det(A_{k})>0$ $\forall k$
+4. 主元 $d_{k}>0\,\forall k$
+5. 存在一个可逆矩阵 $R$，使得 $A=R^TR$
+
+*TFAE : The following are equivalent.*
+
+证明：
+- 【 $1\implies 2$ 】若 $x^TAx>0$，假设 $\lambda _i$ 是一个特征值，对应特征向量 $x_{i}\neq 0$，则 $x_{i}^TAx_{i}>0$。又因为 $Ax_{i}=\lambda x_{i}$，有 $\lambda_{i}x_{i}^Tx_{i}=\lambda_{i}\lVert x_{i} \rVert^{2}>0$，故而 $\lambda_{i}>0$。
+- 【 $2\implies 1$ 】若 $\lambda_{i}>0$，由谱定理，因为 $A$ 是一个对称矩阵，它可以被一个正交矩阵对角化，也就是说存在一组规范正交的特征向量 $x_{1},\dots,x_{n}$ 使得 $Ax_{i}=\lambda_{i}x_{i}$。任意向量可以写成这组特征向量的线性组合： $x=\sum c_{i}x_{i}$。那么 $x^TAx=\left( \sum c_{i}x_{i}^T \right)A\left( \sum c_{i}x_{i} \right)=\left( \sum c_{i}x_{i}^T \right)\left( \sum c_{i}\lambda_{i}x_{i} \right)=\sum c_{i}^{2}\lambda_{i}$（因为交叉项都为 $0$）。故而 $x^TAx>0$。
+- 【 $2\implies 3$ 】 $\det(A_{n})=\prod\lambda_{i}>0$。设原来的二次型为 $g(x_{1}\dots x_{n})=\begin{bmatrix}x_{1}\dots x_{n}\end{bmatrix}A\begin{bmatrix}x_{1} \\ \vdots\\x_{n}\end{bmatrix}$，它是正定的。那么考察 $f(x_{1}\dots x_{k})=\begin{bmatrix}x_{1}\dots x_{k}\end{bmatrix}A\begin{bmatrix}x_{1} \\ \vdots\\x_{k}\end{bmatrix}$，它满足 $f=g(x_{1}\dots x_{k},0\dots 0)$，那么 $f$ 也是正定的。于是 $\det(A_{k})>0$。
+- 【 $3\implies 4$ 】 $d_{k}= \frac{\det(A_{k})}{\det(A_{k-1})}>0$。
+- 【 $4\implies 1$ 】 假设 $A=LDU$，由于 $A^T=U^TDL^T=A=LDU$，有 $U=L^T$。那么 $\forall x\neq 0,x^TAx=x^T(LDU)x=x^TLDL^Tx$。令 $L^Tx=y\neq 0$，则 $x^TAx=y^TDy=\sum d_{i}y_{i}^{2}>0$。
+- 【 $5\implies 1$ 】 $\forall x\neq 0, x^TAx=x^TR^TRx=\lVert Rx \rVert^{2}$，这里由于 $R$ 可逆，$Rx$ 就不为 $0$，因此 $x^TAx>0$。
+- 【 $A>0\implies 5$ 】 
+  - 法一（Cholesky Decomposition ）：$A=LDU=LDL^T=(L\sqrt{ D })(\sqrt{ D }L^T)$，设 $R=\sqrt{ D }L^T$，则 $A=R^TR$，这里 $R$ 显然可逆。
+  - 法二： $A=Q\Lambda Q^T=Q\sqrt{ \Lambda }\sqrt{ \Lambda }Q^T$ ，设 $R=\sqrt{ \Lambda }Q^T$，则 $A=R^TR$，这里 $R$ 显然可逆。
+  - 法三：$A=Q\Lambda Q^T=(Q\sqrt{ \Lambda  }Q^T)(Q\sqrt{ \Lambda }Q^T)$，设 $R=Q\sqrt{ \Lambda }Q^T$，则 $R$ 是一个对称的正定矩阵，且 $A=R^TR=R^{2}$。（这里这种分解方式最好的保留了 $A$ 的对称和正交的性质，所以可以定义 $R=\sqrt{ A }>0$）
+  - 这里有无穷多种分解，因为若 $A=R^TR$，则对任意 $R'=QR$ 其中 $Q$ 是任意正交矩阵，则 $A=R'^TR'$。
+
+当然，根据定义，也可以去直接把二次多项式给 Complete the square 来判断。
+这里你会发现，若 $A=LDU$，则 $x^TAx=\sum d_{i}y_{i}^{2}$，这里 $y_{i}=L^Tx_{i}$，且 $d_{i}$ 为第 $i$ 个主元。这就是配方之后的结果！所以配方和高斯消元的过程其实是对应的。
+
+将一个对称矩阵称为半正定的（Semipositive Definite），若 
+$$
+x^TAx\geq 0\forall x
+$$
+记作 $A\geq 0$。
+半负定： $x^TAx\leq 0 \forall x$。记作 $A\leq 0$。
+
+TFAE:
+- $A\geq 0$
+- 特征值 $\lambda_{i} \geq 0$
+- 没有主矩阵（Principle Matrices）有负的特征值。
+  - 主矩阵：指标集（Index Set） $I\subset \{ 1,2,\dots,n \}$ 对应的主矩阵 $A_{I}$ ，定义为 $A$ 的一个子矩阵，它来自于选取 $A$ 中的所有满足 $i,j\in I$ 的 $a_{ij}$。
+- 主元 $d_{i}\geq 0$
+- 存在矩阵 $R$ 使得 $A=R^TR$。
+
+要证明这些事情，可以用这个事实：
+$$
+A\geq 0 \iff A+\varepsilon I>0 \, \, \forall\text{sufficient small }\varepsilon>0
+$$
+这个事实的证明：
+- 左推右： $\forall x\neq 0, x^T(A+\varepsilon I)x=x^TAx+\varepsilon x^Tx>0$。
+- 右推左：$x^TAx=\lim_{ \varepsilon \to 0 } x^T(A+\varepsilon I)x\geq 0$。
+例如要证明 $A\geq 0\implies\lambda_{i}\geq 0$ ：$A\geq 0 \implies A+\varepsilon I > 0 \implies \lambda_{i}+\varepsilon > 0 \implies\lambda_{i}\geq 0$。
+
+### 合同矩阵
+
+对于二次型 $f=x^TAx$，它可以做换元 $x=Cy$ 来研究，且 
+$$
+x^TAx=y^T(C^TAC)y
+$$
+其中 $C$ 是一个可逆的矩阵。
+
+这里定义 $A,B$ 为合同的（Congruent），若存在可逆矩阵 $C$ 使得
+$$
+B=C^TAC 
+$$
+合同关系（Congruence）有如下性质：
+- 对称矩阵的合同矩阵也是对称矩阵。
+- 单位矩阵 $A=I$ 的合同矩阵形如 $B=C^TC$。也就是说，它是正定的！那么 $B$ 的特征值都是正的。
+
+塞维斯特惯性定律（Sylvester's Law of Inertia）：
+-  $A$ 的合同矩阵 $C^TAC$ 和 $A$ 有相同数量的正特征值，相同数量的负特征值和相同数量的零特征值。
+- 把正特征值的数量称为正惯性指数（Positive index of inertia），记作 $p$。
+- 把负特征值的数量称为负惯性指数（Negative index of inertia），记作 $q$。
+- 这里 $p+q=\text{rank}(A)$。$p-q$ 称为符号差（Signature）。
+该定律也可以表述成：
+- 设 $f(x_{1}\dots x_{n})=x^TAx$ 为秩为 $r$ 的 $n$ 元二次型。存在一个线性变量替换 $x=Cy$ 使得 $f$ 变为
+$$
+g(y_{1}\dots y_{n})=y_{1}^{2}+y_{2}^{2}+\dots+y_{p}^{2}-y_{{p+1}}^{2}-\dots-y_{r}^{2}
+$$
+- 上述二次型被称为 $f$ 的规范型，其由 $f$ 唯一决定。
+
+### 应用
+
+二次超曲面（Geometry of Quadratic Hypersurface）可以写成
+$$
+x^TAx=1
+$$
+要看出它是一种怎样的矩阵，可以做坐标变换 $x=Qy$，其中 $Q$ 是一个正交矩阵。谱定理指出，由于 $A$ 是对称矩阵，存在这样的正交矩阵 $Q$，使得 $Q^TAQ=\Lambda$。
+那么原来的曲面等价于
+$$
+x^TAx=(Qy)^TA(Qy)=y^T(Q^TAQ)y=y^T\Lambda y=\sum\lambda_{i}y_{i}^{2}=1
+$$
+那么只需要去看 $\lambda_{i}$ 的正负，很容易就可看出来这个曲面是什么形状的。
+对于 $n=3$ 的情况，这就可以用来判定三维空间中的二次曲面了：
+$$
+x^TAx=\lambda_{1}y_{1}^{2}+\lambda_{2}y_{2}^{2}+\lambda_{3}y_{3}^{2}=1
+$$
+- 若特征值全为正，如 $\lambda_{1},\lambda_{2},\lambda_{3}>0$，则为椭球面（Ellipsoid）。
+$$
+x^{2}+y^{2}+z^{2}=1
+$$
+- 若特征值两正一负，如 $\lambda_{1},\lambda_{2}>0,\lambda_{3}<0$，则为单叶双曲面（Hyperboloid of One Sheet）。
+$$
+x^{2}+y^{2}-z^{2}= 1
+$$
+- 若特征值一正两负，如 $\lambda_{1}>0,\lambda_{2},\lambda_{3}<0$，则为双叶双曲面 （Hyperboloid of Two Sheet）。
+$$
+x^{2}-y^{2}-z^{2}=1
+$$
+- 若特征值全为负，如 $\lambda_{1},\lambda_{2},\lambda_{3}<0$，则为空集。
+退化状态：
+- 若特征值两正一零，如 $\lambda_{1},\lambda_{2}>0, \lambda_{3}=0$，则为椭圆柱面（Elliptic Cylinder）。
+$$
+x^{2}+y^{2}=1
+$$
+- 若特征值一正一负一零，如 $\lambda_{1}>0,\lambda_{2}<0,\lambda_{3}=0$，则为双曲柱面（Hyperbolic Cylinder）。
+$$
+x^{2}-y^{2}=1
+$$
+- 若特征值两负一零，如 $\lambda_{1},\lambda_{2}<0,\lambda_{3}=0$，则为空集。
+- 若特征值一正两零，如 $\lambda_{1}>0,\lambda_{2},\lambda_{3}=0$，则为两个平行平面（Two  Parallel Planes）。
+$$
+x^{2}=1
+$$
+- 若特征值一负两零，如 $\lambda_{1}<0,\lambda_{2},\lambda_{3}=0$，则为空集。
+- 若特征值全为零，$\lambda_{1},\lambda_{2},\lambda_{3}=0$，则为空集。
+
+要求这个正负惯性指数，就可以利用塞维斯特惯性定律，转换为规范型就直接看出来了。
+- 直接解特征方程。
+- 利用韦达定理判断 $\lambda$ 的正负。
+- 换元，配方转换为规范型。
+*拉格朗日配方法：若至少一个平方项，那就直接对该平方项进行配方，迭代即可。若没有平方项，则挑一个交叉项 $x_{1}x_{2}$，令 $x_{1}=y_{1}+y_{2},x_{2}=y_{1}-y_{2}$，这就用平方差公式创造出了平方项。*
+## 奇异值分解（Singular Value Decomposition, SVD）
+
+任何 $m\times n$ 的矩阵 $A$ 可以被分解为
+$$
+A=U\Sigma V^T
+$$
+其中：
+- $U$ 是 $m\times m$ 的一个正交矩阵。
+- $V$ 是 $n\times n$ 的一个正交矩阵。
+- $\Sigma$ 是一个 $m\times n$ 的对角矩阵，它可以写成分块矩阵
+$$
+\begin{bmatrix}
+\Sigma_{1} & 0 \\
+0  &0 
+\end{bmatrix}
+$$
+- 其中
+$$
+\Sigma_{1}= \begin{bmatrix}
+\sigma_{1} \\
+ & \ddots \\
+ &  & \sigma_{r}
+\end{bmatrix}
+$$
+- 其中 $r$ 为 $A$ 的秩，这里 $\sigma_{i}$ 称为奇异值（Singular Value）。
+
+那么
+$$
+\begin{align}
+A^TA&=(U\Sigma V^T)^TU\Sigma V^T
+\\&=V\Sigma^TU^TU\Sigma V^T \\
+&=V\Sigma^T\Sigma V^T \\
+&=V\begin{bmatrix}
+\Sigma_{1}^T\Sigma_{1} & 0 \\
+0 & 0
+\end{bmatrix}V^T \\
+\end{align}
+$$
+其中
+$$
+\Sigma_{1}^T\Sigma_{1}=\begin{bmatrix}
+\sigma_{1}^{2} \\
+ & \ddots  \\
+ &  &  \sigma_{r}^{2}
+\end{bmatrix}
+$$
+这里就找到了 $A^TA$ 的一个谱分解。那么，$\sigma_{i}^{2}$ 就是 $A^TA$ 的所有非零特征值！
+类似的，由于 $AB$ 和 $BA$ 有相同的非零特征值，那么 $\sigma_{i}^{2}$ 也是 $AA^T$ 的多有非零特征值。

@@ -194,3 +194,16 @@ $$
 \beta
 \end{align}} }{\beta}
 $$
+ND for FOL 是完备的（Complete）和可靠的（Sound）。
+
+任何 FOL 中的公式可以写成前束范式（Prenex Normal Form）：
+$$
+Q_{1}x_{1}Q_{2}x_{2}\dots Q_{k}x_{k}B
+$$
+其中 $Q_{i}$ 为量词，$B$ 为无量词的公式。
+
+*其他逻辑系统：*
+- Higher-Order Logic(HOL, 可描述 Property of a property / function 等)
+- Temporal Logic（描述时间线上的逻辑）
+- Modal Logic（描述必要性/可能性）
+- Hoare Logic（可证明计算机程序的正确性）

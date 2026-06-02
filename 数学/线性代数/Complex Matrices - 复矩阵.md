@@ -237,7 +237,7 @@ J_{i}=\begin{bmatrix}
  & \lambda_{i} & 1 \\
  &  & \ddots & \ddots \\
  &  &  & \ddots & 1 \\
- &  &  &  & \lambda i
+ &  &  &  & \lambda_i
 \end{bmatrix}
 $$
 定义约当形（Jordan Form）：
