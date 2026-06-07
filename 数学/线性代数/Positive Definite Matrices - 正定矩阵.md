@@ -171,13 +171,14 @@ $$
 *拉格朗日配方法：若至少一个平方项，那就直接对该平方项进行配方，迭代即可。若没有平方项，则挑一个交叉项 $x_{1}x_{2}$，令 $x_{1}=y_{1}+y_{2},x_{2}=y_{1}-y_{2}$，这就用平方差公式创造出了平方项。*
 ## 奇异值分解（Singular Value Decomposition, SVD）
 
+
 任何 $m\times n$ 的矩阵 $A$ 可以被分解为
 $$
 A=U\Sigma V^T
 $$
 其中：
-- $U$ 是 $m\times m$ 的一个正交矩阵。
-- $V$ 是 $n\times n$ 的一个正交矩阵。
+- $U$ 是 $m\times m$ 的一个正交矩阵。它是 $AA^T$ 的特征向量构成的。
+- $V$ 是 $n\times n$ 的一个正交矩阵。它是 $A^TA$ 的特征向量构成的。
 - $\Sigma$ 是一个 $m\times n$ 的对角矩阵，它可以写成分块矩阵
 $$
 \begin{bmatrix}
@@ -194,8 +195,9 @@ $$
 \end{bmatrix}
 $$
 - 其中 $r$ 为 $A$ 的秩，这里 $\sigma_{i}$ 称为奇异值（Singular Value）。
+**定义 ：** $A$ 的奇异值 $\sigma_{i}=\sqrt{ \lambda_{i} }=\sqrt{ \mu_{i} }$ ，其中 $\lambda_{i},\mu_{i}$ 是 $AA^T$ 和 $A^TA$ 的非零特征值（$i=1,2,\dots,\text{rank}(A)$）。
 
-那么
+（可以这么定义是因为，$AA^T$ 和 $A^TA$ 都是半正定矩阵，特征值都大于零，而且它们的秩都和 $A$ 相同，且它们的非零特征值也相等。验证一下：这里
 $$
 \begin{align}
 A^TA&=(U\Sigma V^T)^TU\Sigma V^T
@@ -216,4 +218,80 @@ $$
 \end{bmatrix}
 $$
 这里就找到了 $A^TA$ 的一个谱分解。那么，$\sigma_{i}^{2}$ 就是 $A^TA$ 的所有非零特征值！
-类似的，由于 $AB$ 和 $BA$ 有相同的非零特征值，那么 $\sigma_{i}^{2}$ 也是 $AA^T$ 的多有非零特征值。
+类似的，由于 $AB$ 和 $BA$ 有相同的非零特征值，那么 $\sigma_{i}^{2}$ 也是 $AA^T$ 的所有非零特征值。
+有 $AA^T=U\Sigma \Sigma^TU^T$。
+）
+这里会发现，由于 $AV=U\Sigma$，如果对 $r$进行分块：
+$$
+A\begin{bmatrix}
+V_{r} & V_{n-r}
+\end{bmatrix}=\begin{bmatrix}
+U_{r}  & U_{m-r}
+\end{bmatrix}\begin{bmatrix}
+\Sigma_{r} & 0 \\
+0 & 0
+\end{bmatrix}
+$$
+也就是 $AV_{r}=U_{r}\Sigma_{r},AV_{n-r}=0$。
+那么 $V$ 的前 $r$ 列就对应 $A$ 的行空间，后 $n-r$ 列就对应 $A$ 的零空间。
+同理， $U$ 的前 $r$ 列对应 $A$ 的列空间，后 $m-r$ 列就对应 $A$ 的左零空间。
+
+要求一个矩阵的 SVD 分解，不能随便选取 $U,V$。
+需要选取：
+$$
+Av_{j}=\sigma_{j}u_{j}, j=1,\dots,r
+$$
+这个从上面的分块矩阵可以看出来。（存在性证明：
+- 若 $v_{j}$ 是 $A^TA$ 的一个单位特征向量，对应特征值 $\sigma_{j}^{2}$，则 $A^TAv_{j}=\sigma_{j}^{2}v_{j}$，进而 $AA^TAv_{j}=\sigma_{j}^{2}Av_{j}$，也就是 $Av_{j}$ 是 $AA^T$ 的一个特征向量，对应特征值 $\sigma_{j}^{2}$。而且
+$$
+\lVert Av_{j} \rVert^{2}=v_{j}^TA^TAv_{j}=v_{j}^T\sigma_{j}^{2} v_{j}=\sigma_{j}^{2}
+$$
+- 那么 $Av_{j} / \sigma_{j}=u_{j}$ 就是 $AA^T$ 的一个单位特征向量，得证。）
+那么就应该先求出 $A^TA$ 的 $r$ 个非零特征值对应的向量和 $n-r$ 个 $A^TA$ 的零空间的向量，来构造 $V$，再利用关系 $u_{j}= Av_{j} / \sigma_{j}$ 来得到前 $r$ 个构造 $u_{j}$。剩下的 $m-r$ 个 $u_{j}$ 需要去求 $N(A^T)$ 然后再做正交化得到。
+
+
+**定理 ：** 任意可逆方阵 $A$ 都可以写成
+$$
+A=Q_{1}SQ_{2}^{-1}
+$$
+其中 $Q_{1},Q_{2}$ 为正交矩阵，$S$ 是一个正定矩阵。
+证明：
+$$
+x^TA^TAx=\lVert Ax \rVert^{2}>0 \forall x\neq 0 
+$$
+所以 $A^TA$ 是正定的实对称矩阵。那么存在谱分解：
+$$
+Q_{2}^TA^TAQ_{2}=\Lambda
+$$
+令 $S=\sqrt{ \Lambda }$，那么 $S$ 是一个正定的对角的可逆矩阵。那么有：
+$$
+S^{-1}Q_{2}^TQ^TAQ_{2}S^{-1}=I
+$$
+那么 $AQ_{2}S^{-1}$ 就是一个正交矩阵，记为 $Q_{1}$。于是有
+$$
+A=Q_{1}SQ_{2}^{-1}
+$$
+
+### SVD 的应用
+
+极分解（Polar Decomposition）：任何实方阵 $A$ 可以分解成 $A=QS$，其中 $Q$ 是正交矩阵，$S$ 是对称的半正定的矩阵。
+（$A=U\Sigma V^T=(UV^T)(V\Sigma V^T)=QS$）
+类比 $z=re^{i\theta}$。这里 $S$ 类似于  $r$，$Q$ 类似与 $e^{i\theta}$。
+
+有效秩（Effective Rank）：用 $A^TA$ 来计算 $A$ 的秩，会更稳定（实际计算中数值可能有一些小的偏差，$A^TA$ 会把这些偏差平方，而缩小。）
+
+图片压缩（Image Compression）：一个 $m\times n$ 的图像，可以进行 SVD 分解，只需要存储 $r$ 个奇异值和奇异向量，共 $r\times(m+n+1)$ 个值。图片压缩比：$\frac{m\times n}{r\times(m+n+1)}$。
+图片降噪（Noice Reduction）：直接丢掉相对来说特别小的奇异值和奇异降噪。
+
+最小二乘（Least Square）的最优解：最小二乘的 Normal Equation $A^TAx=A^Tb$ ，如果 $A^TA$ 不可逆，也就是说，$A$ 不是列满秩的，则可能有多个解 $\hat{x}$。其中最优解为长度最小的解 $x^{+}$。
+- 记作 $x^{+}=A^+b$ 中，$A^+$ 称为 $A$ 的伪逆（Pseuodoinverse）。
+- 容易验证，$\Sigma^{+}$ 就是把每一个 $\sigma$ 求倒数。
+- 一般情况下，由于 $\hat{x}=x_{r}+x_{n}$，那么由于零空间和行空间正交，有 $\lVert \hat{x} \rVert^{2}=\lVert x_{r} \rVert^{2}+\lVert x_{n} \rVert ^{2}$，取 $x_{n}=0$，则得到了最优解，**所以最优解是行空间中的。** （可以解 Normal Equation 然后选行空间中的）
+- ![[Positive Definite Matrices - 正定矩阵.png]]
+- 一般情况下，伪逆有公式
+$$
+A^{+}=V\Sigma^+ U^T
+$$
+- 证明：$\lVert Ax-b \rVert=\lVert U\Sigma V^Tx-b \rVert=\lVert \Sigma V^Tx-U^Tb \rVert$。
+- 令 $y=V^Tx=V^{-1}x$。只需最小化 $\lVert \Sigma y-U^Tb \rVert$。
+- $y^+=\Sigma^+U^Tb$，故而 $x^+=V\Sigma^+U^T$。

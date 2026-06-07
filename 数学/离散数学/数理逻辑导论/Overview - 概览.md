@@ -1,0 +1,11 @@
+
+考试范围：
+
+|                                              | PL (命题逻辑)                                                                                                 | FOL (一阶逻辑)                                                                                                                            |
+| :------------------------------------------- | :-------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------ |
+| **Syntax**<br>(语法)                           | Alphabet ($\land, \lor, \to \dots$)<br>w.f.f. (properties)<br>parse tree<br>precedence, convention        | Alphabet ($\forall, \exists \dots$)<br>const, predicate, function<br>terms, atom, w.f.f.<br>parse tree, convention                    |
+| **Semantics**<br>(语义)                        | Truth table<br>Tautology, contradiction<br>Satisfiable                                                    | free / bound var<br>Interpretation / environment $(\mathcal{I}, \xi)$<br>$\mathcal{I} \models_\xi \alpha \quad \Sigma \models \alpha$ |
+|                                              | $\Sigma \models \alpha \quad \Sigma \not\models \alpha$<br>adequate set<br>$\equiv$ CNF / DNF (principal) | valid, satisfiable<br>unsatisfiable                                                                                                   |
+| **Formal proof<br>system**<br>(形式化证明系统)      | Hilbert, ND, resolution                                                                                   | ND                                                                                                                                    |
+| **Soundness &<br>Completeness**<br>(可靠性与完备性) | Both（不考证明）                                                                                                | Both                                                                                                                                  |
+| **Formalization**<br>(形式化)                   | NL $\to$ PL                                                                                               | NL $\to$ FOL                                                                                                                          |

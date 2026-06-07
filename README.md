@@ -6,17 +6,17 @@
 已经完成的课程：
 - 【全】大学物理（上）
 - 【全】高等数学（上）
+- 【全】大学物理（下）
+- 【全】高等数学（下）
+- 【全】科学与文明史概论
+- 【全】数理逻辑导论
 - 【仅重点】MIT Missing Semester
 - 【仅期末复习】计算机程序设计基础/JavaA
 - 【仅期中复习】大学化学
 - 【仅少量草稿】SUSTech English III
 
 还在更新的课程：
-- 大学物理（下）
-- 高等数学（下）
 - 线性代数
 - 概率论与数理统计
-- 科学与文明史概论
-- 数理逻辑导论
 - 生命科学概论
 - CS 50's Introduction to Artificial Intelligence with Python

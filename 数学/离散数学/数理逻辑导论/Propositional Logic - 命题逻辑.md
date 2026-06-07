@@ -80,7 +80,8 @@ $\to$  的真值表：
 | false | true  | true     |
 | true  | false | false    |
 | true  | true  | true     |
-这里 $P$ 是前件（Antecedent），$Q$ 是后件（Consequence），$P\to Q$ 相当于 $\neg P \land Q$。
+这里 $P$ 是前件（Antecedent），$Q$ 是后件（Consequence），$P\to Q$ 相当于 $\neg P\lor Q$。
+
 
 $\leftrightarrow$ 的真值表：
 

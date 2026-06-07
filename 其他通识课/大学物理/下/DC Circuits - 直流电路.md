@@ -35,7 +35,7 @@ R=\frac{V}{I}\text{(Ohm's Law)}
 $$
 若电阻率处处相等，截面面积不变，则可以推出电阻和电阻率的关系：
 $$
-V=IR=EL=\rho JL=\frac{\rho L}{A}
+V=IR=EL=\rho JL=\frac{\rho IL}{A}
 $$
 $$
 \implies R=\frac{\rho L}{A}

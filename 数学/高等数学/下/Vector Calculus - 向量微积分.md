@@ -67,7 +67,7 @@ $$
 $$
 \frac{ \partial N }{ \partial x } -\frac{ \partial M }{ \partial y } = (\nabla \times\mathbf{F}) \cdot \mathbf{k}
 $$
-也被称为旋度的 k 分量 the k-component of the curl，记作 $(\text{curl } \mathbf{F})\cdot \mathbf{k}$
+也被称为**旋度的 k 分量** the k-component of the curl，记作 $(\text{curl } \mathbf{F})\cdot \mathbf{k}$
 定义散度（Divergence）：
 $$
 \frac{ \partial M }{ \partial x } +\frac{ \partial N }{ \partial y } =\nabla \cdot \mathbf{F}
@@ -79,7 +79,7 @@ $$
 - $C$ 所包围的区域 $R$ 必须是一个有界的闭区域，且其内部不能包含任何向量场无定义的奇点。
 - 向量场 $\mathbf{F} = \langle M, N \rangle$ 的分量函数 $M(x, y)$ 和 $N(x, y)$，以及它们的一阶偏导数 $\frac{\partial M}{\partial x}, \frac{\partial M}{\partial y}, \frac{\partial N}{\partial x}, \frac{\partial N}{\partial y}$，在包含 $R$ 的某个**开区域**上必须是处处连续（Continuous）的。
 - 曲线 $C$ 的方向必须是**正向（逆时针方向）**。判别法：当你沿着曲线 $C$ 的前进方向行走时，被包围的区域 $R$ 必须始终位于你的左手边。如果题目给出的是顺时针方向，积分结果必须乘以 $-1$。
-那么有环流量-旋度（Circulation-Curl）形式：
+那么有环流量-旋度（Circulation-Curl）形式（右边是旋度的 $k$ 分量）：
 $$\oint_{C}\mathbf{F}\cdot \mathbf{T}ds=\oint_C M \, dx + N \, dy = \iint_R \left( \frac{\partial N}{\partial x} - \frac{\partial M}{\partial y} \right) dA$$
 这个旋度可以写成
 $$
@@ -100,6 +100,7 @@ $$
 
 ## 面积分
 
+
 沿着某个曲面做积分，由于曲面有两个自由度，其参数化需要两个变元，曲面的参数方程可以写成：
 $$
 \mathbf{r}(u,v)=x(u,v)\mathbf{i}+y(u,v)\mathbf{j}+z(u,v)\mathbf{k}
@@ -113,30 +114,62 @@ d\sigma=\lvert \mathbf{r}_{u}\times \mathbf{r}_{v} \rvert  du dv
 $$
 其中  $\mathbf{r}_{u},\mathbf{r}_{v}$ 为 $\mathbf{r}$ 对 $u,v$ 求偏导的结果。
 
-这里若 $z=f(x,y)$，则有 $\mathbf{r}=\left< u,v,f(u,v) \right>$，$\mathbf{r}_{u}=\left< 1,0,f_{x} \right>,\mathbf{r}_{v}=\left< 0,1,f_{y} \right>$，故而 $\mathbf{r}_{u}\times r_{v}=\left< -f_{x},-f_{y},1 \right>$，有结论：
+注意：做这样的换算，都要把积分的区域也做投影！
+
+这里若 $z=f(x,y)$，则有 $\mathbf{r}=\left< u,v,f(u,v) \right>$，$\mathbf{r}_{u}=\left< 1,0,f_{x} \right>,\mathbf{r}_{v}=\left< 0,1,f_{y} \right>$，故而 $\mathbf{r}_{u}\times r_{v}=\left< -f_{x},-f_{y},1 \right>$（这里指向上面），有结论：
 $$
 d\sigma=\sqrt{ f_{x}^{2}+f_{y}^{2}+1 }dudv
 $$
 所以 
 $$
-A=\iint_{R} d\sigma=\iint_{R} \sqrt{ f_{x}^{2}+f_{y}^{2}+1 }dxdy
+A=\iint_{R} d\sigma=\iint_{R'} \sqrt{ f_{x}^{2}+f_{y}^{2}+1 }dxdy
 $$
+其中 $R'$ 为 $R$ 向 $xOy$ 平面投影得到。
 另外，若 $F(x,y,z)=c$，可以推导出：
 $$A = \iint_R \frac{|\nabla F|}{|\nabla F \cdot \mathbf{p}|} \, dA$$
-其中 $\mathbf{p}=\mathbf{i},\mathbf{j}\text{ or }\mathbf{k}$。
+其中 $\mathbf{p}=\mathbf{i},\mathbf{j}\text{ or }\mathbf{k}$，区域 $R$ 是一个垂直于 $\mathbf{p}$ 的平面（原来区域对这个平面做投影得到）。
 这相当于投影到某个平面去求，代数推导是，比如假设 $z=h(x,y)$，则 $h_{x}= - \frac{F_{x}}{F_{z}},h_{y}=- \frac{F_{y}}{F_{z}}$，再代入：
 $$
 d\sigma=\sqrt{ \left( - \frac{F_{x}}{F_{z}} \right)^{2}+ \left( -\frac{F_{y}}{F_{z}} \right)^{2}+1 }dxdy= \frac{\lvert \nabla F \rvert }{\lvert F_{z} \rvert }dA
 $$
 
+总结来说，对于标量曲面积分：
+- **形式 A：参数化曲面 $\mathbf{r}(u,v)$ 下**（最通用）
+    $$\iint_S f(x,y,z) \, d\sigma = \iint_R f(\mathbf{r}(u,v)) \, |\mathbf{r}_u \times \mathbf{r}_v| \, du \, dv$$
+    
+- **形式 B：显式曲面 $z = g(x,y)$ 下**（最常见）
+    
+    $$\iint_S f(x,y,z) \, d\sigma = \iint_R f(x,y,g(x,y)) \, \sqrt{\left(\frac{\partial g}{\partial x}\right)^2 + \left(\frac{\partial g}{\partial y}\right)^2 + 1} \, dx \, dy$$
+    
+- **形式 C：隐式曲面 $F(x,y,z) = c$ 下**（投影法）
+    
+    $$\iint_S f(x,y,z) \, d\sigma = \iint_R f(x,y,z) \, \frac{|\nabla F|}{|\nabla F \cdot \mathbf{p}|} \, dA$$
+    
+    _(其中 $\mathbf{p}$ 是垂直于投影平面的单位法向量，通常是 $\mathbf{k}$)_
 
-另外：对曲面求通量，有
+
+如果我们在曲面 $S$ 上可以选定一个**处处连续变化**的单位法向量场 $\mathbf{n}$，使得当你沿着曲面上的任何闭合回路绕一圈回来时，法向量**不会突然反转**，那么这个曲面就叫做**可定向曲面 (Orientable Surface)**。
+**非定向曲面 (Non-orientable Surface)** 的代表——莫比乌斯带。
+
+另外：对曲面求通量，比如有一个场 $\mathbf{F}$，则 Surface Integral of F over S： 
 $$
 \iint _{S}\mathbf{F}\cdot \mathbf{n}d\sigma=\iint_{S}\mathbf{F}\cdot \frac{\mathbf{r}_{u}\times \mathbf{r}_{v}}{\lvert \mathbf{r}_{u}\times \mathbf{r}_{v} \rvert }\lvert \mathbf{r}_{u}\times \mathbf{r}_{v} \rvert dudv=\iint_{S}\mathbf{F}\cdot(\mathbf{r}_{u}\times \mathbf{r}_{v})dudv
 $$
+这里的 $\mathbf{n}$ 的方向需要确定：
+- **封闭曲面 (Closed Surfaces)** 
+    封闭曲面默认只有两种定向：
+    1. **向外定向 (Outward Orientation)**：法向量 $\mathbf{n}$ 处处指向几何体的**外部**（微积分和物理学默认的**正方向**）。
+    2. **向内定向 (Inward Orientation)**：法向量 $\mathbf{n}$ 处处指向几何体的**内部**。
+- **开放曲面 (Open Surfaces)** —— 如一个雷达锅盖、一个平坦圆盘。
+    开放曲面没有绝对的内外之分，课本通过分量来定义：
+    1. **向上定向 (Upward Orientation)**：法向量 $\mathbf{n}$ 的 $z$ 轴分量（即 $\mathbf{k}$ 分量）必须是**正数**。
+    2. **向下定向 (Downward Orientation)**：法向量 $\mathbf{n}$ 的 $z$ 轴分量必须是**负数**。
 
+类似于之前的多重积分，还可以求曲面的质量（$\iint \delta d\sigma$）和质心/转动惯量等。
 
-斯托克斯定理（Stokes Theorem）：
+### 斯托克斯定理
+
+**斯托克斯定理（Stokes Theorem）：** 流量 - 旋度。
 - 定义在一个场 $\mathbf{F}$ 中某点的旋度（Curl）为
 $$
 \nabla \times \mathbf{F}
@@ -146,6 +179,62 @@ $$
 $$
 \oint_{C}\mathbf{F}\cdot d\mathbf{r}=\iint_{S}(\nabla \times \mathbf{F})\cdot \mathbf{n}d\sigma
 $$
-- 其中 $C$ 是一个闭合边界，$S$ 是以 $C$ 为边界的一个曲面。
+- 其中 $C$ 是一个闭合边界，$S$ 是以 $C$ 为边界的一个**分段光滑曲面**。
 - 也就是说，以 $C$ 为边界的曲面的旋度场的通量，等于这个边界上的环流量。
 - 那么对于一个复杂的曲面积分，可以改成算一个线积分，也可以换成一个简单的（有相同边界的）曲面的积分；对于一个复杂的环流量线积分，也可以换成一个简单曲面的旋度通量积分。
+
+这里要注意，作为一个通量积分，仍然有：
+$$
+d\mathbf{S}=\mathbf{n}d\sigma= \frac{r_{u}\times r_{v}}{\lvert r_{u}\times r_{v} \rvert }\lvert r_{u}\times r_{v} \rvert =r_{u}\times r_{v}
+$$
+那么对于 $z=f(x,y)$，仍然有 $r_{u}\times r_{v}=(-f_{x},-f_{y},1)$。
+
+如果曲面有洞：公式里的边界 $C$ 会变成**一组曲线的集合**：
+
+$$\iint_S (\nabla \times \mathbf{F}) \cdot \mathbf{n} \, d\sigma = \oint_{C_{\text{outer}}} \mathbf{F} \cdot d\mathbf{r} + \oint_{C_{\text{inner}}} \mathbf{F} \cdot d\mathbf{r}$$
+
+根据右手螺旋定则，当曲面的法向量 $\mathbf{n}$ 向上时：
+- **外边界（Outer boundary）**：必须是**逆时针（Counterclockwise）**方向。
+- **内边界（Hole boundary）**：必须是**顺时针（Clockwise）**方向。
+（保持曲面在左手边）
+
+定理：**任何标量场的梯度场，其旋度必为零向量。**
+$$\text{curl}(\text{grad } f) = \mathbf{0} \quad \text{或} \quad \nabla \times \nabla f = \mathbf{0} \quad \text{}$$
+在**连通且单连通（Connected & Simply Connected）的开放区域 $D$** 中，TFAE：
+1. $\mathbf{F}$ 是保守场（$\mathbf{F} = \nabla f$ 存在势函数）。
+2. 沿着区域内任何闭合回路的线积分永远为 0（$\oint_C \mathbf{F} \cdot d\mathbf{r} = 0$）。
+3. 向量场线积分严格路径无关（Path Independence）。
+4. **区域内处处无旋：$\nabla \times \mathbf{F} = \mathbf{0}$**。
+
+
+### 散度定理
+
+> 1. 曲面 $S$ 必须是一个**分段平滑 (Piecewise smooth)** 的**闭合曲面 (Closed Surface)**（比如完整的球面、立方体表面、圆柱体含上下底面）。它包围着一个三维立体区域 $D$。
+> 2. 法向量 $\mathbf{n}$ 必须是**向外定向的单位法向量 (Outward unit normal vector)**。
+> 3. 向量场 $\mathbf{F} = M\mathbf{i} + N\mathbf{j} + P\mathbf{k}$ 的三个分量在区域 $D$ 及其边界 $S$ 上必须有**连续的一阶偏导数**。
+
+**【三维散度定义】**：在三维空间某一点上，流体向外膨胀的微观速率为：
+$$\text{div } \mathbf{F} = \nabla \cdot \mathbf{F} = \frac{\partial M}{\partial x} + \frac{\partial N}{\partial y} + \frac{\partial P}{\partial z}$$
+**散度定理**（Divergence Theorem）：
+
+$$\iint_S \mathbf{F} \cdot \mathbf{n} \, d\sigma = \iiint_D \nabla \cdot \mathbf{F} \, dV$$
+左边是一个面 $S$ 的通量，右边是内部体积 $D$ 中的散度。
+推论：如果一个向量场 $\mathbf{G}$ 是另一个场的旋度（即 $\mathbf{G} = \text{curl } \mathbf{F}$），那么 $\mathbf{G}$ 穿过任何“**闭合曲面** $S$”的向外总通量必定为零。
+$$\iint_S (\nabla \times \mathbf{F}) \cdot \mathbf{n} \, d\sigma = 0$$
+如果向量场 $\mathbf{F}$ 具有连续的二阶偏导数，那么它的旋度的散度必定为零，即 $\text{div}(\text{curl } \mathbf{F}) = \nabla \cdot (\nabla \times \mathbf{F}) = 0$。
+
+总结：
+“保守场 $\nabla f$ 必定无旋（$\nabla \times \nabla f = 0$）”
+“旋度场 $\nabla \times \mathbf{F}$ 必定无源（$\nabla \cdot (\nabla \times \mathbf{F}) = 0$）”
+
+（考点：对于一个场 $\mathbf{G}$，是否存在某个向量场 $\mathbf{F}$，使得 $\mathbf{G} = \nabla \times\mathbf{F}$？只需要去算算 $\nabla \cdot \mathbf{G}$，只要它不为零，就不可能存在 $\mathbf{F}$）。
+### 总结
+
+
+| **定理名称**                                                  | **维度与几何体**                               | **内部积分 (区域上的“导数”累积)**                                                                                                      | **=**   | **边界积分 (边界上的“原函数”表现)**                                                                                         |
+| --------------------------------------------------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
+| **微积分基本定理** (Fundamental Theorem)                         | **1 维**<br><br>  <br><br>线段区间 $[a,b]$    | $\displaystyle\int_a^b \color{red}{f'(x)} \, dx$<br><br>  <br><br>_(内部导数的线积分)_                                             | **$=$** | $\displaystyle \color{blue}{f(b) - f(a)}$<br><br>  <br><br>_(两端点的值相减)_                                         |
+| **格林定理 (环流-旋度)**<br><br>  <br><br>(Green's - Circulation) | **2 维**<br><br>  <br><br>平坦闭区域 $R$       | $\displaystyle\iint_R \color{red}{(\nabla \times \mathbf{F}) \cdot \mathbf{k}} \, dA$<br><br>  <br><br>_(内部微观旋度的面积分)_      | **$=$** | $\displaystyle\oint_C \color{blue}{\mathbf{F} \cdot d\mathbf{r}}$<br><br>  <br><br>_(边界曲线上的总环流做功)_             |
+| **格林定理 (通量-散度)**<br><br>  <br><br>(Green's - Flux)        | **2 维**<br><br>  <br><br>平坦闭区域 $R$       | $\displaystyle\iint_R \color{red}{(\nabla \cdot \mathbf{F})} \, dA$<br><br>  <br><br>_(内部微观散度的面积分)_                        | **$=$** | $\displaystyle\oint_C \color{blue}{\mathbf{F} \cdot \mathbf{n}} \, ds$<br><br>  <br><br>_(穿过边界曲线的总外通量)_        |
+| **斯托克斯定理**<br><br>  <br><br>(Stokes' Theorem)             | **3 维 (曲面)**<br><br>  <br><br>空间弯曲曲面 $S$ | $\displaystyle\iint_S \color{red}{(\nabla \times \mathbf{F}) \cdot \mathbf{n}} \, d\sigma$<br><br>  <br><br>_(曲面微观旋度的面积分)_ | **$=$** | $\displaystyle\oint_C \color{blue}{\mathbf{F} \cdot d\mathbf{r}}$<br><br>  <br><br>_(边界铁丝圈上的总环流做功)_            |
+| **散度定理 (高斯公式)**<br><br>  <br><br>(Divergence Theorem)     | **3 维 (实体)**<br><br>  <br><br>实心立体空间 $D$ | $\displaystyle\iiint_D \color{red}{(\nabla \cdot \mathbf{F})} \, dV$<br><br>  <br><br>_(立体微观散度的体积分)_                       | **$=$** | $\displaystyle\iint_S \color{blue}{\mathbf{F} \cdot \mathbf{n}} \, d\sigma$<br><br>  <br><br>_(穿过边界闭合曲面的总外通量)_ |

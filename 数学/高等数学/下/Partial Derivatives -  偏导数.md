@@ -79,6 +79,10 @@ $$
 多元函数在某个点可微，可以推出它在这一点连续。
 要证明不可微，可以通过证明不连续。
 
+$$
+偏导数连续    \implies可微    \implies连续 且 偏导数存在。
+$$
+
 ### 链式法则
 
 链式法则（Chain Rule）：
@@ -205,5 +209,6 @@ $$
 ![[Partial Derivatives -  偏导数-1.png]]
 也就是说
 $$
-f(x,y)=\left( \sum_{k=0}^{n} \frac{1}{n!}\left( x \frac{ \partial  }{ \partial x } +y \frac{ \partial  }{ \partial y }  \right)^{k}f   \right)+ \left( \frac{1}{(n+1)!}\left( x\frac{ \partial  }{ \partial x } +y\frac{ \partial  }{ \partial y }  \right)^{n+1} f\right)_{(cx, cy)} 
+f(x,y)=\left( \sum_{k=0}^{n} \frac{1}{k!}\left( x \frac{ \partial  }{ \partial x } +y \frac{ \partial  }{ \partial y }  \right)^{k}f   \right)+ \left( \frac{1}{(n+1)!}\left( x\frac{ \partial  }{ \partial x } +y\frac{ \partial  }{ \partial y }  \right)^{n+1} f\right)_{(cx, cy)} 
 $$ 
+
