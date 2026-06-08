@@ -9,3 +9,4 @@
 | **Formal proof<br>system**<br>(形式化证明系统)      | Hilbert, ND, resolution                                                                                   | ND                                                                                                                                    |
 | **Soundness &<br>Completeness**<br>(可靠性与完备性) | Both（不考证明）                                                                                                | Both                                                                                                                                  |
 | **Formalization**<br>(形式化)                   | NL $\to$ PL                                                                                               | NL $\to$ FOL                                                                                                                          |
+预备知识/证明系统的可靠性与完备性证明/霍尔逻辑不考。

@@ -69,9 +69,9 @@ Formula（公式）的定义为， $\alpha \in Form(\mathscr L)$ 当且仅当它
 ### 形式化表达（Formalization）
 
 Every student knows math.
-$\forall xS(x)\to K(x,\text{Math})$
+$\forall x(S(x)\to K(x,\text{Math})$
 Some student knows math.
-$\exists xS(x)\land K(x,\text{Math})$
+$\exists x(S(x)\land K(x,\text{Math}))$
 
 Every student is younger than some instructor.
 $\forall x(S(x)\to(\exists y(I(y)\land Y(x,y))))$

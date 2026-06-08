@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "README.md",
+                "file": "数学/离散数学/数理逻辑导论/Overview - 概览.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "README"
+              "title": "Overview - 概览"
             }
           }
         ]
@@ -142,13 +142,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "README.md",
+                "file": "数学/离散数学/数理逻辑导论/FOL - 一阶逻辑.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "README 的大纲"
+              "title": "FOL - 一阶逻辑 的大纲"
             }
           },
           {
@@ -191,12 +191,15 @@
       "claude-sidebar:New Claude Tab": false
     }
   },
-  "active": "34e71b6dd17ff648",
+  "active": "80c96e901bb066b4",
   "lastOpenFiles": [
+    "数学/离散数学/数理逻辑导论/FOL - 一阶逻辑.md",
+    "数学/离散数学/数理逻辑导论/Overview - 概览.md",
+    "数学/离散数学/数理逻辑导论/Propositional Logic - 命题逻辑.md",
+    "README.md",
     "其他通识课/科学与文明史概论/Insights.md",
     "其他通识课/大学物理/下/Synthesis of Electromagnetism - 电磁学综合.md",
     "其他通识课/大学物理/下/Optics - 光学.md",
-    "数学/离散数学/数理逻辑导论/Propositional Logic - 命题逻辑.md",
     "数学/离散数学/数理逻辑导论/Prerequisite Knowledge - 预备知识.md",
     "其他通识课/大学物理/下/Electrostatics - 静电学.md",
     "其他通识课/大学物理/下/DC Circuits - 直流电路.md",
@@ -212,13 +215,10 @@
     "其他通识课/科学与文明史概论/History.md",
     "其他通识课/大学物理/下/Quantum Physics - 量子物理.md",
     "数学/概率论与数理统计/Random Variables - 随机变量.md",
-    "数学/离散数学/数理逻辑导论/Overview - 概览.md",
     "其他通识课/大学物理/下/Magnetism and Induction - 磁学与电磁感应.md",
     "数学/线性代数/Review - 复习.md",
     "数学/线性代数/Positive Definite Matrices - 正定矩阵.md",
     "数学/线性代数/Complex Matrices - 复矩阵.md",
-    "数学/线性代数/Matrices and System of Linear Equations -  矩阵与线性方程组.md",
-    "其他通识课/生命科学概论/Plants - 植物.md",
     "笔记依赖/图片/Positive Definite Matrices - 正定矩阵.png",
     "笔记依赖/图片/IMG_3056.heic",
     "笔记依赖/图片/Program Verification - 程序验证-4.png",
