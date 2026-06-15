@@ -4,21 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "87de5e9db0040ee0",
+        "id": "a956b1fad92c1fea",
         "type": "tabs",
         "children": [
           {
-            "id": "57860f399f654a1f",
+            "id": "46723fb12bc32b7c",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "计算机/SUSTech CS109 - Java.md",
+                "file": "README.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "SUSTech CS109 - Java"
+              "title": "README"
             }
           }
         ]
@@ -142,13 +142,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "计算机/SUSTech CS109 - Java.md",
+                "file": "README.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "SUSTech CS109 - Java 的大纲"
+              "title": "README 的大纲"
             }
           },
           {
@@ -191,8 +191,17 @@
       "claude-sidebar:New Claude Tab": false
     }
   },
-  "active": "34e71b6dd17ff648",
+  "active": "46723fb12bc32b7c",
   "lastOpenFiles": [
+    "其他通识课/SE III Draft.md",
+    "其他通识课/生命科学概论/Cell Biology - 细胞生物学.md",
+    "其他通识课/生命科学概论/Brain and Mind - 脑与心智.md",
+    "其他通识课/生命科学概论/Plants - 植物.md",
+    "其他通识课/生命科学概论/Big Data - 大数据.md",
+    "README.md",
+    "其他通识课/生命科学概论/总复习.pdf",
+    "其他通识课/生命科学概论/考前速记.pdf",
+    "计算机/SUSTech CS109 - Java.md",
     "计算机/MIT Missing Semester/Git - 版本控制.md",
     "计算机/MIT Missing Semester/Metaprogramming - 元编程.md",
     "计算机/MIT Missing Semester/Basic Cryptography - 基础密码学.md",
@@ -200,7 +209,6 @@
     "计算机/Harvard CS50 - AI/2 - Uncertainty.md",
     "计算机/Harvard CS50 - AI/1 - Knowledge.md",
     "计算机/Harvard CS50 - AI/0 - Search.md",
-    "计算机/SUSTech CS109 - Java.md",
     "其他通识课/大学物理/上/Longitudinal Wave - 纵波.md",
     "其他通识课/大学物理/上/Transverse Wave - 横波.md",
     "其他通识课/大学物理/上/Oscillations - 振动.md",
@@ -209,17 +217,10 @@
     "其他通识课/大学物理/下/Relativity - 相对论.md",
     "其他通识课/大学物理/下/Optics - 光学.md",
     "其他通识课/大学物理/下/Synthesis of Electromagnetism - 电磁学综合.md",
-    "其他通识课/生命科学概论/Big Data - 大数据.md",
     "其他通识课/生命科学概论/总复习.md",
     "其他通识课/生命科学概论/考前速记.md",
-    "其他通识课/生命科学概论/总复习.pdf",
     "数学/线性代数/Final Review - 期末复习.md",
     "数学/离散数学/数理逻辑导论/Program Verification - 程序验证.md",
-    "数学/线性代数/Positive Definite Matrices - 正定矩阵.md",
-    "数学/线性代数/Complex Matrices - 复矩阵.md",
-    "数学/线性代数/Eigenvalues and Eigenvectors - 特征值和特征向量.md",
-    "其他通识课/生命科学概论/Cell Biology - 细胞生物学.md",
-    "数学/线性代数/Orthogonal - 正交.md",
     "笔记依赖/图片/Positive Definite Matrices - 正定矩阵.png",
     "笔记依赖/图片/IMG_3056.heic",
     "笔记依赖/图片/Program Verification - 程序验证-4.png",
@@ -238,7 +239,6 @@
     "数学/高等数学/上",
     "未命名.canvas",
     "杂类文档/Homeworks",
-    "未命名.base",
-    "a.txt"
+    "未命名.base"
   ]
 }
