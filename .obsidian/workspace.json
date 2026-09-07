@@ -4,21 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "a956b1fad92c1fea",
+        "id": "2a20c66238406595",
         "type": "tabs",
         "children": [
           {
-            "id": "46723fb12bc32b7c",
+            "id": "13421daa9c8e4e1f",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "README.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "README"
+              "title": "新标签页"
             }
           }
         ]
@@ -41,7 +37,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "byCreatedTime",
-                "autoReveal": true
+                "autoReveal": true,
+                "showSearch": false,
+                "searchQuery": ""
               },
               "icon": "lucide-folder-closed",
               "title": "文件列表"
@@ -191,54 +189,54 @@
       "claude-sidebar:New Claude Tab": false
     }
   },
-  "active": "46723fb12bc32b7c",
+  "active": "31271abb7afa9ba4",
   "lastOpenFiles": [
-    "其他通识课/SE III Draft.md",
-    "其他通识课/生命科学概论/Cell Biology - 细胞生物学.md",
-    "其他通识课/生命科学概论/Brain and Mind - 脑与心智.md",
-    "其他通识课/生命科学概论/Plants - 植物.md",
-    "其他通识课/生命科学概论/Big Data - 大数据.md",
+    "笔记依赖/证明/Integral-1.md",
+    "笔记依赖/证明/Derivative-1.md",
+    "笔记依赖/证明/Wave-1.md",
+    "笔记依赖/证明/Wave-2.md",
+    "笔记依赖/证明/Gas - 1.md",
+    "计算机/Harvard CS50 - AI/5 - Neural Networks.md",
+    "计算机/Harvard CS50 - AI/6 - Language.md",
+    "笔记依赖/图片/Pasted image 20260627162938.png",
+    "笔记依赖/图片/Pasted image 20260628211041.png",
     "README.md",
-    "其他通识课/生命科学概论/总复习.pdf",
-    "其他通识课/生命科学概论/考前速记.pdf",
-    "计算机/SUSTech CS109 - Java.md",
-    "计算机/MIT Missing Semester/Git - 版本控制.md",
-    "计算机/MIT Missing Semester/Metaprogramming - 元编程.md",
-    "计算机/MIT Missing Semester/Basic Cryptography - 基础密码学.md",
-    "计算机/Harvard CS50 - AI/3 - Optimization.md",
-    "计算机/Harvard CS50 - AI/2 - Uncertainty.md",
-    "计算机/Harvard CS50 - AI/1 - Knowledge.md",
-    "计算机/Harvard CS50 - AI/0 - Search.md",
-    "其他通识课/大学物理/上/Longitudinal Wave - 纵波.md",
-    "其他通识课/大学物理/上/Transverse Wave - 横波.md",
-    "其他通识课/大学物理/上/Oscillations - 振动.md",
-    "其他通识课/大学物理/上/Rolling and Precession - 滚动和进动.md",
+    "数学/离散数学/Logic - 逻辑.md",
+    "笔记依赖/图片/Logic - 逻辑.png",
+    "数学/数理逻辑导论/Propositional Logic - 命题逻辑.md",
+    "数学/离散数学/Set Theory - 集合论.md",
+    "数学/概率论与数理统计/Random Variables - 随机变量.md",
+    "数学/概率论与数理统计/Probability Distributions - 概率分布.md",
+    "未命名.base",
+    "2014_Liu-Shuang_FaceCategorisation_FSVP_导读与翻译.md",
+    "数学/线性代数/Matrices and System of Linear Equations -  矩阵与线性方程组.md",
+    "数学/线性代数/Eigenvalues and Eigenvectors - 特征值和特征向量.md",
+    "数学/线性代数/Orthogonal - 正交.md",
+    "数学/线性代数/Complex Matrices - 复矩阵.md",
+    "数学/线性代数/Positive Definite Matrices - 正定矩阵.md",
+    "数学/线性代数/Linear Transformation - 线性变换.md",
+    "数学/线性代数/Determinant - 行列式.md",
+    "其他通识课/科学与文明史概论/History.md",
     "其他通识课/科学与文明史概论/Review.md",
-    "其他通识课/大学物理/下/Relativity - 相对论.md",
-    "其他通识课/大学物理/下/Optics - 光学.md",
-    "其他通识课/大学物理/下/Synthesis of Electromagnetism - 电磁学综合.md",
-    "其他通识课/生命科学概论/总复习.md",
-    "其他通识课/生命科学概论/考前速记.md",
-    "数学/线性代数/Final Review - 期末复习.md",
-    "数学/离散数学/数理逻辑导论/Program Verification - 程序验证.md",
-    "笔记依赖/图片/Positive Definite Matrices - 正定矩阵.png",
+    "其他通识课/科学与文明史概论/Insights.md",
+    "数学/线性代数/Vector Space - 向量空间.md",
+    "数学/线性代数/The Properties of Matrices - 矩阵的性质.md",
+    "笔记依赖/图片/6 - Language-1.png",
+    "笔记依赖/图片/6 - Language.png",
+    "笔记依赖/图片/5 - Neural Networks-9.png",
+    "笔记依赖/图片/5 - Neural Networks-8.png",
+    "笔记依赖/图片/5 - Neural Networks-7.png",
+    "笔记依赖/图片/5 - Neural Networks-6.png",
+    "笔记依赖/图片/5 - Neural Networks-5.png",
+    "其他通识课/生命科学概论/考前速记.pdf",
+    "其他通识课/生命科学概论/总复习.pdf",
+    "其他通识课/生命科学概论/总复习.pdf",
     "笔记依赖/图片/IMG_3056.heic",
-    "笔记依赖/图片/Program Verification - 程序验证-4.png",
-    "笔记依赖/图片/Program Verification - 程序验证-3.png",
-    "笔记依赖/图片/Pasted image 20260603110049.png",
-    "笔记依赖/图片/Program Verification - 程序验证-2.png",
-    "笔记依赖/图片/Pasted image 20260603105405.png",
-    "笔记依赖/图片/Program Verification - 程序验证-1.png",
-    "笔记依赖/图片/Program Verification - 程序验证.png",
-    "笔记依赖/图片/Pasted image 20260527174316.png",
     "其他通识课",
-    "笔记依赖/图片/History.png",
     "数学/概率论与数理统计",
     "数学/离散数学",
     "数学/高等数学/下",
     "数学/高等数学/上",
-    "未命名.canvas",
-    "杂类文档/Homeworks",
-    "未命名.base"
+    "未命名.canvas"
   ]
 }

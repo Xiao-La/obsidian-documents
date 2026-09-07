@@ -10,6 +10,7 @@
 - 【全】高等数学（上）/（下）
 - 【全】线性代数
 - 【全】科学与文明史概论
+- 【全】CS50's Introduction to Artificial Intelligence with Python
 - 【仅期末复习】计算机程序设计基础/JavaA
 - 【仅期末复习】生命科学概论
 - 【仅期中复习】大学化学
@@ -21,4 +22,3 @@
 
 还在更新的课程：
 - 概率论与数理统计
-- CS 50's Introduction to Artificial Intelligence with Python
