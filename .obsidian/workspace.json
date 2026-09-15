@@ -4,17 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "2a20c66238406595",
+        "id": "4772ce9a245e3b3f",
         "type": "tabs",
         "children": [
           {
-            "id": "13421daa9c8e4e1f",
+            "id": "8d96f2563c162842",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "README.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "新标签页"
+              "title": "README"
             }
           }
         ]
@@ -76,7 +80,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 335.5
+    "width": 245.13932418823242
   },
   "right": {
     "id": "f29a0e88d7772e16",
@@ -189,54 +193,53 @@
       "claude-sidebar:New Claude Tab": false
     }
   },
-  "active": "31271abb7afa9ba4",
+  "active": "8d96f2563c162842",
   "lastOpenFiles": [
+    "计算机/数字逻辑/Boolean Algebra - 布尔代数.md",
+    "笔记依赖/图片/Boolean Algebra - 布尔代数-3.png",
+    "笔记依赖/图片/Boolean Algebra - 布尔代数-2.png",
+    "笔记依赖/图片/Boolean Algebra - 布尔代数-1.png",
+    "笔记依赖/图片/Boolean Algebra - 布尔代数.png",
+    "计算机/数字逻辑/Number Systems - 数字系统.md",
+    "笔记依赖/图片/Number Systems - 数字系统-12.png",
+    "笔记依赖/图片/Number Systems - 数字系统-11.png",
+    "数学/概率与统计/Random Variables - 随机变量.md",
+    "数学/概率与统计/Probability Basic - 概率基础.md",
+    "其他通识课/科学哲学/Lecture1.md",
+    "笔记依赖/图片/Probability Basic - 概率基础.png",
+    "README.md",
+    "笔记依赖/图片/Lecture1.png",
+    "其他通识课/科学与文明史概论/History.md",
+    "其他通识课/科学与文明史概论/Review.md",
+    "其他通识课/科学与文明史概论/Insights.md",
+    "其他通识课/科学与文明史概论/Special Lecture.md",
+    "计算机/DSAA/Introduction.md",
+    "其他通识课/科学哲学",
+    "数学/离散数学/Logic - 逻辑.md",
+    "数学/数理逻辑导论/Propositional Logic - 命题逻辑.md",
+    "其他通识课/旧石器艺术与符号/Week1.md",
+    "笔记依赖/图片/Week1.png",
+    "其他通识课/旧石器艺术与符号",
+    "其他通识课/未命名.md",
+    "笔记依赖/图片/Introduction.png",
+    "其他通识课/大学物理/上/Thermodynamics - 热力学.md",
+    "计算机/DSAA",
+    "计算机/数字逻辑",
+    "计算机/未命名.md",
+    "数学/离散数学/Set Theory - 集合论.md",
+    "其他通识课/生命科学概论/考前速记.pdf",
+    "其他通识课/生命科学概论/总复习.pdf",
+    "笔记依赖/证明/Rolling-1.md",
     "笔记依赖/证明/Integral-1.md",
     "笔记依赖/证明/Derivative-1.md",
     "笔记依赖/证明/Wave-1.md",
     "笔记依赖/证明/Wave-2.md",
     "笔记依赖/证明/Gas - 1.md",
     "计算机/Harvard CS50 - AI/5 - Neural Networks.md",
-    "计算机/Harvard CS50 - AI/6 - Language.md",
-    "笔记依赖/图片/Pasted image 20260627162938.png",
-    "笔记依赖/图片/Pasted image 20260628211041.png",
-    "README.md",
-    "数学/离散数学/Logic - 逻辑.md",
-    "笔记依赖/图片/Logic - 逻辑.png",
-    "数学/数理逻辑导论/Propositional Logic - 命题逻辑.md",
-    "数学/离散数学/Set Theory - 集合论.md",
-    "数学/概率论与数理统计/Random Variables - 随机变量.md",
-    "数学/概率论与数理统计/Probability Distributions - 概率分布.md",
     "未命名.base",
-    "2014_Liu-Shuang_FaceCategorisation_FSVP_导读与翻译.md",
-    "数学/线性代数/Matrices and System of Linear Equations -  矩阵与线性方程组.md",
-    "数学/线性代数/Eigenvalues and Eigenvectors - 特征值和特征向量.md",
-    "数学/线性代数/Orthogonal - 正交.md",
-    "数学/线性代数/Complex Matrices - 复矩阵.md",
-    "数学/线性代数/Positive Definite Matrices - 正定矩阵.md",
-    "数学/线性代数/Linear Transformation - 线性变换.md",
-    "数学/线性代数/Determinant - 行列式.md",
-    "其他通识课/科学与文明史概论/History.md",
-    "其他通识课/科学与文明史概论/Review.md",
-    "其他通识课/科学与文明史概论/Insights.md",
-    "数学/线性代数/Vector Space - 向量空间.md",
-    "数学/线性代数/The Properties of Matrices - 矩阵的性质.md",
-    "笔记依赖/图片/6 - Language-1.png",
-    "笔记依赖/图片/6 - Language.png",
-    "笔记依赖/图片/5 - Neural Networks-9.png",
-    "笔记依赖/图片/5 - Neural Networks-8.png",
-    "笔记依赖/图片/5 - Neural Networks-7.png",
-    "笔记依赖/图片/5 - Neural Networks-6.png",
-    "笔记依赖/图片/5 - Neural Networks-5.png",
-    "其他通识课/生命科学概论/考前速记.pdf",
-    "其他通识课/生命科学概论/总复习.pdf",
-    "其他通识课/生命科学概论/总复习.pdf",
     "笔记依赖/图片/IMG_3056.heic",
     "其他通识课",
-    "数学/概率论与数理统计",
-    "数学/离散数学",
-    "数学/高等数学/下",
-    "数学/高等数学/上",
+    "数学/概率与统计",
     "未命名.canvas"
   ]
 }

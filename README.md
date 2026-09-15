@@ -10,7 +10,6 @@
 - 【全】高等数学（上）/（下）
 - 【全】线性代数
 - 【全】科学与文明史概论
-- 【全】CS50's Introduction to Artificial Intelligence with Python
 - 【仅期末复习】计算机程序设计基础/JavaA
 - 【仅期末复习】生命科学概论
 - 【仅期中复习】大学化学
@@ -18,7 +17,13 @@
 
 专业课
 - 【全】数理逻辑导论
+- 【全】CS50's Introduction to Artificial Intelligence with Python
 - 【仅重点】MIT Missing Semester
 
 还在更新的课程：
-- 概率论与数理统计
+- 概率与统计
+- 离散数学
+- 数字逻辑
+- 数据结构与算法分析
+- 旧石器艺术与符号
+- 科学哲学
