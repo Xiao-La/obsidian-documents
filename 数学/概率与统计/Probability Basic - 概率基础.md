@@ -91,6 +91,7 @@ $$
 - 最终可以算出 $P(A)=1-\frac{1}{2!}+\frac{1}{3!}+\dots+(-1)^{n-1} \frac{1}{n!}$。
 - 当 $n\to \infty$，$P(A)\to 1-\frac{1}{e}$。
 - 错位排列的概率 $P(\overline{A})\to \frac{1}{e}$。
+- 错排数 $D_{n}=n!P(A)$。
 ### 几何概型（Geometric Model of Probability）
 
 几何概型适用于：随机事件可表示成在一个有界区域 $\Omega$ 上投点，每一个点是等可能的。
@@ -111,3 +112,22 @@ $$
 也就是说，样本空间从 $\Omega$ 变成了 $B$。
 - 乘法定律：$P(AB)=P(A|B)P(B)$
 - 全概率公式：$P(A)=P(A \overline{B})+P(AB)=P(A|\overline{B})P(\overline{B})+P(A|B)P(B)$
+- 链式法则：$P(A_{1}A_{2}\dots A_{n})=P(A_{n}|A_{1}A_{2}\dots A_{n-1})P(A_{n-1}|A_{1}A_{2}\dots A_{n-2})\dots P(A_{2}|A_{1})P(A_{1})$
+
+贝叶斯定理（Bayes' Theorem）
+$$
+P(B_{i}|A)= \frac{P(B_{i})P(A|B_{i})}{\sum P(B_{i})P(A|B_{i})}
+$$
+其中 $B_{1}, \dots, B_{n}$ 是样本空间的一个划分（partition）。
+这里 $P(B_{i}|A)$ 称为 $B_{i}$ 的后验概率（Posterior probability）； $P(B_{i})$ 叫做 $B_{i}$ 的先验概率（Prior probability）。
+
+独立性（Independence）：
+- 从条件概率来看，就是事件 $A$ 的发生不影响 $B$ 的概率，反之亦然。
+- 两个事件相互独立就是 $P(AB)=P(A)P(B)$。
+- 三个事件相互独立就是 $P(AB)=P(A)P(B), P(AC)=P(A)P(C), P(BC)=P(B)P(C), P(ABC)=P(A)P(B)P(C)$。
+- $n$ 个事件 $A_{1}\dots A_{n}$ 相互独立：对任意这些事件的子集 $A_{i_{1}}, A_{i_{2}}\dots A_{i_{}k}$，都有 $P(A_{i_{1}}\dots A_{i_{k}})=P(A_{i_{1}})\dots P(A_{i_{k}})$。
+ 
+条件独立性（Conditional Independence）
+- 把上面的条件概率的定义改成 $P(A_{i_{1}}\dots A_{i_{k}}|B)=P(A_{i_{1}}|B)\dots P(A_{i_{k}}|B)$。
+
+条件独立性和独立性是互相不能推出的。

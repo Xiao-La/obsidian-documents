@@ -17,7 +17,7 @@
 例如异或的真值表：
 ![[Logic - 逻辑.png|233]]
 - $p\oplus q\equiv \neg(p\leftrightarrow q)$
-- $p\to q \equiv \neg p\lor q$
+- $p\to q \equiv \neg p\lor q$ (Useful Law)
 
 关于 Implication，有一些对应的概念：
 - Converse of $p\to q$ ： $q\to p$（反/逆命题）
@@ -93,7 +93,7 @@ Negation Laws
 
 有量词的逻辑。
 - Existential Quantifier：$\exists$
-- Universal Quantifier：$\forall$
+- Universal Quantifier：$\forall$ 
 
 谓词逻辑包含
 - Constant
@@ -105,3 +105,50 @@ Predicate $P(x_{1},\dots,x_{n})$ 只能称为**Statement**；只有当每个 $x_
 - Truth set：让 $P(x_{1},\dots ,x_{n})$ 成立的取值 $(x_{1},x_{2}\dots x_{n})$ 的集合。
 
 $\forall$ 和 $\exists$ 的优先级比其他逻辑运算符更高。
+
+通常 $\forall, \to$ 搭配，$\exists, \land$ 搭配。
+-  $\neg \exists x P(x)\equiv \forall x\neg P(x)$ (De Morgan Law) 否定之后改变量词类型，把否定放到谓词上。这对嵌套也成立：  $\neg(\forall x\exists yP(x,y))\equiv \exists x\forall y\neg P(x,y)$。
+- $\neg \forall x(P(x)\to Q(x))\equiv \exists x(P(x)\land \neg Q(x))$
+
+嵌套的量词若种类不同不可交换。
+
+翻译：There is **EXACTLY** one person whom everybody loves.
+$$
+\exists y(\forall xL(x,y) \land \forall z(\forall xL(x,z)\to z=y))
+$$
+
+
+## Inference
+
+对于命题逻辑有如下的 **Inference Rules:**
+![[Logic - 逻辑-1.png|433]]
+![[Logic - 逻辑-2.png|432]]
+![[Logic - 逻辑-3.png|434]]
+![[Logic - 逻辑-4.png|436]]
+
+对于一阶逻辑：
+![[Logic - 逻辑-5.png|437]]
+
+## 数学证明（Mathematical Proof）
+**Axiom（公理）：** 不证自明的命题。
+**Theorem（定理）：** 可以证明的命题。
+**Lemma（引理）：** 可以证明的命题，用于证明其他命题。
+**Corollary（推论）：** 从定理可以推出来的结论。
+
+**Formal Proof：** 每一步都遵循逻辑，从前提/公理/引理/定理中获得。  
+**Informal Proof：** 更常用，使用自然语言。
+
+证明定理（形如 $p\to q$）的基本方法（可以通过 $p\to q$ 的真值表理解）：
+- Direct proof
+- Proof by contrapositive （逆否命题）
+- Proof by contradiction（说明 $p\land \neg q$ 不可能发生以说明 $p\to q$）
+- Proof by cases （$(p_{1}\lor\dots \lor p_{n})\to q \equiv(p_{1}\to q)\land(p_{2}\to q)\land\dots \land(p_{n}\to q)$）
+- Proof of equivalence （$p\leftrightarrow q\equiv(p\to q)\land(q\to p)$）
+Vacuous Proof：证明 $p$ 永远是假的，那么 $p\to q$ 就是真的。
+Trivial Proof：证明 $q$ 永远是真的，那么 $p\to q$ 就是真的。
+证明含量词的命题
+- Proof by cases
+- Counterexample
+- Constructive proof
+- Non constructive - proof by contradiction
+
