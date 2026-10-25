@@ -1,7 +1,7 @@
 
 ## Java 简介（Introduction to Java）
 
-Java 是一门基于 **C++** 的编程语言。
+Java 的语法基于 **C++**。
 
 Java 之父：James Gosling。
 
@@ -13,9 +13,9 @@ JVM：Java Virtual Machine，运行程序的虚拟机。
 JRE：Java Runtime Environment = JVM + 核心类库。
 JDK：Java Development Kit = JRE + 开发工具
 
-变量名，方法名都是标识符（Identifiers）。标识符只允许出现大小写英文字母和数字，$和_，不允许用数字开头。
+变量名，方法名都是标识符（Identifiers）。标识符允许出现字母（含 Unicode）、数字、`$` 和 `_`，不能以数字开头或使用保留关键字。
 
-多行注释是贪心匹配的，不能嵌套。
+多行注释在遇到第一个 `*/` 时结束，不能嵌套。
 
 ```java
 /*
@@ -32,7 +32,7 @@ JDK：Java Development Kit = JRE + 开发工具
   byte(8 bits), short(16 bits), int(32 bits), long(64 bits)  // Integral Type
   float(32 bits), double(64 bits) // Floating-Point Type
   // 注意 float f = 1.2f 要在数字后加个 "f" 显式告诉编译器
-  boolean(1 bit)
+  boolean(true/false)
   char(16 bits, unicode)   
   ```
 - 引用类型（Reference Type），也叫复杂数据类型（Complex Data Type）。
@@ -49,12 +49,12 @@ JDK：Java Development Kit = JRE + 开发工具
 
 类型强制转换（Explicit Conversion） `(double)a * b`，其中 `b` 也会被隐式提升（Implicitly Promoted） 为 `double`。
 
-提升需要不丢精度，比如 `float` 可以提升为 `double`，`short` 可以提升为 `long`，反过来却不安全。
+拓宽转换不一定保留精度（例如 `int/long` 转 `float` 或 `long` 转 `double`）；比如 `float` 可以提升为 `double`，`short` 可以提升为 `long`，反过来却不安全。
 
 ![[CS109 - 3.png]]
 
 八大基础类型有对应的 Wrapper Classes
-`ArrayList<Integer> list = new Arraylist<Integer>();`
+`ArrayList<Integer> list = new ArrayList<Integer>();`
 `Map<Integer, String>`
 
 ## 控制语句（Control Statement）
@@ -98,7 +98,7 @@ switch (a) {
 > `String / StringBuilder` 用 `a.length()`。
 > `List / Set / Map` 这种东西都用 `a.size()`。
 
-数组越界会抛 `ArrayIndexOutofBound` 异常。
+数组越界会抛 `ArrayIndexOutOfBoundsException` 异常。
 
 初始化数组的方法：
 ```java
@@ -125,9 +125,9 @@ int[][] arr1 = {{1, 2}, {3, 4, 5}};
 
 ## 方法（Method）
 
-函数中的传参数：基础类型是传值本身，引用类型是传引用。参数也会隐式提升。
+函数中的传参数：Java 一律按值传参：基础类型复制值，引用类型复制引用值。参数也会隐式提升。
 
-同一个方法不同的签名（Signature，就是参数类型列表），可实现方法重载（Method Overloading）
+同一个方法不同的签名（Signature，包括方法名与参数类型等，不含返回类型），可实现方法重载（Method Overloading）
 
 可变数量参数 `public static double sum(double... numbers)`
 
@@ -166,12 +166,12 @@ System.out.println("he".compareTo("hello")); // -3 (2 - 5)
 
 boolean r1 = "hello".startsWith("he"); // true
 boolean r2 = "hello".endsWith("lo"); // ture
-boolean r3 = "hello".startsWith("ell", 1) // true
+boolean r3 = "hello".startsWith("ell", 1); // true
 
 String s = "abcdcba";
 int index1 = s.indexOf('c'); // 2
 int index2 = s.indexOf('p'); // -1
-int index3 = s.indexOf('c', 3) // 4 (从 index = 3 开始搜)
+int index3 = s.indexOf('c', 3); // 4 (从 index = 3 开始搜)
 // lastIndexOf 为反向搜索，其余一样
 
 String ss1 = "abcdefg".substring(2); // cdefg
@@ -219,7 +219,7 @@ int c = b; // auto-unboxing
 
 包（Package）：例如 `java.util` ，`edu.sustech.xiangqi`。
 可以导入包中的类，例如 `import java.util.*`。
-还可以导入类的静态成员，例如 `import java.lang.Math.*`。
+还可以导入类的静态成员，例如 `import static java.lang.Math.*`。
 但导入了同名的静态成员会有编译错误。
 
 枚举类（Enumerations）：
@@ -227,7 +227,7 @@ int c = b; // auto-unboxing
 public enum Direction {
 	NORTH, SOUTH, EAST, WEST
 }
-// 等效于下面这个
+// 用普通类示意枚举常量（不完全等价）
 public final class Direction {
 	private Direction() {} 
 	public static final Direction EAST = new Direction();
@@ -261,7 +261,7 @@ Collections.reverse(list);
 修饰符：
 
 ![[CS109-1.png]]
-子类会不会“继承“超类 `private` 成员具有争议。一个比较有共识的说法是，子类会继承超类的所有成员，但是会隐藏 `private` 成员。
+子类不继承超类的 `private` 成员，但对象仍保留超类的私有状态。
 子类可以通过 `super` 关键字调用（invoke）超类的构造方法。
 没有标识符（no modifier）相当于 `package-private`。
 使用  `extends` 关键字继承。
@@ -315,11 +315,11 @@ animal = new Fish(); // 隐式转换（Implicit Casting）
 animal.move(); // 动态绑定，调用的是 Fish 的 move 方法
 animal.swim(); // 编译错误，因为 animal 本身没有 swim 这个方法
 if (animal instanceof Fish) {
-	Fish fish = (Fish) Animal; // 显式转换（Explicit Casting）
+	Fish fish = (Fish) animal; // 显式转换（Explicit Casting）
 	fish.swim(); // 可以正常运作
 }
 ```
-- 静态绑定（Static Binding）：当方法被定义为 `static / final / private`，方法调用基于引用变量的类型。
+- 静态绑定（Static Binding）：`static` 方法按编译时类型选择，不能动态重写；`private` 方法不被继承，`final` 方法不可重写。可重写的实例方法按运行时对象类型动态绑定。
 ```java
 // 考虑上面写的 Parent 和 Child 类，虽然子类隐藏了父类的 staticMethod 方法，但由于静态绑定，还是会调用父类的静态方法
 Parent p = new Child();
@@ -327,8 +327,8 @@ p.staticMethod(); // 输出 "Parent static"
 ```
 
 `final` 关键字：
-- 可以修饰变量，让它变成常量，不能再修改；
-- 可以修饰方法，让它不能被子类重写（`private / static` 方法都隐式声明为 ` final `）；
+- 可以修饰变量，使其赋值后不能重新赋值；引用变量指向的对象仍可能被修改；
+- 可以修饰方法，让它不能被子类重写（`private` 方法不能被重写；`static` 方法可被隐藏，并不隐式声明为 `final`）；
 - 可以修饰类，让它不能被继承（`String / System` 都是 `final` 类）。
 
 `abstract` 关键字：
@@ -343,10 +343,10 @@ p.staticMethod(); // 输出 "Parent static"
 
 ## 接口（Interface）
 
-接口是一种特殊的类，与公共的抽象类类似。使用 `interface` 关键字。
+接口与公共的抽象类类似。使用 `interface` 关键字。
 接口不可以包含构造方法。
 接口中的常量都隐式被 `public static final` 修饰。
-接口可以包含抽象方法（Abstract） / 默认方法 （Default） / 静态方法 （Static）。如果没有指定，隐式为抽象方法。
+接口可以包含抽象方法（Abstract） / 默认方法（Default） / 静态方法（Static）。普通无方法体的方法隐式为 `public abstract`。
 不可以直接实例化一个接口，但接口变量可以指向实现了接口的类的实例。
 ```java
 Payable p1 = new Alipay();
@@ -369,16 +369,16 @@ public static <T> void printArray(T[] array) {
 
 ```java
 public static <T extends Comparable<T>> T maximum(T a, T b, T c) {
-	T m = x;
-	if (y.compareTo(m) > 0)	max = y;
-	if (z.compareTo(m) > 0) max = z;
+	T m = a;
+	if (b.compareTo(m) > 0) m = b;
+	if (c.compareTo(m) > 0) m = c;
 	return m;
 }
 ```
-注意这里的 `extends` 是实现的意思。
+这里的 `extends` 声明类型参数的上界：`T` 必须是 `Comparable<T>` 的子类型（类通过实现接口满足此条件）。
 
 泛型类（Generic Classes）例如 `ArrayList<T>, Stack<T>`。
-泛型只是语法糖，编译成字节码之后，泛型是不存在的，会自动进行类型转换（这个叫做擦除 Erasure）。
+泛型通过类型擦除（Erasure）实现：编译时将类型参数替换为其上界，并插入必要的类型转换。
 
 需要注意泛型的**类型安全**：
 ```java

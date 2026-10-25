@@ -1,35 +1,35 @@
 **Concepts:**
-- Conditional Probability: $P(a|b) =\frac{P(a\land b)}{P(b)}=\alpha P(a\land b)$
+- Conditional Probability: $P(a\mid b) =\frac{P(a\land b)}{P(b)}=\alpha P(a\land b)$
 - Random Variables
 - Independence: $P(a\land b)=P(a)P(b)$
-- Bayes' Rule: $P(b|a)=\frac{P(b)P(a|b)}{P(a)}$
+- Bayes' Rule: $P(b\mid a)=\frac{P(b)P(a\mid b)}{P(a)}$
 - Joint Probability
 - Probability Rules:
   - Negation: $P(\neg a)=1-P(a)$
-  - Inclusion-Exclution: $P(a\lor b)=P(a)+P(b)-P(a\land b)$
-  - Marginalization: 
+  - Inclusion-Exclusion: $P(a\lor b)=P(a)+P(b)-P(a\land b)$
+  - Marginalization:
     -  $P(a)=P(a,b)+P(a,\neg b)$
     - $P(X=x_{i})=\sum_{j} P(X=x_{i}, Y=y_{j})$
   - Conditioning:
-    - $P(a) =P(b)P(a|b) + P(\neg b)P(a|\neg b)$  
-	- $P(X=x_{i})=\sum_{j}P(Y=y_{j})P(X=x_{i}|Y=y_{j})$
+    - $P(a) =P(b)P(a\mid b) + P(\neg b)P(a\mid \neg b)$  
+	- $P(X=x_{i})=\sum_{j}P(Y=y_{j})P(X=x_{i}\mid Y=y_{j})$
 
 ### Bayesian Network
 
-A Bayesian network is a data structure(directed graphs) that represents the dependencies among random variables.
+A Bayesian network is a data structure (directed acyclic graphs, DAGs) that represents the dependencies among random variables.
 
 ![[2 - Uncertainty.png]]
 
 **Concepts:**
 - Inference
   - Query, Evidence variables, Hidden variables, The goal
-- Inference by Enumeration: 
+- Inference by Enumeration:
   $$
-P(X|e)=\alpha P(X,e)=\alpha \sum_{y}P(X,e,y)
+P(X\mid e)=\alpha P(X,e)=\alpha \sum_{y}P(X,e,y)
 $$
 - Approximate Inference (Sampling):
   - Each variable is sampled for a value according to its probability distribution.
-  - Likelihood Weighting: 
+  - Likelihood Weighting:
     - Fixing the evidence variables.
     - Sample the non-evidence variables.
     - Weight each sample by its likelihood: the probability of all the evidence occurring.

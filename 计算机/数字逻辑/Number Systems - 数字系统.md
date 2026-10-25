@@ -46,7 +46,7 @@ LSD（Least-significant Digit）：权重最低的位。
 
 十六进制表示（Hexadecimal representation）：两个十六进制位表示一个字节。
 ![[Number Systems - 数字系统-6.png|219]]
-KB 与 B 的转换，是以 1024 为基数：
+二进制容量单位 $1\,\mathrm{KiB}=1024\,\mathrm{B}$；十进制 $1\,\mathrm{kB}=1000\,\mathrm{B}$（下图的 KB 使用旧的二进制习惯记法）：
 ![[Number Systems - 数字系统-7.png|282]]
 
 

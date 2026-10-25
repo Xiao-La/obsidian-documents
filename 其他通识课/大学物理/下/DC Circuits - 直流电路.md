@@ -1,22 +1,22 @@
 
-## 电流 
- 
+## 电流
+
 电流为电荷因电场作用在导体中定向移动产生的，定义为单位时间内通过一个截面的正电荷量。
 $$
-i=\frac{dq}{dt}
+i=\frac{\mathrm{d}q}{\mathrm{d}t}
 $$
 电流为一个标量。
 微观表示
   $$
-i=\frac{\Delta q}{\Delta t}=\frac{NALe}{\frac{L}{v_{d}}}=nAev_{d}
+i=\frac{\Delta q}{\Delta t}=\frac{nALe}{\frac{L}{v_{d}}}=nAev_{d}
 $$
 定义电流密度
 $$
-\vec{J}=\frac{i}{A}\hat{v_{d}}=ne \vec{v_{d}}
+\mathbf{J}=nq\mathbf{v}_d\quad(q=-e\text{ for electrons})
 $$
-那么有 
+那么有
 $$
-di=\vec{J}d\vec{A}
+\mathrm{d}i=\mathbf{J}\cdot \mathrm{d}\mathbf{A}
 $$
 
 ## 电阻
@@ -40,7 +40,7 @@ $$
 $$
 \implies R=\frac{\rho L}{A}
 $$
-一般情况下 $R=\int \frac{\rho(x)}{A(x)}dx$。
+一般情况下 $R=\int \frac{\rho(x)}{A(x)}\,\mathrm{d}x$。
 
 电阻率与温度之间的关系：
 $$
@@ -64,20 +64,20 @@ R=R_{1}+R_{2}+\dots +R_{n}
 $$
 并联：
 $$
-R=\frac{1}{R_{1}}+\frac{1}{R_{2}}+\dots+\frac{1}{R_{n}}
+\frac{1}{R}=\frac{1}{R_{1}}+\frac{1}{R_{2}}+\dots+\frac{1}{R_{n}}
 
 $$
 ## 电功率
 
 $$
-U=qV\implies dU=Vdq=VIdt
+U=qV\implies \mathrm{d}U=V\,\mathrm{d}q=VI\,\mathrm{d}t
 $$
 $$
-\implies P=\frac{dU}{dt}=IV
+\implies P=\frac{\mathrm{d}U}{\mathrm{d}t}=IV
 $$
 在纯电阻的情况下, 应用欧姆定律有：
 $$
-P=I^{2}R=\frac{V}{R}
+P=I^{2}R=\frac{V^2}{R}
 $$
 ## 电路
 
@@ -100,7 +100,7 @@ $$
 $$
 这等价于关于 $q$ 的一阶微分方程：
 $$
-\frac{dq}{dt}=-\frac{q-C\varepsilon}{RC}
+\frac{\mathrm{d}q}{\mathrm{d}t}=-\frac{q-C\varepsilon}{RC}
 $$
 解得
 $$
@@ -108,7 +108,7 @@ q=C\varepsilon(1-e^{-t/RC})
 $$
 以及
 $$
-i=\frac{dq}{dt}=\frac{\varepsilon}{R} e^{-t/RC}
+i=\frac{\mathrm{d}q}{\mathrm{d}t}=\frac{\varepsilon}{R} e^{-t/RC}
 $$
 $$
 V=\frac{q}{C}=\varepsilon(1-e^{-t/RC})
@@ -123,5 +123,5 @@ $$
 q=Q_{0}e^{-t/RC}
 $$
 $$
-i=-\frac{Q}{RC}e^{-t/RC}=I_{0}e^{-t/RC}
+i=-\frac{Q_0}{RC}e^{-t/RC}=I_{0}e^{-t/RC}
 $$

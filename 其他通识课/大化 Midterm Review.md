@@ -26,7 +26,7 @@
 - Proton
 - Electron
 - Neutron
-  
+
 **Isotope and Atomic Weight**
 
 **Formula**
@@ -78,7 +78,7 @@
 - Common Soluble Compounds:
   - $\ce{NO_{3}- / CH_{3}COO-}$: No exception
   -  $\ce{Cl- / Br- / I- :Ag+, Hg_{2}^2+, Pb^2+}$  Precipitation
-  - $\ce{SO_{4}^2-  : Sr^2+, Ba^2+, Hg_{2}+, Pb^2+}$ Precipitation
+  - $\ce{SO_{4}^2-  : Sr^2+, Ba^2+, Hg_{2}^2+, Pb^2+}$ Precipitation
 - Common Insoluble Compounds
   - $\ce{S^2- / OH- : NH_{4}+, \text{alkali metal cations}, Ca^2+, Sr^2+, Ba^2+}$ Soluble
   - $\ce{CO_{3}^2- / PO_{4}^3- : NH_{4}+, \text{alkali metal cations}}$ Soluble
@@ -96,7 +96,7 @@
 - Arrhenius (increase $\ce{[H+] / [OH-]}$) / Brønsted (Donate / Accept Protons)
 - Strong / Weak
   - Strong Acids: $\ce{HCl, HBr, HI, HClO_{3}, HClO_{4}, HNO_{3}, H_{2}SO_{4}}$
-  - Strong Bases: $\ce{LiOH, NaOH, KOH, RbOH, CsOh, Ca(OH)2, Sr(OH)2, Ba(OH)2}$
+  - Strong Bases: $\ce{LiOH, NaOH, KOH, RbOH, CsOH, Ca(OH)2, Sr(OH)2, Ba(OH)2}$
 
 **Oxidation Numbers**
 
@@ -128,16 +128,16 @@
 
 **Heisenberg's uncertainty principle** $(\Delta x)(\Delta p)\geq \frac{h}{4\pi}$
 
-**$\psi^2$ gives electron density**
+**$\lvert \psi\rvert ^2=\psi^*\psi$ gives electron probability density**
 
 **Quantum Numbers**
-- Principle quantum number - shells/orbitals - $n$
+- Principal quantum number - shells/orbitals - $n$
 - Angular quantum number - subshells - $l(0\leq l\leq n-1)$
 - Magnetic quantum number  - $m_{l} (-l\leq m_{l} \leq l)$
 - Spin quantum number - $m_{s}(\frac{1}{2} / -\frac{1}{2})$
 
 **Electron Configuration / Orbital Diagram**
-- Pauli Exclusion Principle 
+- Pauli Exclusion Principle
 - Hund's Rule
 - Aufbau principle
 - Condensed Electron Configuration
@@ -145,7 +145,7 @@ Exception $\ce{[Ar] 3d^5 4s^1, [Ar] 3d^10 4s^1}$
 
 ## Chapter 7
 
-**Effective Nuclear Charge** $Z_{\text{eff}}=Z-S$
+**Effective Nuclear Charge** $Z_{\mathrm{eff}}=Z-S$
 - Calculation is not required , as Chapter 8 & 9 are harder
 
 **Size of atom**
@@ -153,7 +153,7 @@ Exception $\ce{[Ar] 3d^5 4s^1, [Ar] 3d^10 4s^1}$
 - Isoelectronic Series <- Judge from Nuclear Charge
 
 **Ionization Energy**
-- $I_{n}$ Energy required to remove the nth election 
+- $I_{n}$ Energy required to remove the nth electron
 - Judge group of a element (e.g. Al has a sharp increase from $I_{3}$ to $I_{4}$)
 - Always **endothermic**
 
@@ -189,10 +189,10 @@ Exception $\ce{[Ar] 3d^5 4s^1, [Ar] 3d^10 4s^1}$
 
 **Bond Polarity**
 - Dipoles $\mu=Qr$
-  - Units: $\text{Debyes (D)}$ (carefully convert to $\text{C} \cdot \text{m}$)
+  - Units: $\text{Debyes (D)}$ (carefully convert to $\mathrm{C} \cdot \mathrm{m}$)
 
 **Lewis Structure**
-- Assign the electrons with the Octet Rule (only for period 1 and 2)
+- Assign the electrons with the Octet Rule (especially for period 2); H and He follow the duet rule
   - Exceptions
     - odd number of electrons ($\ce{NO}$)
     - less than an octet of valence electron($\ce{BF3}$)
@@ -204,7 +204,7 @@ Exception $\ce{[Ar] 3d^5 4s^1, [Ar] 3d^10 4s^1}$
 - Delocalized electrons
 
 **Bond Enthalpy**
-- $\Delta H_{\text{rxn}}=\sum \Delta H(\text{bonds broken}) +\sum \Delta H(\text{bonds formed})$
+- $\Delta H_{\mathrm{rxn}}\approx\sum\Delta H(\text{bonds broken})-\sum\Delta H(\text{bonds formed})$（这里两项均取正的平均键焓：断键吸热，成键放热）
 
 ## Chapter 9
 
@@ -245,7 +245,7 @@ Exception $\ce{[Ar] 3d^5 4s^1, [Ar] 3d^10 4s^1}$
 - Bonding orbitals and Antibonding orbitals
 - Bond Order = 1/2 (Bonding electrons - Antibonding electrons)
 - HOMO : highest occupied molecular orbital
-- LUMO : lowest unoccupied molecular orbital 
+- LUMO : lowest unoccupied molecular orbital
 - Paramagnetism: have unpaired electrons
 - Diamagnetism: no unpaired electrons
 ![[Chemistry-Midterm-Review-1.png]]

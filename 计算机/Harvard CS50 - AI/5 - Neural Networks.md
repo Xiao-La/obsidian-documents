@@ -26,7 +26,7 @@ Using linear function we can handle multiple inputs: $h=g\left(w_{0}+ \sum w_{i}
 
 - Start with a random choice of weights.
 - Keep doing:
-	- Calculate the gradient based on **all data points**: direction that will lead to decreasing loss.
+	- Calculate the gradient based on **all data points**: the gradient points toward increasing loss; update in the negative gradient direction.
 	- Update the weights based on the gradient.
 
 Variants:
@@ -80,7 +80,7 @@ Better way:
 
 This matrix is often used to detect edges. (Same values leads to 0, larger if the central is different from neighbors)
 
-**Pooling:** Reduce the size of an image by pooling some pixels together. A way is to use **max-pooling** (choose the maximum value of a picture)
+**Pooling:** Reduce the size of an image by pooling some pixels together. A way is to use **max-pooling** (choose the maximum value within each local pooling window)
 
 ### Convolutional Neural Network (CNN)
 

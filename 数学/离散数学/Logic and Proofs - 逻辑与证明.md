@@ -6,7 +6,7 @@
 
 逻辑连接符（Logic Connectives）：
 - Negation $\neg$
-- Conjuntion/and $\land$
+- Conjunction/and $\land$
 - Disjunction/or $\lor$
 - Exclusive or $\oplus$
 - Implication $\to$
@@ -42,9 +42,6 @@ Contingency：可真可假。
 - 另一种定义：$p\leftrightarrow q$ 是永真式。
 - 记作 $p\equiv q$ 或 $p \iff q$。
 
-分配率：
-- $(w\land(u\lor v))\equiv(w\land u)\lor(w\land v)$
-- $(w\lor(u\land v))\equiv(w\lor u)\land(w\lor v)$。
 
 De Morgan's Law：
 - $\neg(p\lor q)\equiv \neg p\land \neg q$
@@ -69,13 +66,13 @@ Commutative Laws:
 - $p\lor q\equiv q\lor p$
 - $p\land q\equiv q\land p$
 
-Associatie Laws:
+Associative Laws:
 - $(p\lor q)\lor r\equiv p\lor(q\lor r)$
 - $(p\land q)\land r\equiv p\land(q\land r)$
 
 Distributive Laws:
 - $p\lor(q\land r)\equiv(p\lor q)\land(p\lor r)$
-- $p\land(p\lor r)\equiv(p\land q)\lor(p\land r)$
+- $p\land(q\lor r)\equiv(p\land q)\lor(p\land r)$
 
 Absorption Laws
 - $p\lor(p\land q)\equiv p$
@@ -100,7 +97,7 @@ Negation Laws
 - Variable
 - Predicate：$P(x)$ 给每个 $x$ 赋一个 T / F 值。
 
-Predicate $P(x_{1},\dots,x_{n})$ 只能称为**Statement**；只有当每个 $x_{i}$ 换成具体的值，或在它的前面加上一个 Quantifier，它才成为一个 **proposition**（具有真值）。
+Predicate $P(x_{1},\dots,x_{n})$ 只能称为**Statement**；只有当每个 $x_{i}$ 换成具体的值，或用量词约束全部自由变量，它才成为一个 **proposition**（具有真值）。
 - Universe/Domain：所有可能取值 $(x_{1},x_{2}\dots x_{n})$ 的集合。
 - Truth set：让 $P(x_{1},\dots ,x_{n})$ 成立的取值 $(x_{1},x_{2}\dots x_{n})$ 的集合。
 
@@ -130,7 +127,7 @@ $$
 ![[Logic - 逻辑-5.png|437]]
 
 ## 数学证明（Mathematical Proof）
-**Axiom（公理）：** 不证自明的命题。
+**Axiom（公理）：** 在一个理论中选定、不经证明而作为推理起点的命题。
 **Theorem（定理）：** 可以证明的命题。
 **Lemma（引理）：** 可以证明的命题，用于证明其他命题。
 **Corollary（推论）：** 从定理可以推出来的结论。

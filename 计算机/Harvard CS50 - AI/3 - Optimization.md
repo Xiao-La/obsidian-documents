@@ -8,7 +8,7 @@ It can find the **local extrema.**
 - Stochastic - choose randomly from higher-valued neighbors
 - First-choice - choose the first higher-valued neighbor
 - Random-restart - conduct hill climbing multiple times
-- Local beam search - choose the k-highest-valued neighbor 
+- Local beam search - maintain k states, expand all their neighbors, and retain the k highest-valued successors
 
 ### Simulated Annealing
 
@@ -19,11 +19,12 @@ Function Simulated-Annealing (_problem_, _max_):
 - _current_ = initial state of _problem_
 - For _t_ = 1 to _max_:
     - _T_ = Temperature (_t_)
+    - If _T_ = 0: Return _current_
     - _neighbor_ = random neighbor of _current_
     - _ΔE_ = how much better _neighbor_ is than _current_
     - If _ΔE_ > 0:
         - _current_ = _neighbor_
-    - With probability e^(_ΔE/T_) set _current_ = _neighbor_
+    - Otherwise, with probability e^(_ΔE/T_) set _current_ = _neighbor_
 - Return _current_
 
 Local search can be used to solve TSP problem.
@@ -118,7 +119,7 @@ Enhanced version: Maintaining Arc-Consistency
 - Call AC-3
 
 Select-Unassigned-Var
-- Minimum remaining values heuristic - select the smallest value
+- Minimum remaining values heuristic - select the unassigned variable with the fewest remaining legal values
 - Degree heuristic - select the highest degree
 
 Domain-Values

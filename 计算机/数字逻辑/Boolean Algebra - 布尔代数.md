@@ -34,9 +34,9 @@
 - 再把每个 Literal 取反。
 - 例如， $F=x'y'z+x'yz+xy'$，那么 $F'=(x+y+z')(x+y'+z')(x'+y)$。
 
-- 最小项（Minterm）：包含了所有的 Literals （包括补的形式）的 AND 项。
+- 最小项（Minterm）：每个变量恰好出现一次（原变量或其补）的 AND 项。
   - 例如，对两个变量 $x,y$ ，最小项： $x'y',x'y,xy',xy(m_{0}\sim m_{3})$。 
-- 最大项（Maxterm）：包含了所有的 Literals （包括补的形式）的 OR 项。
+- 最大项（Maxterm）：每个变量恰好出现一次（原变量或其补）的 OR 项。
   - 例如，对两个变量 $x,y$ ，最大项： $x+y,x+y',x'+y,x'+y'(M_{0}\sim M_{3})$。 
 这个编号就是对应变量的十进制值。另外有 $M_{i}=m_{i}'$。
 ![[Boolean Algebra - 布尔代数-2.png|521]]

@@ -3,11 +3,11 @@
 集合的基数（Cardinality）为其元素（Element）的个数。
 可以用集合的外延（Extension）和内涵（Intension）定义一个集合。
  - 外延：列出所有元素。
- - 内涵：用某种共性：$\{x|\varphi(x)\}$。
+ - 内涵：用某种共性：$\{x\mid \varphi(x)\}$。
 子集（Subset）和真子集（Proper Subset）的定义与以往相同。
 
 幂集（Power Set）：
->  若 $A$ 是一个集合，则 $A$ 的幂集 $P(A):= \{X|X \subseteq A\}$。
+>  若 $A$ 是一个集合，则 $A$ 的幂集 $P(A):= \{X\mid X \subseteq A\}$。
 
 集合运算（Set Operations）：
 - 并集（Union）
@@ -23,7 +23,7 @@
 
 笛卡尔积（Cartesian product）$A\times B$：
 $$
-A\times B=\{ \langle x,y \rangle | x \in A , y \in B \}
+A\times B=\{ \langle x,y \rangle\mid  x \in A , y \in B \}
 $$
 集合 $A$ 和 $B$ 的一个二元关系 $R$ 是它们笛卡尔积的子集。
 $$
@@ -52,7 +52,7 @@ $\langle x,y \rangle \in R$ 记作 $R(x,y)$ 或 $xRy$，读作 "x is R-related t
 
 若 $x \in A$ 且 $A$ 上有一个等价关系 $R$，则 $x$ 的等价类：
 $$
-[x]_{R}:= \{ y \in A|xRy \}
+[x]_{R}:= \{ y \in A\mid xRy \}
 $$
 等价类的性质：
 - 每个元素只属于一个等价类。
@@ -105,7 +105,7 @@ $$
 - 归纳定义（Inductive Definiton）。例如定义 $\mathbb{N}$：$0\in \mathbb{N}$，且 $n \in \mathbb{N}\implies n+1 \in \mathbb{N}$，且只有前两个规则产生的元素才属于 $\mathbb{N}$。
 - 归纳证明（Proof by Induction）。若要证明 $P(x) \forall x$：
   - 先证明 $P(n_{0})$ 成立（Base case）。
-  - 归纳假设：假设 $P(k)$ 对 $k= n_{0}$ 成立。
+  - 归纳假设：对任意 $k\geq n_0$，假设 $P(k)$ 成立。
   - 归纳：证明 $P(k+1)$ 成立。
 - 递归定义（Recursive Definition）：
 $$

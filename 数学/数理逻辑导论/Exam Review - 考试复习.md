@@ -16,7 +16,6 @@
 4. [一阶逻辑 — 语法](#4-一阶逻辑--语法)
 5. [一阶逻辑 — 语义](#5-一阶逻辑--语义)
 6. [一阶逻辑 — ND 证明](#6-一阶逻辑--nd-证明)
-7. [综合练习题](#7-综合练习题)
 
 ---
 
@@ -114,7 +113,7 @@
 **逻辑等价**：$A \equiv B$ 当且仅当 $A \leftrightarrow B$ 是永真式。
 
 **语义蕴含 (Entailment)**：$\Sigma \vDash \alpha$ 当且仅当 $\forall v$，若 $\Sigma^v = 1$ 则 $\alpha^v = 1$。
-- $\emptyset \vDash A$ ⟺ $A$ 是永真式
+- $\varnothing \vDash A$ ⟺ $A$ 是永真式
 - $A \vDash B$ ⟺ $A \to B$ 是永真式
 
 ### 判定方法
@@ -453,17 +452,17 @@ k+1. α                      [∨e c, c+1-j, j+1-k]
 
 ### 例题：Assignment 5.1 (用 Soundness 做语义论证)
 
-**A5.1** 若 $\{\alpha, \beta\} \vdash_{ND} \gamma$，则 $\emptyset \vDash (\alpha \land \beta) \to \gamma$。
+**A5.1** 若 $\{\alpha, \beta\} \vdash_{ND} \gamma$，则 $\varnothing \vDash (\alpha \land \beta) \to \gamma$。
 
 **证明**：由 ND 的 Soundness，$\{\alpha, \beta\} \vdash \gamma \implies \{\alpha, \beta\} \vDash \gamma$。
 
-反证法：假设 $\emptyset \not\vDash (\alpha \land \beta) \to \gamma$，则存在 $v$ 使 $(\alpha \land \beta)^v = 1$ 且 $\gamma^v = 0$。于是 $\alpha^v = 1, \beta^v = 1, \gamma^v = 0$，与 $\{\alpha, \beta\} \vDash \gamma$ 矛盾。故 $\emptyset \vDash (\alpha \land \beta) \to \gamma$。
+反证法：假设 $\varnothing \not\vDash (\alpha \land \beta) \to \gamma$，则存在 $v$ 使 $(\alpha \land \beta)^v = 1$ 且 $\gamma^v = 0$。于是 $\alpha^v = 1, \beta^v = 1, \gamma^v = 0$，与 $\{\alpha, \beta\} \vDash \gamma$ 矛盾。故 $\varnothing \vDash (\alpha \land \beta) \to \gamma$。
 
 ---
 
 ### 3.3 Resolution (归结)
 
-**核心思路**：要证 $\Sigma \vdash_{\text{Res}} \varphi$，转为证 $\Sigma \cup \{\neg \varphi\} \vdash_{\text{Res}} \perp$。
+**核心思路**：要证 $\Sigma \vdash_{\mathrm{Res}} \varphi$，转为证 $\Sigma \cup \{\neg \varphi\} \vdash_{\mathrm{Res}} \perp$。
 
 **步骤**：
 1. 将 $\Sigma$ 和 $\neg \varphi$ 化为 CNF
@@ -478,7 +477,7 @@ $$\dfrac{(\alpha \lor p) \quad ((\neg p) \lor \beta)}{(\alpha \lor \beta)} \qqua
 
 ### 例题：Assignment 5.2 (Resolution)
 
-**A5.2** $p \to (q \land r) \vdash_{\text{Res}} (\neg q \lor \neg r) \to \neg p$
+**A5.2** $p \to (q \land r) \vdash_{\mathrm{Res}} (\neg q \lor \neg r) \to \neg p$
 
 第一步：转换前提和否定结论为 CNF，再转为子句集合。
 
@@ -589,8 +588,8 @@ $$\dfrac{(\alpha \lor p) \quad ((\neg p) \lor \beta)}{(\alpha \lor \beta)} \qqua
 
 | 概念 | 定义 |
 |------|------|
-| **自由变元 (Free Variable)** | 不在任何量词作用域内的变量 |
-| **约束变元 (Bound Variable)** | 在某个量词作用域内的变量 |
+| **自由变元 (Free Variable)** | 该次出现不被任何对应变量的量词绑定 |
+| **约束变元 (Bound Variable)** | 该次出现被对应变量的量词绑定 |
 | **句子 (Sentence)** | 无自由变元的公式（也称闭公式） |
 | **阐释 (Interpretation) $\mathcal{I}$** | Domain + 常量/函数/谓词的具体含义 |
 | **环境 (Environment) $E$** | 给自由变元赋值 |
@@ -646,7 +645,7 @@ $\Sigma \vDash \alpha$ ⟺ 对所有 $\mathcal{I}, E$，若 $\mathcal{I} \vDash_
 | 公式 | 值 | 理由 |
 |------|-----|------|
 | $\forall x \exists y F(x,y)$ | **True** | $x=3$ 有 $y=4$；$x=4$ 有 $y=3$。全满足 |
-| $\exists x \forall y F(x,y)$ | **False** | $x=3$ 时 $F(3,3) \notin F^{\mathcal{I}}$；$x=4$ 时 $F(4,4) \notin F^{\mathcal{I}}$。不存在这样的 $x$ |
+| $\exists x \forall y F(x,y)$ | **False** | $x=3$ 时 $(3,3) \notin F^{\mathcal{I}}$；$x=4$ 时 $(4,4) \notin F^{\mathcal{I}}$。不存在这样的 $x$ |
 | $\forall x \forall y (F(x,y) \to F(f(x), f(y)))$ | **True** | 枚举 4 对 $(x,y)$：$(3,3)$ 前提假→整体真；$(3,4)$: $F(3,4)=1, F(f(3),f(4))=F(4,3)=1$；$(4,3)$: 同理；$(4,4)$ 前提假→整体真 |
 
 **A6.3** Domain $\mathbb{N}$, $a^{\mathcal{I}}=2$, $f^{\mathcal{I}}(x,y)=x+y$, $g^{\mathcal{I}}(x,y)=x\times y$, $P^{\mathcal{I}}(x,y): x=y$, $E(x)=0, E(y)=1, E(z)=2$
@@ -666,7 +665,7 @@ $\Sigma \vDash \alpha$ ⟺ 对所有 $\mathcal{I}, E$，若 $\mathcal{I} \vDash_
 | $\forall x(P(x) \to P(x)) \to \exists y(Q(y) \land \neg Q(y))$ | **Unsatisfiable** | 前件永真，后件永假；$1 \to 0 = 0$ |
 | $\forall x \forall y (P(x,y) \to P(y,x))$ | **Satisfiable** | 取 $P$ 为 $=$ → True；取 $P$ 为 $<$ → False。故不是 valid 也不是 unsatisfiable |
 | $\neg(\forall x P(x) \to \exists y Q(y)) \land \exists y Q(y)$ | **Unsatisfiable** | 设公式为真：前半要求 $\forall x P(x)=1$ 且 $\exists y Q(y)=0$；后半要求 $\exists y Q(y)=1$。矛盾 |
-| $\exists x P(x,y)$ | **Satisfiable** | $y$ 自由，可在阐释中取合适的 $y$ 和 $P$ 满足；也可取不满足的阐释。故 satisfiable |
+| $\exists x P(x,y)$ | **Satisfiable** | $y$ 自由，可选择合适的阐释 $\mathcal{I}$ 和环境 $E$（赋值给 $y$）满足；也可取不满足的阐释。故 satisfiable |
 
 ---
 

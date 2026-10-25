@@ -1,5 +1,5 @@
 [[Oscillations - 振动]]
-**横波（Transverse Wave）** 指质点振动方向与波传播方向相反的波。
+**横波（Transverse Wave）** 指质点振动方向与波传播方向垂直的波。
 
 向右传播的波可以写成 $y(x,t)=f(x - vt)$ 的形式。
 ## 谐波
@@ -27,7 +27,7 @@ $$
 证明： [[Wave-1]]
 波能量传递的平均功率：
 $$
-P_{\text{avg}} = \frac{1}{2}\mu v\omega^2y_{m}^2
+P_{\mathrm{avg}} = \frac{1}{2}\mu v\omega^2y_{m}^2
 $$
 证明：[[Wave-2]]
 
@@ -42,10 +42,10 @@ $$
 
 若两列波振幅，波长和频率相同，只差一个相位 $\phi$，那么它们的叠加：
 $$
-\begin{align}
+\begin{aligned}
 y(x,t)&=y_{m}\sin(kx-\omega t)+y_{m}\sin(kx-\omega t+\phi) \\
 &=2y_{m}\cos\left( \frac{\phi}{2} \right)\sin\left( kx-\omega t+\frac{\phi}{2} \right)
-\end{align}
+\end{aligned}
 $$
 1. 若 $\cos\left( \frac{\phi}{2} \right)=0$，则两列波反相（Out of phase），称为相消干涉（Destructive Interference）。
 2. 若 $\cos\left( \frac{\phi}{2} \right)=\pm 1$，则两列波同相（In phase），称为相长干涉（Constructive Interference）。
@@ -53,22 +53,22 @@ $$
 
 若两列波振幅，波长和频率相同，但传播方向相反，那么它们的叠加：
 $$
-\begin{align}
+\begin{aligned}
 y(x,t)&=y_{m} \sin (kx-\omega t) + y_{m} \sin(kx+\omega t) \\
 &=2y_{m} \sin kx
- \cos\omega t\end{align}
+ \cos\omega t\end{aligned}
 $$
 是一个**驻波（Standing Wave）**。
 1. 若 $\sin kx=0$，即 $x=n \frac{\lambda}{2}$，这些点永远不动，叫做节点（Nodes）。
-2. 若 $\sin kx=\pm 1$，即 $x=\left( n+\frac{1}{2} \right) \frac{\lambda}{2}$，这些点振幅最大，叫做负点（Antinodes）。
+2. 若 $\sin kx=\pm 1$，即 $x=\left( n+\frac{1}{2} \right) \frac{\lambda}{2}$，这些点振幅最大，叫做波腹（Antinodes）。
 ## 波的反射
 
-如果一个波撞到“硬边界”（Hard boundary），会发生半波损，波会跳跃半个相位后反射回来。
+如果一个波撞到“硬边界”（Hard boundary），会发生半波损，反射波相位改变 $\pi$ 后返回。
 如果一个波撞到“软边界”（Soft boundary），会直接反射回来。
 
 如果一个波和其反射的波叠加形成了驻波，则这种现象称为共振（Resonance）。
 
-**可以证明，产生共振的必要条件是硬边界都在节点，软边界都在负点**。
+**可以证明，产生共振的必要条件是硬边界都在节点，软边界都在波腹**。
 
 两边都是硬边界的情况，需要 $L=n \frac{\lambda}{2}$ 形成共振：
 ![[Wave-3.png]]

@@ -1,14 +1,13 @@
 [
-  "easy-typing-obsidian",
   "cm-chs-patch",
   "obsidian-vimrc-support",
   "vim-im-select",
   "obsidian-git",
-  "obsidian-latex-suite",
   "obsidian-image-layouts",
   "obsidian-pandoc",
   "pseudocode-in-obs",
   "obsidian-paste-image-rename",
   "better-export-pdf",
-  "claude-sidebar"
+  "claude-sidebar",
+  "obsidian-latex-suite"
 ]

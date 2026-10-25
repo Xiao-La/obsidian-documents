@@ -9,7 +9,7 @@
 1. MAJOR version：不兼容的 API 修改。
 2. MINOR version：向下兼容的功能性新增。
 3. PATCH version：向下兼容的问题修正。
-理论上，一个软件依赖的库版本号只需要 `MAJOR` 相同，`MINOR.PATCH` 大于或等于期望的版本，即可正常运行。 
+依赖遵守语义化版本时，主版本相同且版本不低于所需版本，公共 API 应保持兼容（主版本为 0 时不作此保证）。
 ## 持续集成系统
 
 持续集成（Continuous integration，CI），比如 Github Actions，可以在代码发生变化后，自动运行一些动作。比如 Github Pages 就是在代码更新后执行 `jekyll`  构建网站，并对接到一个域名上。

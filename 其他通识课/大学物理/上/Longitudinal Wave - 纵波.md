@@ -1,6 +1,6 @@
 前置： [[Transverse Wave - 横波]]
 
-**纵波（Longitudinal Wave）** 指质点振动方向与波传播方向相同的波。
+**纵波（Longitudinal Wave）** 指质点振动方向与波传播方向平行的波。
 
 **声波（Sound Waves）** 是一种常见的纵波。
 声波的波速：
@@ -25,11 +25,11 @@ $$
 $$
 能量传递的平均功率：
 $$
-P_{avg}=\frac{1}{2}ABk\omega s_{m}^2
+P_{\mathrm{avg}}=\frac{1}{2}ABk\omega s_{m}^2
 $$
 定义声音的**强度（Intensity）** 为单位面积的功率：
 $$
-I=\frac{P_{avg}}{A}=\frac{1}{2}\rho v\omega^2s_{m}^2
+I=\frac{P_{\mathrm{avg}}}{A}=\frac{1}{2}\rho v\omega^2s_{m}^2
 $$
 
 在三维空间中，波面为球形：
@@ -39,21 +39,21 @@ $$
 
 进而定义**声级（Sound Level，单位为分贝 dB）：**
 $$
-\beta=(10\text{dB})\log \frac{I}{I_{0}}
+\beta=(10\,\mathrm{dB})\log \frac{I}{I_{0}}
 $$
-其中 $I_{0}=10^{-12}\text{W/m}^2$，约为人能听到的最小声强。
+其中 $I_{0}=10^{-12}\,\mathrm{W/m}^2$，约为人能听到的最小声强。
 
 ## 声波的干涉
 
 ### 路程差导致的相位差
 $$
-\begin{align}
+\begin{aligned}
 s(P,t)&=s_{1}(x,t)+s_{2}(x,t) \\
 &=s_{m}\cos(kx_{1}-\omega t)+s_{m}\cos(kx_{2}-\omega t) \\
 &=2s_{m}\cos\left( \frac{k\Delta L}{2} \right)\cos(\omega t-\bar{\phi})
-\end{align}
+\end{aligned}
 $$
-其中 $\Delta L=|x_{2}-x_{1}|, \bar{\phi}=\frac{k(x_{1}+x_{2})}{2}$ 。
+其中 $\Delta L=\lvert x_{2}-x_{1}\rvert , \bar{\phi}=\frac{k(x_{1}+x_{2})}{2}$ 。
 由于 $\frac{k\Delta L}{2}=\frac{\pi \Delta L}{\lambda}$，有：
 1. 若 $\Delta L$ 为半波长的偶数倍，则为相长干涉。
 2. 若 $\Delta L$ 为半波长的奇数倍，则为相消干涉。
@@ -64,7 +64,7 @@ $$
 两列波 $s_{1}=s_{m}\cos \omega_{1}t, s_{2}=s_{m} \cos \omega_{2}t$，那么它们的叠加 $s = 2s_{m} \cos (\frac{\omega_{1}-\omega_{2}}{2}t)  \cos (\frac{\omega_{1}+\omega_{2}}{2}t)$
 叠加会形成这样的波形：
 ![[Wave-7.png]]
-$\omega_{\text{beat}}=|\omega_{1}-\omega_{2}|, f_{\text{beat}}=|f_{1}-f_{2}|$
+$\omega_{\mathrm{beat}}=\lvert \omega_{1}-\omega_{2}\rvert , f_{\mathrm{beat}}=\lvert f_{1}-f_{2}\rvert $
 
 ### 驻波
 
@@ -81,7 +81,7 @@ $$
 
 超音速（Supersonic）：$v_{S}>v$ 的情形，会引发激波（Shock Wave）.
 马赫数（Mach Number）：$\frac{v_{S}}{v}$。
-![[Wave-8.png]] 
+![[Wave-8.png]]
 $$
 \sin \theta= \frac{v}{v_{S}}
 $$

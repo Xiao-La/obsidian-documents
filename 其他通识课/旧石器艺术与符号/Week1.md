@@ -1,4 +1,4 @@
-Humans are biocultural organism.
+Humans are biocultural organism.
 Culture: “patterns of learned behaviour and ideas that humans acquire as members of a society, together with the artifacts and structures we create and use.”
 - Culture knowledge
 - Tool : survival; overcome biological and individual limitations; information

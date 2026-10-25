@@ -10,37 +10,37 @@
 随机事件（Random Event / Event）：样本空间的一个子集。记作一个大写字母，如 $A,B,C$。
 
 事件之间的关系和集合论中的一样：
-- 包含（Inclusion）：$A\subset B$
-- 和/并（Sum/Union）：$A\cup B(A+B)$
-- 积/交（Product/Intersection）：$A\cap B(AB)$
-- 差（Difference）：$A-B(A\backslash B)$
+- 包含（Inclusion）：$A\subseteq B$
+- 和/并（Sum/Union）：$A\cup B$（也记作 $A+B$）
+- 积/交（Product/Intersection）：$A\cap B$（也记作 $AB$）
+- 差（Difference）：$A-B$（也记作 $A\backslash B$）
 - 互斥（Mutually exclusive/disjoint）：$A\cap B=\varnothing$
 - 对立/互补（Complement）：$A\cap B=\varnothing \&A\cup B=\Omega$
 
 且事件之间的运算满足：
-- 交换律（Communicative Laws）：$A \cap B=B\cap A$
+- 交换律（Commutative Laws）：$A \cap B=B\cap A$
 - 结合律（Associative laws）：$A\cap (B\cap C)=(A\cap B)\cap C$
-- 分配率（Distributive Law）：$A\cup(B\cap C)=(A\cup B)\cap(A\cup C)$
+- 分配律（Distributive Law）：$A\cup(B\cap C)=(A\cup B)\cap(A\cup C)$
 - 德摩根律（De Morgan's Laws）：$\overline{\bigcup_{i=1}^{\infty} A_i} = \bigcap_{i=1}^{\infty} \overline{A_i}, \qquad \overline{\bigcap_{i=1}^{\infty} A_i} = \bigcup_{i=1}^{\infty} \overline{A_i}$
 
 ## 概率
 
-概率测度（Probability Measure），简称概率（Probability），是一个定义在样本空间 $\Omega$ 的子集上的实值函数，满足一下三个公理：
-- 非负性（Non-negativity）：对任意 $A\subset \Omega$，$P(A)\geq 0$。
-- 规范型（Normalization）：$P(\Omega)=1$。
+概率测度（Probability Measure），简称概率（Probability），是定义在样本空间 $\Omega$ 的事件上的实值函数，满足以下三个公理：
+- 非负性（Non-negativity）：对任意 $A\subseteq\Omega$，$P(A)\geq 0$。
+- 规范性（Normalization）：$P(\Omega)=1$。
 - 可加性（Additivity）：对于任何互斥事件 $A_{1},A_{2},\dots$，有
 $$
 P\left( \bigcup_{i=1}^\infty A_{i}\right)=\sum_{i=1}^{\infty}P(A_{i})
 $$
-概率空间（Probability Space）：$(\Omega, A, P)$
+概率空间（Probability Space）：$(\Omega,A,P)$，其中 $A$ 表示事件集合。
 
 由公理可以推出概率的一些性质：
 - $P(\varnothing)=0$。
-- 有限可加性（Finite Additivity）：
+- 有限可加性（Finite Additivity）：当 $A_1,\dots,A_n$ 两两互斥时，
 $$P\left( \bigcup_{i=1}^n A_{i}\right)=\sum_{i=1}^{n}P(A_{i})$$
 - $P(\overline{A})=1-P(A)$。
 - $0\leq P(A)\leq 1$
-- 单调性（Monotonicity）：若 $A\subset B$，则 $P(A)\leq P(B)$ 且 $P(B-A)=P(B)-P(A)$。
+- 单调性（Monotonicity）：若 $A\subseteq B$，则 $P(A)\leq P(B)$ 且 $P(B-A)=P(B)-P(A)$。
 - 加法定律（The addition law）：$P(A\cup B)=P(A)+P(B)-P(AB)$。
 - 容斥原理（The inclusion-exclusion principle）：（$A_{1},A_{2},\dots,A_{n}$ 不必互斥）：
 $$
@@ -58,7 +58,7 @@ $$
 ### 古典概型 （Classical Model of Probability）
 
 一个随机试验满足：
-- 样本空间 $\Omega$ 中只有有限个样本点： $\Omega=\{ w=\omega_{1},\omega_{2},\dots,\omega _{n} \}$。
+- 样本空间 $\Omega$ 中只有有限个样本点： $\Omega=\{\omega_{1},\omega_{2},\dots,\omega_n\}$。
 - 每个样本点是等可能的：$P(\{ \omega_{1} \})=\dots=P(\{ \omega_{n} \})=\frac{1}{n}$
 那么计算概率只需要数样本点：
 $$
@@ -72,7 +72,7 @@ $$
 计算概率
 - 加法原理（Addition principle）：分类
 - 乘法原理（Multiplication principle）：分步
-- 排列数（Permutation）：无重复随机抽取，有序 $A_{n}^k= \frac{n!}{(n-k)!}$ 
+- 排列数（Permutation）：无重复随机抽取，有序 $A_{n}^k= \frac{n!}{(n-k)!}$
 - 组合数（Combination）：无重复随机抽取，无序 $C_{n}^k=\binom{n}{k}= \frac{n!}{k!(n-k)!}$
 
 例：$n$ 个人， $n$ 个纸条，纸条中有 $m(<n)$ 个中奖，每个人按顺序抽签得到纸条。则每个人中奖概率如何计算？
@@ -86,12 +86,12 @@ $$
 例：错位排列的概率。
 - 考虑补事件 $A$：至少有一个人到了它应该在的位置。
 - 设 $A_{i}$ 为：编号为 $i$ 的人到了它应该在的位置。
-- 那么容斥原理： $P(A)=P(A_{1}\cup A_{2}\cup\dots\cup A_{n})=\sum P(A_{i})-\sum P(A_{i}A_{j})+\sum P(A_{i}A_{j}A_{k})\dots$ 
-- 其中 $P(A_{i})= \frac{(n-1)!}{n!}, P(A_{i}A_{j})= \frac{(n-2)!}{n!}$，以此类推。
+- 那么容斥原理： $P(A)=P(A_{1}\cup A_{2}\cup\dots\cup A_{n})=\sum P(A_{i})-\sum P(A_{i}\cap A_{j})+\sum P(A_{i}\cap A_{j}\cap A_{k})\dots$
+- 其中 $P(A_{i})= \frac{(n-1)!}{n!}, P(A_{i}\cap A_{j})= \frac{(n-2)!}{n!}$，以此类推。
 - 最终可以算出 $P(A)=1-\frac{1}{2!}+\frac{1}{3!}+\dots+(-1)^{n-1} \frac{1}{n!}$。
 - 当 $n\to \infty$，$P(A)\to 1-\frac{1}{e}$。
 - 错位排列的概率 $P(\overline{A})\to \frac{1}{e}$。
-- 错排数 $D_{n}=n!P(A)$。
+- 错排数 $D_{n}=n!P(\overline{A})$。
 ### 几何概型（Geometric Model of Probability）
 
 几何概型适用于：随机事件可表示成在一个有界区域 $\Omega$ 上投点，每一个点是等可能的。
@@ -105,29 +105,31 @@ $$
 
 ## 条件概率（Conditional Probability）
 
-在事件 $B$ 发生的情况下，事件 $A$ 的条件概率为：
+在 $P(B)>0$ 且事件 $B$ 发生的情况下，事件 $A$ 的条件概率为：
 $$
-P(A|B)= \frac{P(AB)}{P(B)}
+P(A\mid B)= \frac{P(AB)}{P(B)}
 $$
 也就是说，样本空间从 $\Omega$ 变成了 $B$。
-- 乘法定律：$P(AB)=P(A|B)P(B)$
-- 全概率公式：$P(A)=P(A \overline{B})+P(AB)=P(A|\overline{B})P(\overline{B})+P(A|B)P(B)$
-- 链式法则：$P(A_{1}A_{2}\dots A_{n})=P(A_{n}|A_{1}A_{2}\dots A_{n-1})P(A_{n-1}|A_{1}A_{2}\dots A_{n-2})\dots P(A_{2}|A_{1})P(A_{1})$
+- 乘法定律：$P(AB)=P(A\mid B)P(B)$
+- 全概率公式：$P(A)=P(A\overline{B})+P(AB)=P(A\mid \overline{B})P(\overline{B})+P(A\mid B)P(B)$
+- 链式法则（条件概率有定义时）：$P(A_{1}\cap A_{2}\dots A_{n})=P(A_{n}\mid A_{1}\cap A_{2}\dots A_{n-1})P(A_{n-1}\mid A_{1}\cap A_{2}\dots A_{n-2})\dots P(A_{2}\mid A_{1})P(A_{1})$
 
 贝叶斯定理（Bayes' Theorem）
 $$
-P(B_{i}|A)= \frac{P(B_{i})P(A|B_{i})}{\sum P(B_{i})P(A|B_{i})}
+P(B_{i}\mid A)= \frac{P(B_{i})P(A\mid B_{i})}{\sum_{j=1}^n P(B_j)P(A\mid B_j)}
 $$
-其中 $B_{1}, \dots, B_{n}$ 是样本空间的一个划分（partition）。
-这里 $P(B_{i}|A)$ 称为 $B_{i}$ 的后验概率（Posterior probability）； $P(B_{i})$ 叫做 $B_{i}$ 的先验概率（Prior probability）。
+其中 $B_{1}, \dots, B_{n}$ 是样本空间的一个划分（partition），且 $P(A)>0$。全概率公式中概率为零的分支作零处理。
+这里 $P(B_{i}\mid A)$ 称为 $B_{i}$ 的后验概率（Posterior probability）； $P(B_{i})$ 叫做 $B_{i}$ 的先验概率（Prior probability）。
 
 独立性（Independence）：
 - 从条件概率来看，就是事件 $A$ 的发生不影响 $B$ 的概率，反之亦然。
 - 两个事件相互独立就是 $P(AB)=P(A)P(B)$。
 - 三个事件相互独立就是 $P(AB)=P(A)P(B), P(AC)=P(A)P(C), P(BC)=P(B)P(C), P(ABC)=P(A)P(B)P(C)$。
-- $n$ 个事件 $A_{1}\dots A_{n}$ 相互独立：对任意这些事件的子集 $A_{i_{1}}, A_{i_{2}}\dots A_{i_{}k}$，都有 $P(A_{i_{1}}\dots A_{i_{k}})=P(A_{i_{1}})\dots P(A_{i_{k}})$。
- 
+- $n$ 个事件 $A_{1}\dots A_{n}$ 相互独立：对任意这些事件的子集 $A_{i_{1}}, A_{i_{2}}\dots A_{i_k}$，都有 $P(A_{i_{1}}\cap\cdots\cap A_{i_{k}})=P(A_{i_{1}})\dots P(A_{i_{k}})$。
+
 条件独立性（Conditional Independence）
-- 把上面的条件概率的定义改成 $P(A_{i_{1}}\dots A_{i_{k}}|B)=P(A_{i_{1}}|B)\dots P(A_{i_{k}}|B)$。
+- 在 $P(B)>0$ 时，把上面的相互独立定义改成 $P(A_{i_{1}}\cap\cdots\cap A_{i_{k}}\mid B)=P(A_{i_{1}}\mid B)\dots P(A_{i_{k}}\mid B)$。
 
 条件独立性和独立性是互相不能推出的。
+
+

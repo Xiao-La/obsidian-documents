@@ -1,7 +1,7 @@
 
 ## Supervised Learning
 
-Learning from a discrete function $f$ (actual data) to create a function $h$ that approximate the behavior of $f$.
+Learning from labeled examples of a function $f$ (actual data) to create a function $h$ that approximate the behavior of $f$.
 
 ## Nearest-Neighbor Classification
 
@@ -27,7 +27,7 @@ h_{\mathbf{w}}(x)=\begin{cases}
 0 & \text{Otherwise}
 \end{cases}
 $$
-One way to find the best weight vector $\mathbf{w}$ is to use **perception learning:**
+One way to find the best weight vector $\mathbf{w}$ is to use **perceptron learning:**
 $$
 w_{i} \gets w_{i}+\alpha(y-h_{\mathbf{w}}(x)) \times x_{i}
 $$

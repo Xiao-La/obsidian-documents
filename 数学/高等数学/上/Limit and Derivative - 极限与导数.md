@@ -1,4 +1,4 @@
-
+
 ## 概念与定义
 
 函数连续（Continuous）的定义： $\lim_{ x \to c }f(x)=f(c)$
@@ -13,13 +13,13 @@ Concave Up 和 Concave Down：$f''(x)>0$ 或 $f''(x)<0$。
 
 拐点（Inflection Point）：左右两边 $f''(x)$ 符号不同（注意不要求 $f''(x)$ 存在）。
 
-一对一函数（One-to-one Function）：$f(x_{1})=f(x_{2})\implies x_{1}=x_{2}$（一个充分条件是 $f$ 严格单调） 
+一对一函数（One-to-one Function）：$f(x_{1})=f(x_{2})\implies x_{1}=x_{2}$（一个充分条件是 $f$ 严格单调）
 
-反函数（Inverse Function）：对一对一函数（One-to-one Function）来说，存在反函数 $y=f^{-1}(x)$，使得 $f(y)=x$。 
+反函数（Inverse Function）：对一对一函数（One-to-one Function）来说，存在反函数 $y=f^{-1}(x)$，使得 $f(y)=x$。
 
 小 o 记号（little-oh Notation）：$f=o(g)$（“$f$ is little-oh of $g$”），当  $f$ 的阶比 $g$ 的阶更小，即 $\lim\limits_{x\to\infty}\frac{f(x)}{g(x)}=0$
 
-大 O 记号（big-oh Notation）： $f=O(g)$（“$f$ is big-oh of $g$”），当的阶小于或等于 $g$  的阶，即 $\lim\limits_{x\to\infty}\frac{f(x)}{g(x)}\le M$
+大 O 记号（big-oh Notation）： $f=O(g)$（“$f$ is big-oh of $g$”），当存在 $M>0,x_0$，使 $x\ge x_0$ 时 $\lvert f(x)\rvert \le M\lvert g(x)\rvert $
 
 ## 定理
 
@@ -88,14 +88,20 @@ Concave Up 和 Concave Down：$f''(x)>0$ 或 $f''(x)<0$。
     $$
     \lim_{x\to a}\frac{f(x)}{g(x)} \;=\; \lim_{x\to a}\frac{f'(x)}{g'(x)}.
     $$
-## 经典反例
+## 经典反例
 
-1. $f(x)=\begin{cases}x^2\sin \left( \frac{1}{x} \right) & x\neq 0 \\ 0 & x=0\end{cases}$
+1.    $$
+   f(x)=\begin{cases}x^2\sin \left( \frac{1}{x} \right) & x\neq 0 \\ 0 & x=0\end{cases}
+   $$
 	$f(x)$ 连续且处处可导，但 $f'(x)$ 在 $0$ 处不连续，因为 $\lim_{ x \to 0 }f'(x)$ 不存在。
-	这个函数在 $0$ 附近震荡非常强烈，例如可构造 $g(x)=2f(x)+x$ 让 $f'(x)$ 在 $0$ 附近符号频繁变化。
+	这个函数在 $0$ 附近震荡非常强烈，例如可构造 $g(x)=2f(x)+x$ 让 $g'(x)$ 在 $0$ 附近符号频繁变化。
 	另外，它在  $0$  处没有二阶导，$(0,0)$ 也不是它的拐点。
-2.  $f(x)=\begin{cases}1 & x\neq 0 \\ 0 & x=0\end{cases}$
-	和第 1 条类似但稍弱一些，说明 $f'(0)$ 和 $\lim_{ x \to 0 }f'(x)$ 不是一回事。
+2.
+
+   $$
+   f(x)=\begin{cases}1 & x\neq 0 \\ 0 & x=0\end{cases}
+   $$
+	这里 $f$ 在 $0$ 处不连续，所以 $f'(0)$ 不存在；但在 $x\neq0$ 处 $f'(x)=0$，因此 $\lim_{x\to0}f'(x)=0$。这说明导数的极限存在，并不能单独保证该点可导。
 
 ## 杂类
 
@@ -126,14 +132,14 @@ $$f(x)=\left(\sum^{n}_{i=0}\frac{f^{(i)}(a)(x-a)^i}{i!}\right)+R_n(x)$$
 
 余项 $R_n(x)=\dfrac{f^{(n+1)}(c)}{(n+1)!}(x-a)^{n+1}$，其中 $c$ 位于 $a$ 与 $x$ 之间。
 **余项估计定理（Remainder Estimation Theorem）：** 若存在正常数 $M$ 使得
-$$|f^{(n)}(x)|\leq M$$
-对每个 $n\geq 0$ 成立，则该级数收敛到 $f(x)$。
+$$\lvert f^{(n)}(x)\rvert \leq M$$
+在 $a$ 与所考察的 $x$ 之间对所有阶数 $n\ge0$ 都成立（使用同一个 $M$），则该级数收敛到 $f(x)$。
 
 若此时 $R_{n}\to 0$ 当 $n\to \infty$ 对 $x \in I$ 恒成立，则 $f$ 在 $x=a$ 处的泰勒展开收敛到 $f$，记作
 $$
-f(x)=\sum^{\infty}_{i=0} \frac{f^{(i)}(a)(x-a)}{i!}
+f(x)=\sum^{\infty}_{i=0} \frac{f^{(i)}(a)(x-a)^i}{i!}
 $$
-麦克劳林级数（Maclaurin series）是在 $0$ 处的泰勒公式。 
+麦克劳林级数（Maclaurin series）是在 $0$ 处的泰勒公式。
 一些常见函数的麦克劳林展开：
 $$
 \sin x=x- \frac{x^3}{3!}+ \frac{x^5}{5!} - \frac{x^7}{7!}+\cdots (x\to 0)
@@ -152,7 +158,7 @@ $$
 $$
 \tan^{-1}x=x-\frac{x^3}{3}+\frac{x^5}{5}+\cdots(x\to 0)
 $$
-注意，上面这些公式在其定义域内都收敛。
+注意，$\sin x,\cos x,e^x$ 的上述级数对所有实数收敛；$\tan x$ 的级数要求 $\lvert x\rvert <\pi/2$，$\arctan x$ 的级数要求 $\lvert x\rvert \le1$。
 $$
 \frac{1}{1-x}=1+x+x^2+x^3+\cdots(x\to 0)
 $$
@@ -163,15 +169,15 @@ $$
 \ln(1+x)=x- \frac{x^2}{2}+ \frac{x^3}{3}-\frac{x^4}{4} + \cdots (x \to 0)
 $$
 这几个都可以互推。
-注意，前两个公式收敛需要 $|x|<1$，最后一个公式收敛需要 $-1<x\leq 1$。
+注意，前两个公式收敛需要 $\lvert x\rvert <1$，最后一个公式收敛需要 $-1<x\leq 1$。
 特别的，
 $$
 \ln(\cos x)=\ln\left( 1-\frac{x^2}{2}+o(x^2) \right)=-\frac{x^2}{2}+o(x^2)
 $$
 用广义二项式定理求幂级数：
 $$
-\begin{align}
+\begin{aligned}
 (1+x)^{\alpha}&=\sum_{k=0}^{\infty}\binom{\alpha}{k}x^k \\
 &=\sum_{k=0}^{\infty} \frac{\alpha(\alpha-1)(\alpha-2)\cdots (\alpha-k+1)}{k!}x^k
-\end{align}
+\end{aligned}
 $$

@@ -65,7 +65,7 @@ WFF 的性质：
 为了可读性，有*惯例：*
 - 将 $F$ 和 $(F)$ 视为相同的公式。
 - 优先级（Precedence）：从高到低为 $(), \neg,\land,\lor,\to,\leftrightarrow$。
-- 结合性（Associativity）：$\land, \lor, \leftrightarrow$ 具有结合性。$\to$ 具有右结合性。
+- 结合性（Associativity）：$\land, \lor, \leftrightarrow$ 具有结合性。$\to$ 按右结合约定解析（不满足结合律）。
 
 ### 语义
 
@@ -80,7 +80,7 @@ $\to$  的真值表：
 | false | true  | true     |
 | true  | false | false    |
 | true  | true  | true     |
-这里 $P$ 是前件（Antecedent），$Q$ 是后件（Consequence），$P\to Q$ 相当于 $\neg P\lor Q$。
+这里 $P$ 是前件（Antecedent），$Q$ 是后件（Consequent），$P\to Q$ 相当于 $\neg P\lor Q$。
 
 
 $\leftrightarrow$ 的真值表：
@@ -97,8 +97,8 @@ $\leftrightarrow$ 的真值表：
 - 记号：若 $p\in \mathrm{Atom}(\mathscr{L}^P)$，则用 $v(p)$ 或 $p^v$ 表示 $p$ 在赋值 $v$ 下的真值，且 $p^v\in\{0,1\}$。
 
 若 $A \in \mathscr{L}^p$：
-• 若 $\forall v$，有 $A^v=1$ 则称 $A$ 为永真式（tautology/重言式） 
-• 若 $\forall v$，有 $A^v=0$ 则称 $A$ 为永假式（contradiction/矛盾式) 
+• 若 $\forall v$，有 $A^v=1$ 则称 $A$ 为永真式（tautology/重言式）
+• 若 $\forall v$，有 $A^v=0$ 则称 $A$ 为永假式（contradiction/矛盾式)
 • 若 $\exists v$，使得 $A^v=1$ 则称 $A$ 为可满足的（satisfiable）
 
 要证明某个式子是永真式/永假式/可满足的，可以用：
@@ -112,7 +112,7 @@ $\leftrightarrow$ 的真值表：
 ![[Propositional Logic - 命题逻辑-4.png|540]]
 ![[Propositional Logic - 命题逻辑-5.png|541]]
 
-**代换实例（Substitution Instance）：** 将一个式子里的某些部分替换为其他式子，且保持替换的一致性（相同的部分替换为相同的式子）得到的式子。
+**代换实例（Substitution Instance）：** 将公式中的原子命题统一替换为其他公式，且保持替换的一致性（同一原子命题的所有出现均替换为同一公式）得到的式子。
 - 一个永真式的代换实例仍然是永真式。
 **代换定理：** 如果 $A$ 是一个 wff ，它有一个子式 $C$，且 $C \equiv D$，则将 $A$ 中的某些 $C$ 代换成 $D$ 得到的结果 $B$ 有 $A\equiv B$。
 
@@ -185,7 +185,7 @@ $$
     - 是  $\mathscr{H}$ 中的一个公理，或一个 $\Sigma$ 中的一个公式。
     - 是 $A_{j}(j<i)$。
     - 是通过 MP 从 $A_{j}, A_{k}(j, k<i)$ 推导出来的。
-- 这里我们称 $A_{n}$ 是 $\mathscr{H}$ 中的一个定理（Theorem）。
+- 当 $\Sigma=\varnothing$ 时，称 $A_n$ 是 $\mathscr{H}$ 中的定理（Theorem）；否则它是由前提 $\Sigma$ 导出的结论。
 - $A_{n}$ 可被证明记作 $\Sigma\vdash A_{n}$。
 - 若 $\Sigma=\varnothing$，则简记为 $\vdash A_{n}$。
 
@@ -209,10 +209,10 @@ $$
 ![[Propositional Logic - 命题逻辑-8.png|516]]
 - Contrapositive Rule:
 $$
-\text{if } \Sigma\vdash \neg B\to \neg A, \text{then } \Sigma\vdash  A\to B 
+\text{if } \Sigma\vdash \neg B\to \neg A, \text{then } \Sigma\vdash  A\to B
 $$
 
-(Theorem H3) 
+(Theorem H3)
 $$
 \vdash \neg \neg A\to A
 $$
@@ -261,7 +261,7 @@ $$
 - 公式：与 wff 类似的定义。
 
 推理规则（Inference Rules）：
-- 自反（Reflexivity）：$\Sigma \cup {\alpha}\vdash\alpha$ or $\Sigma,\alpha\vdash\alpha$
+- 自反（Reflexivity）：$\Sigma \cup \{\alpha\}\vdash\alpha$ or $\Sigma,\alpha\vdash\alpha$
 - 每条规则包括 introduction 和 elimination 两部分。
 - $\land\text{i}$ ：$$
 \frac{\alpha \,\, \beta}{\alpha \land\beta}
@@ -279,7 +279,7 @@ $$
 \frac{\boxed{\begin{aligned}
 \alpha \\
 \dots \\
-\beta 
+\beta
 \end{aligned}}}{\alpha\to\beta}
 $$
 或： 若 $\Sigma,\alpha\vdash_{ND} \beta$，则 $\Sigma\vdash_{ND}(\alpha\to\beta)$。这里被框起来的就是一个子证明（Subproof）。
@@ -291,23 +291,23 @@ $$
 $$
 - $\lor\text{e}$（Proof by cases）：
 $$
-\frac{(\alpha_{1}\lor\alpha_{2})\,\,\boxed{\begin{align}
+\frac{(\alpha_{1}\lor\alpha_{2})\,\,\boxed{\begin{aligned}
 \alpha_{1} \\
 \dots \\
 \beta
-\end{align}}\,\,\boxed{\begin{align}
+\end{aligned}}\,\,\boxed{\begin{aligned}
 \alpha_{2} \\
 \dots \\
 \beta
-\end{align}}}{\beta}
+\end{aligned}}}{\beta}
 $$
 - $\neg\text{i}$（用 $\perp$ 表示矛盾）：
 $$
-\frac{\boxed {\begin{align}
+\frac{\boxed {\begin{aligned}
 \alpha \\
 \dots \\
 \perp
-\end{align}}}{\neg\alpha}
+\end{aligned}}}{\neg\alpha}
 $$
 - $\neg\text{e}$ 或 $\perp\text{i}$：
 $$
@@ -326,7 +326,7 @@ $$
 $$
 \frac{\Sigma}{\alpha}
 $$
-- 否定后件（Modus tollens, MT）： 
+- 否定后件（Modus tollens, MT）：
 $$
 \{ (p\to q,\neg q) \}\vdash _{ND}(\neg p)
 $$
@@ -336,11 +336,11 @@ $$
 $$
 - 反证法（Proof by contradiction, reductio ad absurdum）
 $$
-\frac{\boxed{\begin{align}
+\frac{\boxed{\begin{aligned}
 (\neg\alpha) \\
 \dots \\
 \perp
-\end{align}}}{\alpha}
+\end{aligned}}}{\alpha}
 $$
 - 排中律（Law of Excluded Middle, Tertiam non datur）
 $$
@@ -369,16 +369,22 @@ $$
 有了可靠性，证明蕴含就可以用：真值表，定义，反证法，以及 **用 ND 证明**。
 
 要证明 ND 的完备性，设 $\Sigma=\{ a_{0},a_{1},\dots,a_{n} \}$ ，可以分别证明三个引理：
-- Lemma 1: 若 $\Sigma\vDash\beta$，则 $\emptyset \vDash(a_{0}\to(a_{1}\to(\dots\to(a_{n}\to\beta))))$。
-- Lemma 2: 对任意 wff $\gamma$，若 $\emptyset\vDash \gamma$, 则 $\emptyset\vdash_{ND}\gamma$。（永真式可以被证明）
-- Lemma 3: 若 $\emptyset\vdash_{ND}(a_{0}\to(a_{1}\to(\dots\to(a_{n}\to\beta)\dots))$，则 $\{ a_{0},a_{1},\dots,a_{n} \}\vdash_{ND}\beta$。也就是说 $\Sigma\vdash_{ND}\beta$。
+- Lemma 1: 若 $\Sigma\vDash\beta$，则 $\varnothing \vDash(a_{0}\to(a_{1}\to(\dots\to(a_{n}\to\beta))))$。
+- Lemma 2: 对任意 wff $\gamma$，若 $\varnothing\vDash \gamma$, 则 $\varnothing\vdash_{ND}\gamma$。（永真式可以被证明）
+- Lemma 3: 若 $\varnothing\vdash_{ND}(a_{0}\to(a_{1}\to(\dots\to(a_{n}\to\beta)\dots)))$，则 $\{ a_{0},a_{1},\dots,a_{n} \}\vdash_{ND}\beta$。也就是说 $\Sigma\vdash_{ND}\beta$。
 Lemma 1 容易用反证法证明。Lemma 3 可以重复用 $\to\text{e}$ 消去最后得到 $\beta$ 证明。
 Lemma 2：
 - 例如有两个 Atom $p,q$，就只需要证明 $p,q\vdash\gamma,\ p, \neg q\vdash\gamma,\ \neg p, q \vdash \gamma,\ \neg p, \neg q\vdash \gamma$ 四种情况。因为，我们可以用排中律构造一个这样的证明：![[Propositional Logic - 命题逻辑-10.png|545]]
 - 对于 $n$ 个 Atom $p_{1},p_{2},\dots,p_{n}$ 的一般情况，有子引理（Sublemma）：对任意由这些 Atom 组成的 wff $\gamma$，对任意赋值 $v$，有：
   - 若 $\gamma^v=1$，则 $\{ \hat{p_{1}}, \hat{p_{2}}, \dots, \hat{p_{n}} \}\vdash\gamma$。
   - 若 $\gamma^v=0$，则 $\{ \hat{p_{1}}, \hat{p_{2}}, \dots, \hat{p_{n}} \}\vdash\neg \gamma$。
-- 这里 $\hat{p_{i}}=\begin{cases}p_{i} & p_{i}^v=1 \\ \neg p_{i} & p_{i}^v=0\end{cases}$。
+- 这里
+
+  $$
+  \hat{p_{i}}=\begin{cases}p_{i} & p_{i}^v=1 \\ \neg p_{i} & p_{i}^v=0\end{cases}
+  $$
+
+  。
 - 如果证明了这个 Sublemma，那么其第一种情况（$\gamma^v=1$） 恰好对应了前面的构造，所以就能证明 Lemma 2。
 Sublemma 的证明：
 -  对 $\gamma$ 的构造进行归纳证明。
@@ -386,16 +392,16 @@ Sublemma 的证明：
   - 若 $\gamma^v=p_{1}^v=1$，则 $\hat{p_{1}}=p_{1}\vdash p_{1}=\gamma$。
   - 若 $\gamma^v=p_{1}^v=0$，则 $\hat{p_{1}}=\neg p_{1}\vdash\neg p_{1}=\neg \gamma$。
 - Inductive Hypothesis: 用 $P(\gamma)$ 表示 $\gamma$ 符合 Sublemma，假设 $P(\gamma_{1}), P(\gamma_{2})$ 成立。
-- Inductive Step: 
+- Inductive Step:
   - Case 1: $\gamma=\neg \gamma_{1}$。
     - 若 $\gamma^v=(\neg \gamma_{1})^v=1$，则 $\gamma_{1}^v=0$。则有 $\{ \hat{p_{1}}, \hat{p_{2}}, \dots, \hat{p_{n}} \} \vdash \neg \gamma_{1}=\gamma$。
     - 若 $\gamma^v=(\neg \gamma_{1})^v=0$，则 $\gamma_{1}^v=1$。则有 $\{ \hat{p_{1}}, \hat{p_{2}}, \dots, \hat{p_{n}} \} \vdash \gamma_{1}$。用 $\neg \neg\text{i}$ 规则，有 $\{ \hat{p_{1}}, \hat{p_{2}}, \dots, \hat{p_{n}} \}\vdash (\neg(\neg \gamma_{1}))=\neg \gamma$。
   - Case 2:  $\gamma=\gamma_{1}\to \gamma_{2}$。
-    - 若 $\gamma^v=0$，则 $\gamma_{1}^v=1, \gamma_{2}^v=0$。假设 $\gamma_{1}$ 包含 $\{ q_{1},\dots,q_{k} \}$ 这些 Atom，$\gamma_{2}$ 包含 $\{ r_{1},r_{2},\dots,r_{w} \}$ 这些 Atom，则 I.H. 给出 $\{ \hat{q_{1}},\dots,\hat{q_{k}} \}\vdash \gamma_{1}, \{ \hat{r_{1}}, \dots, \hat{r_{w}} \}\vdash \neg \gamma_{2}$。由于这里的前提都是 $\{ \hat{p_{1}}, \hat{p_{2}}, \dots, \hat{p_{n}} \}\vdash\gamma$ 的子集，所以可以得到 $\{ \hat{p_{1}}, \hat{p_{2}}, \dots, \hat{p_{n}} \}\vdash\gamma_{1}, \{ \hat{p_{1}}, \hat{p_{2}}, \dots, \hat{p_{n}} \}\vdash\neg\gamma_{2}$。只要构造一个从这两个命题出发对 $\neg(\gamma_{1}\to \gamma_{2})$ 的证明即可。这用 PBC 是容易的。
+    - 若 $\gamma^v=0$，则 $\gamma_{1}^v=1, \gamma_{2}^v=0$。假设 $\gamma_{1}$ 包含 $\{ q_{1},\dots,q_{k} \}$ 这些 Atom，$\gamma_{2}$ 包含 $\{ r_{1},r_{2},\dots,r_{w} \}$ 这些 Atom，则 I.H. 给出 $\{ \hat{q_{1}},\dots,\hat{q_{k}} \}\vdash \gamma_{1}, \{ \hat{\mathbf{r}_{1}}, \dots, \hat{\mathbf{r}_{w}} \}\vdash \neg \gamma_{2}$。由于这里的前提都是 $\{ \hat{p_{1}}, \hat{p_{2}}, \dots, \hat{p_{n}} \}\vdash\gamma$ 的子集，所以可以得到 $\{ \hat{p_{1}}, \hat{p_{2}}, \dots, \hat{p_{n}} \}\vdash\gamma_{1}, \{ \hat{p_{1}}, \hat{p_{2}}, \dots, \hat{p_{n}} \}\vdash\neg\gamma_{2}$。只要构造一个从这两个命题出发对 $\neg(\gamma_{1}\to \gamma_{2})$ 的证明即可。这用 PBC 是容易的。
     - 若 $\gamma^v=1$，类似的去讨论即可。
    - 其他二元连接符的 Cases 也类似。
 
- 
+
 #### Resolution
 
 定义单式/文字（Literal）：Atom 或 Atom 的否定。
@@ -430,7 +436,7 @@ Theorem: 任何式子 $A\in\text{Form}(\mathscr{L}^p)$ 都可以与  CNF 形式�
 将任意式子转化为 DNF/CNF：
 ![[Propositional Logic - 命题逻辑-11.png|555]]
 
-定义 $B$ 为 $A$ 的主合取/析取范式（Principle CNF/DNF）：
+定义 $B$ 为 $A$ 的主合取/析取范式（Principal CNF/DNF）：
 - $B$ 是 $A$ 的 CNF/DNF。
 - 每个 $B$ 中的子句（clause）都包含 $A$ 中的所有命题变量恰好一次，且没有两个相同的子句。
 要写出主 CNF 和主 DNF，可以先写出真值表，DNF 就是所有值为 1 的 row 析取，CNF 就是所有值为 0 的 row 先否定再合取。
@@ -448,15 +454,15 @@ $$
 $$
 \dfrac{p\ \ \ (\neg p)}{\perp}
 $$
-在 Resolution Proof 中，要证明 $\Sigma\vdash_{\text{Res}}\varphi$：
-- 转换为证明 $\Sigma\cup \{ \neg \varphi \}\vdash_{\text{Res}}\perp$。
+在 Resolution Proof 中，要证明 $\Sigma\vdash_{\mathrm{Res}}\varphi$：
+- 转换为证明 $\Sigma\cup \{ \neg \varphi \}\vdash_{\mathrm{Res}}\perp$。
 - 首先把 $\neg \varphi$ 和 $\Sigma$ 转换为 CNF。
 - 将 CNF 从 $\land$ 分开，变成一堆析取子式（Disjunctive Clauses）。
 - 再把析取子式从 $\lor$ 分开，把每个析取子式变成单式的集合。
 - 在这些集合上不断使用 Resolution Inference，直到不再可以使用，或获得 $\perp$ 证明命题。
 这里 $\perp$ 为空子句/空集。
 
-例如，要证明 $\{ p,q \}\vdash_{\text{Res}}(p\land q)$：
+例如，要证明 $\{ p,q \}\vdash_{\mathrm{Res}}(p\land q)$：
 - 前提转换为 $\{ p,q,\neg(p\land q) \}$。
 - 转换为 CNF $\{ p,q,\neg p\lor \neg q \}$。
 - 变成集合记号 $\{ p \}, \{ q \}, \{ \neg p,\neg q \}$。

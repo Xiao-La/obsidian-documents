@@ -2,13 +2,13 @@
 ## 光电效应
 
 $$
-hf=K+\Phi
+hf=K_{\max}+\Phi
 $$
 这里 $\Phi$ 是材料中电子和真空中电子的能量差。必须要 $hf\geq \Phi$ 才能激发电子。
 实验中，会发现光子的能量是量子化的，是一份一份的。
 截止电压：
 $$
-hf-\Phi=K_{max}=eV_{stop}
+hf-\Phi=K_{\mathrm{max}}=eV_{\mathrm{stop}}
 $$
  从这个公式可以做实验测出 $\Phi$ 和 $h$。（测两组 $V,\lambda$）
 
@@ -25,7 +25,7 @@ $$
 \frac{hc}{\lambda}= \frac{hc}{\lambda'}+(\gamma-1)mc^{2}
 $$
 $$
-\frac{h}{\lambda}=\frac{h}{\lambda'}+\gamma mv\cos\theta
+\frac{h}{\lambda}=\frac{h}{\lambda'}\cos\phi+\gamma mv\cos\theta
 $$
 这里 $\theta$ 为电子偏转的角度，$\phi$ 是光子偏转的角度。
 那么 Compton Shift，即前后的波长变化量为：
@@ -39,7 +39,7 @@ $$
 $$
 \lambda=\frac{h}{p}
 $$
-能量特别高的时候（波长<1 nm），要考虑相对论效应：
+当 $v$ 不再远小于 $c$（或动能不再远小于 $mc^2$）时，要考虑相对论效应：
 $$
 p=\gamma mv,K=(\gamma-1)mc^{2}
 $$
@@ -51,7 +51,7 @@ $$
 ## 海森堡不确定性原理
 
 $$
-\Delta x\cdot \Delta p_{x}\geq \hbar
+\Delta x\cdot\Delta p_x\geq\frac{\hbar}{2}
 $$
 
 

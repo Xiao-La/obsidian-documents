@@ -3,24 +3,24 @@
 
 ### 多元函数及其极限
 
-实值函数（Real-valued Function）$f$ 将 $n$ 元组 $(x_{1},x_{2},\dots,x_{n})$ 映射到一个实数 $w$。称 $w$ 为因变量/输入变量（Dependent Variable/Output Variable），$x_{1},x_{2},\dots,x_{n}$ 为自变量/输出变量（Independent Variables/Input Variables）。
+实值函数（Real-valued Function）$f$ 将 $n$ 元组 $(x_{1},x_{2},\dots,x_{n})$ 映射到一个实数 $w$。称 $w$ 为因变量/输出变量（Dependent Variable/Output Variable），$x_{1},x_{2},\dots,x_{n}$ 为自变量/输入变量（Independent Variables/Input Variables）。
 
-对于 $\mathbb{R}^{2}$ 上的区域/集合 $R$，定义它的内点（Interior Point）为使得以这个点为原心的小圆只包含 $R$ 中的点；定义它的边界点（Boundary Point）为使得以这个点为原心的小圆中同时包含 $R$ 中和 $R$ 外的点。$R$ 的内点构成的集合称为这个区域的内部（Interior）。边界点构成的集合称为这个区域的边界（Boundary）。包含了所有内点的区域定义为是开的（Open）。包含了所有边界点的区域定义为是闭的（Closed）。
+对于 $\mathbb{R}^{2}$ 上的区域/集合 $R$，定义它的内点（Interior Point）为使得存在以这个点为圆心的小圆盘完全包含在 $R$ 内；定义它的边界点（Boundary Point）为使得任意以这个点为圆心的小圆盘都同时包含 $R$ 中和 $R$ 外的点。$R$ 的内点构成的集合称为这个区域的内部（Interior）。边界点构成的集合称为这个区域的边界（Boundary）。所有点都是内点的区域定义为是开的（Open）。包含了所有边界点的区域定义为是闭的（Closed）。
 （类似的，把小圆换成小球，就是 $\mathbb{R}^{3}$ 中的情况）
 
 定义区域有界（Bounded）若它落在一个有限半径的圆内，反之称为无界（Unbounded）。
 
 定义函数 $f(x,y)$ 的等值线（Level Curve）为满足 $f(x,y)=c$ 的点 $(x,y)$ 构成的集合。在 $\mathbb{R}^{3}$ 中的点 $(x,y,f(x,y))$ 构成的集合为这个二元函数的图象（Graph），也就是曲面 $z=f(x,y)$。
 
-定义极限 
+定义极限
 $$
-\lim_{ (x,y) \to (x_{0},y_{0}) }f(x,y)=L 
+\lim_{ (x,y) \to (x_{0},y_{0}) }f(x,y)=L
 $$
-为 $\forall\varepsilon, \exists \delta$ 使得
+为 $\forall\varepsilon>0, \exists \delta>0$ 使得
 $$
-0<\sqrt{ (x-x_{0})^{2}+(y-y_{0})^{2} }<\delta \implies |f(x,y)-L|<\varepsilon
+0<\sqrt{ (x-x_{0})^{2}+(y-y_{0})^{2} }<\delta \implies \lvert f(x,y)-L\rvert <\varepsilon
 $$
-这个极限运算的性质也非常好，可以和加/减/乘/除/数乘/幂/开方军算交换位置。
+有限极限可以按加、减、乘和数乘法则运算；除法还要求分母的极限非零，幂和开方则要满足相应的定义域及连续性条件。
 定义二元函数 $f(x,y)$ 在 $(x_{0},y_{0})$ 处连续：
 $$ f(x_{0},y_{0})=\lim_{ (x,y) \to (x_{0},y_{0}) }f(x,y)$$
 前提是左右两边都存在。
@@ -29,8 +29,8 @@ $$ f(x_{0},y_{0})=\lim_{ (x,y) \to (x_{0},y_{0}) }f(x,y)$$
 - 从所有直线趋近某个点得到的极限相同，并不能说明极限存在。
 
 极坐标代换：当出现 $x^{2}+y^{2}$，或分子次数大于分母次数时，或想要证明极限为 $0$ 时，考虑令 $x=r\cos\theta,y=r\sin\theta$，则 $\lim_{ (x,y) \to (0,0) }f(x,y)=\lim_{ r \to 0 }f(r,\theta)$。
-- 注意，这里不能简单地把 $\theta$ 视为常数然后求 $r\to 0$ 处的极限，因为这样相当于只走直线路径 $y=\tan\theta$。可以先猜测极限为 $L$，然后再用 $\varepsilon-\delta$ 语言严格证明 $\forall\varepsilon>0, \exists \delta>0,s.t.$ $$
-|r|<\delta \implies|f(r,\theta)-L|<\varepsilon
+- 注意，这里不能简单地把 $\theta$ 视为常数然后求 $r\to 0$ 处的极限，因为这样相当于只走直线路径 $y=x\tan\theta$。可以先猜测极限为 $L$，然后再用 $\varepsilon-\delta$ 语言严格证明 $\forall\varepsilon>0, \exists \delta>0,s.t.$ $$
+\lvert r\rvert <\delta \implies\lvert f(r,\theta)-L\rvert <\varepsilon
 $$
 ### 求二元多项式之比的极限
 
@@ -53,7 +53,7 @@ $$
 1.  **拆分出有界项：** 凑出一个能在 $(0,0)$ 附近有界的项。
     *   技巧：局部 $\le$ 整体。因为 $A^2, B^2 \ge 0$，所以 $A^2 \le A^2 + B^2$ 。
     *   推出基础不等式：$\frac{x^2}{x^2+y^4} \le 1$ 以及 $\frac{y^4}{x^2+y^4} \le 1$。
-2.  **均值不等式。
+2.  **均值不等式：** 由 $2\lvert xy^2\rvert\leq x^2+y^4$，得 $\frac{\lvert xy^2\rvert}{x^2+y^4}\leq\frac12$。
 
 **特例：分母非正定**（分母为 0 不对应 $x=0,y=0$，而对一整个曲线成立），那么极限大概率不存在，因为只要贴近这个曲线再加上一个高阶无穷小，就能使极限不存在。例如 $\frac{x^{3}+y^{3}}{x^{2}+y}$，只要令 $y=-x^{2}+x^{3}$，则变成 $\frac{x^{3}+(-x^{2}+x^{3})^{3}}{x^{3}}\to 1$, 令 $y=-x^2+x^4$  就趋于无穷。
 
@@ -64,10 +64,10 @@ $$
 
 对于 $n$ 元函数 $f(x_{1},x_{2},\dots,x_{n})$ ，定义它在 $(t_{1},t_{2},\dots,t_{n})$ 处对 $x_{i}$ 的偏导数（Partial Derivatives w.r.t. $x_{i}$）为
 $$
-\left.\frac{ \partial f }{ \partial x_{i} }\right|_{(t_{1},t_{2},\dots,t_{n})} =\lim_{ h \to 0 }  \frac{f(t_{1},t_{2},\dots,t_{i}+h, \dots, t_{n})-f(t_{1},t_{2},\dots, t_{i}, \dots,t_{n})}{h}
+\left.\frac{ \partial f }{ \partial x_{i} }\right\rvert _{(t_{1},t_{2},\dots,t_{n})} =\lim_{ h \to 0 }  \frac{f(t_{1},t_{2},\dots,t_{i}+h, \dots, t_{n})-f(t_{1},t_{2},\dots, t_{i}, \dots,t_{n})}{h}
 $$
 
-混合偏导定理（Mixed Derivative Theorem）：若 $f(x,y)$ 及其偏导数 $f_x, f_y, f_{xy}, f_{yx}$ 在包含点 $(a,b)$ 的某个开区域内处处有定义，且它们在 $(a,b)$ 处都连续，则混合偏导相等：$f_{xy}(a,b)=f_{yx}(a,b).$ 
+混合偏导定理（Mixed Derivative Theorem）：若 $f(x,y)$ 及其偏导数 $f_x, f_y, f_{xy}, f_{yx}$ 在包含点 $(a,b)$ 的某个开区域内处处有定义，且它们在 $(a,b)$ 处都连续，则混合偏导相等：$f_{xy}(a,b)=f_{yx}(a,b).$
 - 也就是说，若偏导数都连续，求偏导的顺序可以交换。
 
 定义可微（Differentiable）：函数 $z=f(x,y)$ 在 $(x_0,y_0)$ 处可微，当且仅当 $f_x(x_0,y_0)$ 与 $f_y(x_0,y_0)$ 存在，且增量 $\Delta z$ 满足 $\Delta z=f_x(x_0,y_0)\Delta x+f_y(x_0,y_0)\Delta y+\varepsilon_1\Delta x+\varepsilon_2\Delta y$ 其中当 $\Delta x,\Delta y\to 0$ 时，$\varepsilon_1,\varepsilon_2\to 0$。（高阶无穷小量）
@@ -79,36 +79,34 @@ $$
 多元函数在某个点可微，可以推出它在这一点连续。
 要证明不可微，可以通过证明不连续。
 
-$$
-偏导数连续    \implies可微    \implies连续 且 偏导数存在。
-$$
+$$\text{偏导数连续}\quad\implies\quad\text{可微}\quad\implies\quad\text{连续且偏导数存在}$$
 
 ### 链式法则
 
 链式法则（Chain Rule）：
-- 一元自变量 + 二个中间变量：若 $w=f(x,y)$ 可微，且 $x=x(t),\ y=y(t)$ 是关于 $t$ 的可微函数，则复合函数 $w=f(x(t),y(t))$ 关于 $t$ 可微，且有 $$\frac{dw}{dt}=\frac{\partial f}{\partial x}\frac{dx}{dt}+\frac{\partial f}{\partial y}\frac{dy}{dt}.$$
+- 一元自变量 + 二个中间变量：若 $w=f(x,y)$ 可微，且 $x=x(t),\ y=y(t)$ 是关于 $t$ 的可微函数，则复合函数 $w=f(x(t),y(t))$ 关于 $t$ 可微，且有 $$\frac{\mathrm{d}w}{\mathrm{d}t}=\frac{\partial f}{\partial x}\frac{\mathrm{d}x}{\mathrm{d}t}+\frac{\partial f}{\partial y}\frac{\mathrm{d}y}{\mathrm{d}t}.$$
 - 一元自变量 + 多个中间变量也类似： $w=f(x_{1},x_{2} ,\dots,x_{n}),x_{1}=x_{1}(t),x_{2}=x_{2}(t)\dots,x_{n}=x_{n}(t)$
-$$\implies \frac{dw}{dt}=\sum \frac{ \partial f }{ \partial x_{i} } \frac{dx_{i}}{dt}$$
+$$\implies \frac{\mathrm{d}w}{\mathrm{d}t}=\sum \frac{ \partial f }{ \partial x_{i} } \frac{\mathrm{d}x_{i}}{\mathrm{d}t}$$
 - 二个自变量 + 三个中间变量：设 $w=f(x,y,z)$，且 $x=g(r,s),\ y=h(r,s),\ z=k(r,s)$；若这四个函数均可微，则 $w$ 关于 $r,s$ 有偏导，并满足
 $$\frac{\partial w}{\partial r}=\frac{\partial w}{\partial x}\frac{\partial x}{\partial r}+\frac{\partial w}{\partial y}\frac{\partial y}{\partial r}+\frac{\partial w}{\partial z}\frac{\partial z}{\partial r},$$ $$\frac{\partial w}{\partial s}=\frac{\partial w}{\partial x}\frac{\partial x}{\partial s}+\frac{\partial w}{\partial y}\frac{\partial y}{\partial s}+\frac{\partial w}{\partial z}\frac{\partial z}{\partial s}.$$
-隐函数求导公式（Implicit Differentiation）：设 $F(x,y)$ 可微，且方程 $F(x,y)=0$ 将 $y$ 定义为 $x$ 的可微函数；则在任意满足 $F_y\neq 0$ 的点处，$$\frac{dy}{dx}=-\frac{F_x}{F_y}.$$
+隐函数求导公式（Implicit Differentiation）：设 $F(x,y)$ 可微，且方程 $F(x,y)=0$ 将 $y$ 定义为 $x$ 的可微函数；则在任意满足 $F_y\neq 0$ 的点处，$$\frac{\mathrm{d}y}{\mathrm{d}x}=-\frac{F_x}{F_y}.$$
 这个可以从链式法则直接推导出来。
 
 ### 方向导数与梯度
 
 二元函数 $f(x,y)$ 在 $P_{0}(x_{0},y_{0})$ 处，在单位向量 $\mathbf{u}=u_{1}\mathbf{i}+u_{2}\mathbf{j}$ 的方向的导数定义为：
 $$
-\left( \frac{df}{ds} \right)_{\mathbf{u},P_{0}}= \lim_{ s \to 0 } \frac{f(x_{0}+su_{1}, y_{0}+su_{2})-f(x_{0},y_{0})}{s} 
+\left( \frac{\mathrm{d}f}{\mathrm{d}s} \right)_{\mathbf{u},P_{0}}= \lim_{ s \to 0 } \frac{f(x_{0}+su_{1}, y_{0}+su_{2})-f(x_{0},y_{0})}{s}
 $$
 也记作 $(D_{\mathbf{u}}f)_{P_{0}}$。
-通过链式法则，由于 $x=x_{0}+su_{1}, y=y_{0}+su_{2}$ 我们可以把它拆成：
+若 $f$ 在 $P_0$ 可微，通过链式法则，由于 $x=x_{0}+su_{1}, y=y_{0}+su_{2}$ 我们可以把它拆成：
 $$
-\begin{align}
-(D_{\mathbf{u}}f)_{P_{0}}&= \left( \frac{df}{ds} \right)_{\mathbf{u},P_{0}} \\
-&= \left(\frac{ \partial f }{ \partial x }\right)_{P_{0}} \frac{dx}{ds}+\left(\frac{ \partial f }{ \partial y }\right)_{P_{0}} \frac{dy}{ds} \\
+\begin{aligned}
+(D_{\mathbf{u}}f)_{P_{0}}&= \left( \frac{\mathrm{d}f}{\mathrm{d}s} \right)_{\mathbf{u},P_{0}} \\
+&= \left(\frac{ \partial f }{ \partial x }\right)_{P_{0}} \frac{\mathrm{d}x}{\mathrm{d}s}+\left(\frac{ \partial f }{ \partial y }\right)_{P_{0}} \frac{\mathrm{d}y}{\mathrm{d}s} \\
 &= \left(\frac{ \partial f }{ \partial x }\right)_{P_{0}} u_{1}+\left(\frac{ \partial f }{ \partial y }\right)_{P_{0}}u_{2} \\
-&=\left( \frac{ \partial f }{ \partial x } \mathbf{i}+\frac{ \partial f }{ \partial y } \mathbf{j} \right) \left( u_{1}\mathbf{i}+u_{2}\mathbf{j} \right) 
-\end{align}
+&=\left( \frac{ \partial f }{ \partial x } \mathbf{i}+\frac{ \partial f }{ \partial y } \mathbf{j} \right)\cdot\left( u_{1}\mathbf{i}+u_{2}\mathbf{j} \right)
+\end{aligned}
 $$
 这里定义 $f(x,y)$ 的梯度（Gradient） 为向量
 $$
@@ -117,25 +115,25 @@ $$
 （更高维度也可以类似定义）
 那么有
 $$
-D_{\mathbf{u}}f=\nabla f\cdot \mathbf{u}=\left| \nabla f \right| \cos\theta
+D_{\mathbf{u}}f=\nabla f\cdot \mathbf{u}=\left\lvert \nabla f \right\rvert  \cos\theta
 $$
-所以，$\theta=0$ 时 $f$ 增长最快，$\theta=\pi$ 时 $f$ 衰减最快，$\theta=\frac{\pi}{2}$ 时 $f$ 不改变。
-向量 $\nabla f$ 与曲线 $z=f(x,y)$ 的等值线（Level Curve）成法向（Normal）（与方向向量垂直）。所以可以写出等值线的切线：
+当 $\nabla f\neq\mathbf{0}$ 时，$\theta=0$ 时 $f$ 增长最快，$\theta=\pi$ 时 $f$ 衰减最快，$\theta=\frac{\pi}{2}$ 时方向导数为零（一阶变化为零）。
+向量 $\nabla f$ 与曲线 $z=f(x,y)$ 的等值线（Level Curve）成法向（Normal）（与方向向量垂直）。当该点 $\nabla f\ne0$ 时，可以写出等值线的切线：
 $$
 f_{x}(x-x_{0})+f_{y}(y-y_{0})=0
 $$
-并且，$\nabla$ 算子的加/减/数乘/乘/除的规则都和求导算子 $\frac{d}{dx}$ 类似。
+并且，$\nabla$ 算子的加/减/数乘/乘/除的规则都和求导算子 $\frac{\mathrm{d}}{\mathrm{d}x}$ 类似。
 
-路径导数的链式法则：若 $\mathbf{r}(t)=x(t)\mathbf{i}+y(t)\mathbf{j}+z(t)\mathbf{j}$ 为一条平滑路径，$f(\mathbf{r}(t))$ 是路径上的一个函数，则有
+路径导数的链式法则：若 $\mathbf{r}(t)=x(t)\mathbf{i}+y(t)\mathbf{j}+z(t)\mathbf{k}$ 为一条平滑路径，$f(\mathbf{r}(t))$ 是路径上的一个函数，则有
 $$
-\frac{d}{dt}f(\mathbf{r}(t))=\nabla f(\mathbf{r}(t))\cdot \mathbf{r}'(t)
+\frac{\mathrm{d}}{\mathrm{d}t}f(\mathbf{r}(t))=\nabla f(\mathbf{r}(t))\cdot \mathbf{r}'(t)
 $$
 
-切平面：从上面的链式法则，若左边为零，也就是说，$\mathbf{r}(t)$ 为等值面 $f(x,y,z)=c$ 上的一个路径，则 $f(\mathbf{r}(t))$ 为常数，那么右边的两个向量 $\nabla f(\mathbf{r}(t))$ 与 $\mathbf{r}'(t)$ 垂直。故而定义等值面 $f(x,y,z)=c$  在 $P_{0}(x_{0},y_{0},z_{0})$ 的切平面（Tangent Plane）为经过 $P_{0}$，以 $(\nabla f)_{P_{0}}$  为法向量的平面：
+切平面：从上面的链式法则，若左边为零，也就是说，$\mathbf{r}(t)$ 为等值面 $f(x,y,z)=c$ 上的一个路径，则 $f(\mathbf{r}(t))$ 为常数，那么右边的两个向量 $\nabla f(\mathbf{r}(t))$ 与 $\mathbf{r}'(t)$ 垂直。当 $(\nabla f)_{P_0}\ne0$ 时，故而定义等值面 $f(x,y,z)=c$  在 $P_{0}(x_{0},y_{0},z_{0})$ 的切平面（Tangent Plane）为经过 $P_{0}$，以 $(\nabla f)_{P_{0}}$  为法向量的平面：
 $$
 f_{x}(x-x_{0})+f_{y}(y-y_{0})+f_{z}(z-z_{0})=0
 $$
-法线：经过 $P_{0}$ 且平行与 $(\nabla f)_{P_{0}}$ 的直线
+法线：经过 $P_{0}$ 且平行于 $(\nabla f)_{P_{0}}$ 的直线
 $$
 x=x_{0}+f_{x}t, y= y_{0}+f_{y}t, z=z_{0}+f_{z}t
 $$
@@ -145,20 +143,20 @@ $$
 
 可以估计多元函数在某个方向的增量：
 $$
-df=(D_{\mathbf{u}}f)_{P_{0}} ds=((\nabla f)_{{P_{0}}} \cdot \mathbf{u})s
+\mathrm{d}f=(D_{\mathbf{u}}f)_{P_{0}}\,\mathrm{d}s=((\nabla f)_{{P_{0}}} \cdot \mathbf{u})\,\mathrm{d}s
 $$
 从而有线性化 (Linearization)：
 $$
 L(x,y)=f(x_{0},y_{0})+f_{x}(x-x_{0})+f_{y}(y-y_{0})
 $$
 用 $L(x,y)$ 来估计 $f(x,y)$ 称为标准线性估计（Standard Linear Approximation）
-在一个矩形区域中，如果 $|f_{x x}|,|f_{y y}|, |f_{xy}|$ 有上界 $M$，则误差 $E(x,y)=f(x,y)-L(x,y)$ 满足
+在一个矩形区域中，如果 $\lvert f_{x x}\rvert ,\lvert f_{y y}\rvert , \lvert f_{xy}\rvert $ 有上界 $M$，则误差 $E(x,y)=f(x,y)-L(x,y)$ 满足
 $$
-|E(x,y)|\leq \frac{1}{2}M(|x-x_{0}|+|y-y_{0}|)^{2}
+\lvert E(x,y)\rvert \leq \frac{1}{2}M(\lvert x-x_{0}\rvert +\lvert y-y_{0}\rvert )^{2}
 $$
 在线性化中，称全微分（Total Differential）为
 $$
-df=f_{x}dx+f_{y}dy
+\mathrm{d}f=f_{x}\,\mathrm{d}x+f_{y}\,\mathrm{d}y
 $$
 更多元的情况也类似。
 
@@ -168,12 +166,12 @@ $$
 
 定义二元函数的关键点（Critical Point）为 $f_{x},f_{y}$ 全为 $0$ 或至少有一个不存在的情况。
 
-定义二元函数的鞍点（Saddle Point）为对任意以它为中心的圆盘中，都存在定义域内值更小的点和值更大的点。
+可微二元函数的鞍点（Saddle Point）是一个关键点，且其任意邻域内都有函数值比该点更大和更小的点。
 
-二阶导测试（Second Derivative Test）： 定义 $f$ 的判别式（discriminant）或海森（Hessian）为海森矩阵的行列式：
+二阶导测试（Second Derivative Test，要求二阶偏导在该点附近连续）：定义 $f$ 的判别式（discriminant）或海森（Hessian）为海森矩阵的行列式：
 $$
-D=f_{x x}f_{yy}-f_{x y}^{2}= \left| \begin{matrix} f_{x x} & f_{x y} \\
-f_{xy}  & f_{yy} \end{matrix} \right|
+D=f_{x x}f_{yy}-f_{x y}^{2}= \left\lvert  \begin{matrix} f_{x x} & f_{x y} \\
+f_{xy}  & f_{yy} \end{matrix} \right\rvert
 $$
 那么，若已知某点处 $f_{x}=f_{y}=0$：
 - 若 $D>0$：
@@ -182,7 +180,7 @@ $$
 - 若 $D<0$：该点为鞍点。
 - 若 $D=0$：测试失效。
 
-若要找全局的最值，则应列出所有关键点处的值以及边界上的极值，然后找出最小和最大的。
+连续函数在闭有界区域上的全局最值：比较内部关键点和边界候选点（包括端点、角点）处的函数值。
 
 ### 拉格朗日乘子
 
@@ -194,7 +192,7 @@ $$
 
 几何解释：考察任意 $g=0$ 上的曲线 $C:\mathbf{r}(t)$，若  $f$ 在它上面某点取得极值，则有 $\nabla f\cdot \mathbf{r}'(t)=0$，也就是，$\nabla f$ 垂直于这一点处曲线 $C$ 的切向量。另外，在这一点也有 $\nabla g$  垂直于 $g=0$。所以考察 $f$ 在 $g=0$ 上的最值，有 $\nabla f$ 与 $\nabla g$ 共线。这就说明了拉格朗日乘子法的有效性。
 
-如果有两个限制条件 $g_{1}=0,g_{2}=0$，那么要满足：
+如果有两个限制条件 $g_{1}=0,g_{2}=0$，且两约束的梯度在该点线性无关，那么要满足：
 $$
 \nabla f=\lambda \nabla g_{1}+\mu \nabla g_{2}
 $$
@@ -207,8 +205,8 @@ $$
 ![[Partial Derivatives -  偏导数.png]]
 把这里的 $h,k$ 换成 $x,y$，可以写出在原点处的 $n+1$ 阶泰勒公式：
 ![[Partial Derivatives -  偏导数-1.png]]
-也就是说
+也就是说（算子展开为各阶偏导时，系数 $x,y$ 视为常数）
 $$
-f(x,y)=\left( \sum_{k=0}^{n} \frac{1}{k!}\left( x \frac{ \partial  }{ \partial x } +y \frac{ \partial  }{ \partial y }  \right)^{k}f   \right)+ \left( \frac{1}{(n+1)!}\left( x\frac{ \partial  }{ \partial x } +y\frac{ \partial  }{ \partial y }  \right)^{n+1} f\right)_{(cx, cy)} 
-$$ 
+f(x,y)=\sum_{k=0}^{n}\frac{1}{k!}\left[\left(x\frac{\partial}{\partial x}+y\frac{\partial}{\partial y}\right)^k f\right]_{(0,0)}+\frac{1}{(n+1)!}\left[\left(x\frac{\partial}{\partial x}+y\frac{\partial}{\partial y}\right)^{n+1}f\right]_{(cx,cy)},\quad 0<c<1
+$$
 

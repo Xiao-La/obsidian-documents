@@ -82,6 +82,9 @@ To determine if KB entails $\alpha$, we enumerate all possible models, and check
       \ElsIf{\texttt{IsDisjunction(formula)}}
         \State \texttt{left} $\gets$ \texttt{Left(formula)}; \texttt{right} $\gets$ \texttt{Right(formula)}
         \State \Return \texttt{Evaluate(left, valuation)} or \texttt{Evaluate(right, valuation)}
+      \ElsIf{\texttt{IsExclusiveOr(formula)}}
+        \State \texttt{left} $\gets$ \texttt{Left(formula)}; \texttt{right} $\gets$ \texttt{Right(formula)}
+        \State \Return \texttt{Evaluate(left, valuation)} $\ne$ \texttt{Evaluate(right, valuation)}
       \ElsIf{\texttt{IsImplication(formula)}}
         \State \texttt{left} $\gets$ \texttt{Left(formula)}; \texttt{right} $\gets$ \texttt{Right(formula)}
         \State \Return (not \texttt{Evaluate(left, valuation)}) or \texttt{Evaluate(right, valuation)}

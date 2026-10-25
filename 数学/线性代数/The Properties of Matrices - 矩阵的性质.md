@@ -1,87 +1,93 @@
 [[Matrices and System of Linear Equations -  矩阵与线性方程组]]
 ## 矩阵的逆
 
-矩阵的逆（Inverse）：方阵 $\mathbf{A}$ 的逆记作 $\mathbf{A}^{-1}$，符合 $\mathbf{A}\mathbf{A}^{-1}= \mathbf{A}^{-1}\mathbf{A}=\mathbf{I}$。
+矩阵的逆（Inverse）：方阵 $A$ 的逆记作 $A^{-1}$，符合 $AA^{-1}= A^{-1}A=I$。
 
 矩阵的逆如果存在，则一定唯一：
 
->  假设存在两个矩阵 $\mathbf{B}_{1}, \mathbf{B}_{2}$ 使得 $\mathbf{A}\mathbf{B}_{1}=\mathbf{B}_{1}\mathbf{A}=\mathbf{I}$ 且 $\mathbf{A}\mathbf{B}_{2}=\mathbf{B}_{2}\mathbf{A}=\mathbf{I}$ ，那么有：
+>  假设存在两个矩阵 $B_{1}, B_{2}$ 使得 $AB_{1}=B_{1}A=I$ 且 $AB_{2}=B_{2}A=I$ ，那么有：
 >  $$
 \begin{cases}
-(\mathbf{B}_{1}\mathbf{A})\mathbf{B}_{2}=\mathbf{I}\mathbf{B}_{2}=\mathbf{B}_{2}\\
-\mathbf{B}_{1}(\mathbf{A}\mathbf{B}_{2})=\mathbf{B}_{1}\mathbf{I}=\mathbf{B}_{1}
+(B_{1}A)B_{2}=IB_{2}=B_{2}\\
+B_{1}(AB_{2})=B_{1}I=B_{1}
 \end{cases}
 $$
->  即 $\mathbf{B}_{1}=\mathbf{B}_{2}$。
+>  即 $B_{1}=B_{2}$。
 
 性质：
--  $(\mathbf{A}\mathbf{B})^{-1}=\mathbf{B}^{-1}\mathbf{A}^{-1}$。  
-- $(\mathbf{A}_{1}\dots \mathbf{A}_{n})^{-1}=\mathbf{A}_{n}^{-1}\mathbf{A}_{n-1}^{-1}\dots \mathbf{A}_{1}^{-1}$
+-  $(AB)^{-1}=B^{-1}A^{-1}$。  
+- $(A_{1}\dots A_{n})^{-1}=A_{n}^{-1}A_{n-1}^{-1}\dots A_{1}^{-1}$
 
-矩阵的左/右逆（Left/Right Inverse）：对 $m\times n$ 矩阵 $\mathbf{A}$，若存在 $\mathbf{B}$ 使得 $\mathbf{A}\mathbf{B}=\mathbf{I}_{m}$，则称 $\mathbf{B}$ 为 $\mathbf{A}$ 的右逆矩阵，$\mathbf{A}$ 为 $\mathbf{B}$ 的左逆矩阵。
+矩阵的左/右逆（Left/Right Inverse）：对 $m\times n$ 矩阵 $A$，若存在 $B$ 使得 $AB=I_{m}$，则称 $B$ 为 $A$ 的右逆矩阵，$A$ 为 $B$ 的左逆矩阵。
 
-对一个 $m\times n$ 矩阵，它存在右逆等价于 $r=m$（行满秩，也说明 $C(\mathbf{A})=\mathbb{R}^m$）。类似的，存在左逆等价于 $r=n$（列满秩，也说明 $C(\mathbf{A}^T)=\mathbb{R}^n$）。记忆： $\begin{bmatrix}1  & 0\end{bmatrix}\begin{bmatrix}1 \\ 0\end{bmatrix}=\mathbf{I}_{1}$。
+对一个 $m\times n$ 矩阵，它存在右逆等价于 $r=m$（行满秩，也说明 $C(A)=\mathbb{R}^m$）。类似的，存在左逆等价于 $r=n$（列满秩，也说明 $C(A^{\top})=\mathbb{R}^n$）。记忆：
+
+$$
+\begin{bmatrix}1  & 0\end{bmatrix}\begin{bmatrix}1 \\ 0\end{bmatrix}=I_{1}
+$$
+
+。
 推论：矩阵可逆的条件为 $r=m=n$。
 
-左右逆的最佳选择（Best Choices）$\mathbf{B}=(\mathbf{A}^T\mathbf{A})^{-1}\mathbf{A}^T, \mathbf{C}=\mathbf{A}^T(\mathbf{A}\mathbf{A}^T)^{-1}$。
+左右逆的最佳选择（Best Choices）$B=(A^{\top}A)^{-1}A^{\top}, C=A^{\top}(AA^{\top})^{-1}$。
 #### 高斯-约旦方法（Gauss-Jordan method）求逆
 
 $$
-\mathbf{A}\mathbf{B}=\mathbf{I}
+AB=I
 $$
 $$
-\implies  \mathbf{A}\begin{bmatrix}
-\mathbf{b}_{1} & \mathbf{b}_{2} & \dots & \mathbf{b}_{n}
+\implies  A\begin{bmatrix}
+\boldsymbol{b}_{1} & \boldsymbol{b}_{2} & \dots & \boldsymbol{b}_{n}
 \end{bmatrix}=\begin{bmatrix}
-\mathbf{e}_{1} & \mathbf{e}_{2} & \dots & \mathbf{e}_{n}
+\boldsymbol{e}_{1} & \boldsymbol{e}_{2} & \dots & \boldsymbol{e}_{n}
 \end{bmatrix} \\
 $$
 $$
-\implies \mathbf{A}\mathbf{b}_{i}=\mathbf{e}_{i}(1\leq i\leq n)
+\implies A\boldsymbol{b}_{i}=\boldsymbol{e}_{i}(1\leq i\leq n)
 $$
-第 $i$ 组解 $\mathbf{b}_{i}$ 即对应逆矩阵的第 $i$ 列。为解这一系列的线性方程组，可以构造增广矩阵：
+第 $i$ 组解 $\boldsymbol{b}_{i}$ 即对应逆矩阵的第 $i$ 列。为解这一系列的线性方程组，可以构造增广矩阵：
 $$
 \begin{bmatrix}
-\mathbf{A} | \mathbf{I}
+A \mid  I
 \end{bmatrix}
 $$
 对它进行一系列初等行变换，把它化成形式：
 $$
 \begin{bmatrix}
-\mathbf{I}|\mathbf{B}
+I\mid B
 \end{bmatrix}
 $$
-那么右边的每 $i$ 列就是第 $i$ 个方程组的解，于是得到 $\mathbf{A}^{-1}=\mathbf{B}$。
-另一种角度，设一系列初等行变换的复合 $\mathbf{T}$ 使得 $\mathbf{T}\mathbf{A}=\mathbf{I}$，那么 $\mathbf{B}=\mathbf{T}\mathbf{I}=\mathbf{T}=\mathbf{A}^{-1}$。
+那么右边的每 $i$ 列就是第 $i$ 个方程组的解，于是得到 $A^{-1}=B$。
+另一种角度，设一系列初等行变换的复合 $T$ 使得 $TA=I$，那么 $B=TI=T=A^{-1}$。
 
 #### 判断逆是否存在
 
-- $\mathbf{A}\text{ is invertible} \Leftrightarrow \mathbf{A}\text{ has a full set of pivots}$ 
+- $A\text{ is invertible} \Leftrightarrow A\text{ has a full set of pivots}$
  > Proof:
- > - $\mathbf{A}\text{ is invertible} \Leftarrow \text{ Gauss-Jordan method works} \Leftarrow \mathbf{A}\text{ has a full set of pivots}$ 
- > - $\mathbf{A}\text{ is invertible} \Rightarrow \mathbf{A}\mathbf{x}=\mathbf{O}\text{ only has zero solution} \Rightarrow \mathbf{A}\text{ has a full set of pivots}$  
+ > - $A\text{ is invertible} \Leftarrow \text{ Gauss-Jordan method works} \Leftarrow A\text{ has a full set of pivots}$
+ > - $A\text{ is invertible} \Rightarrow A\boldsymbol{x}=\boldsymbol{0}\text{ only has zero solution} \Rightarrow A\text{ has a full set of pivots}$  
 
-- $\mathbf{A}\text{ is invertible} \Leftrightarrow \mathbf{A}\text{ is nonsingular}$ 
+- $A\text{ is invertible} \Leftrightarrow A\text{ is nonsingular}$
  > Proof:
- > - $\mathbf{A}\text{ is invertible}\Leftarrow \mathbf{A}\text{ has a full set of pivots} \Leftarrow \mathbf{A}\mathbf{x}=\mathbf{O}\text{ only has zero solution} \Leftarrow  \mathbf{A}\text{ is nonsingular}$
- > - $\mathbf{A}\text{ is invertible} \Rightarrow \mathbf{x}=\mathbf{A}^{-1}\mathbf{b}$  
+ > - $A\text{ is invertible}\Leftarrow A\text{ has a full set of pivots} \Leftarrow A\boldsymbol{x}=\boldsymbol{0}\text{ only has zero solution} \Leftarrow  A\text{ is nonsingular}$
+ > - $A\text{ is invertible} \Rightarrow \boldsymbol{x}=A^{-1}\boldsymbol{b}$  
 
 
-- $\mathbf{A}\text{ is invertible} \Leftrightarrow \mathbf{A}\mathbf{x}=\mathbf{0}\text{ only has zero solution}$ 
-- $\mathbf{A}\text{ is invertible} \Leftrightarrow\text{rank}(A)=n$
-- $\mathbf{A}\text{ is invertible} \Leftrightarrow N(A)=\{ 0 \}$
-- $\mathbf{A}\text{ is invertible} \Leftrightarrow\text{The columns/rows of A is linear independent}$
+- $A\text{ is invertible} \Leftrightarrow A\boldsymbol{x}=\boldsymbol{0}\text{ only has zero solution}$
+- $A\text{ is invertible} \Leftrightarrow\operatorname{rank}(A)=n$
+- $A\text{ is invertible} \Leftrightarrow N(A)=\{ 0 \}$
+- $A\text{ is invertible} \Leftrightarrow\text{The columns/rows of A is linear independent}$
 #### 求二阶矩阵的逆
 
 $$
-\mathbf{A}=\begin{bmatrix}
+A=\begin{bmatrix}
 a & b \\
 c & d
 \end{bmatrix}
 $$
- 的逆为 
+ 的逆为
  $$
-\mathbf{A}^{-1}=\frac{1}{\det(\mathbf{A})} \begin{bmatrix}
+A^{-1}=\frac{1}{\det(A)} \begin{bmatrix}
 d & -b \\
 -c & a
 \end{bmatrix}
@@ -89,7 +95,7 @@ $$
 
 #### 求三阶矩阵的逆
 $$
-\mathbf{A}=\begin{bmatrix}
+A=\begin{bmatrix}
 a_{11} & a_{12} & a_{13} \\
 a_{21} & a_{22} & a_{23} \\
 a_{31} & a_{32} & a_{33}
@@ -97,7 +103,7 @@ a_{31} & a_{32} & a_{33}
 $$
 需要先构造余子式的矩阵
 $$
-\mathbf{M}= \begin{bmatrix}
+M= \begin{bmatrix}
 M_{11} & M_{12} & M_{13} \\
 M_{21} & M_{22} & M_{23} \\
 M_{31} & M_{32} & M_{33}
@@ -105,7 +111,7 @@ M_{31} & M_{32} & M_{33}
 $$
 再交替添负号
 $$
-\mathbf{C}=\begin{bmatrix}
+C=\begin{bmatrix}
 M_{11} & -M_{12} & M_{13} \\
 -M_{21} & M_{22} & -M_{23} \\
 M_{31} & -M_{32} & M_{33}
@@ -113,7 +119,7 @@ M_{31} & -M_{32} & M_{33}
 $$
 最后做转置
 $$
-\mathbf{C}^T=\begin{bmatrix}
+C^{\top}=\begin{bmatrix}
 M_{11} & -M_{21} & M_{31} \\
 -M_{12} & M_{22} & -M_{32} \\
 M_{13} & -M_{23} & M_{33}
@@ -121,54 +127,60 @@ M_{13} & -M_{23} & M_{33}
 $$
 那么
 $$
-\mathbf{A}^{-1}=\frac{1}{\det(\mathbf{A})}\mathbf{C}^T
+A^{-1}=\frac{1}{\det(A)}C^{\top}
 $$
 
-即 $a_{ij}'=\frac{1}{\det(\mathbf{A})}M_{ji} (-1)^{i+j}$ 。
+即 $a_{ij}'=\frac{1}{\det(A)}M_{ji} (-1)^{i+j}$ 。
 （证明见行列式）
 ## 矩阵的转置
 
-矩阵的转置（Transpose）：矩阵 $\mathbf{A}$ 的转置记作 $\mathbf{A}^T$ ，其中 $a_{ij}'= a_{ji}$。相当于把行换成列，列换成行。转置的性质：
-- $(\mathbf{A}^T)^T=\mathbf{A}$
-- $(k\mathbf{A})^T=kA^T$
-- $(\mathbf{A}+\mathbf{B})^T=\mathbf{A}^T+\mathbf{B}^{T}$
-- $(\mathbf{A}\mathbf{B})^T=\mathbf{B}^{T}\mathbf{A}^{T}$
-- $(\mathbf{A}^{-1})^{T}=(\mathbf{A}^{T})^{-1}$
+矩阵的转置（Transpose）：矩阵 $A$ 的转置记作 $A^{\top}$ ，其中 $a_{ij}'= a_{ji}$。相当于把行换成列，列换成行。转置的性质：
+- $(A^{\top})^{\top}=A$
+- $(kA)^{\top}=kA^{\top}$
+- $(A+B)^{\top}=A^{\top}+B^{\top}$
+- $(AB)^{\top}=B^{\top}A^{\top}$
+- $(A^{-1})^{\top}=(A^{\top})^{-1}$
 
-对称矩阵（Symmetric Matrix）：满足  $\mathbf{A}^T=\mathbf{A}$ 的矩阵 $\mathbf{A}$ 称为对称矩阵。
+对称矩阵（Symmetric Matrix）：满足  $A^{\top}=A$ 的矩阵 $A$ 称为对称矩阵。
 - 对称矩阵的逆还是对称矩阵。
-- $\mathbf{R}\mathbf{R}^T$ 为对称矩阵。 
-- $\mathbf{S}=\mathbf{L}\mathbf{D}\mathbf{L}^T$。
+- $RR^{\top}$ 为对称矩阵。
+- $S=LDL^{\top}$。
 
-定理：若 $\mathbf{A}^T=\mathbf{A}$ 可以被在不用行交换的情况下分解为 $\mathbf{L}\mathbf{D}\mathbf{U}$，则有 $\mathbf{L}^T=\mathbf{U}$。
+定理：若 $A^{\top}=A$ 可以被在不用行交换的情况下分解为 $LDU$，则有 $L^{\top}=U$。
 
 ## 分块矩阵
 
 使用分块矩阵（Partitioned Matrices）来思考矩阵的运算。也就是说，把矩阵分为若干块，每一块是一个小矩阵，则可以把这些小矩阵看成一个新的元素。
 
-用分块矩阵来看矩阵乘法：把 $\mathbf{A}$ 的每一行看成一个新的元素，则 $\mathbf{A}=\begin{bmatrix}\mathbf{a}_{1} \\ \mathbf{a}_{2} \\ \vdots \\\mathbf{a}_{n}\end{bmatrix}$，把 $\mathbf{B}$ 的每一列看成一个新的元素，则 $\mathbf{B}=\begin{bmatrix}\mathbf{b}_{1} & \mathbf{b}_{2} & \cdots & \mathbf{b}_{n}\end{bmatrix}$ 。
-那么可以把 $\mathbf{A}\mathbf{B}$ 看成
+用分块矩阵来看矩阵乘法：把 $A$ 的每一行看成一个新的元素，则
+
 $$
-\mathbf{A}\mathbf{B}=\begin{bmatrix}
-\mathbf{A}
-\end{bmatrix}\begin{bmatrix}\mathbf{b}_{1} & \mathbf{b}_{2} & \cdots & \mathbf{b}_{n}\end{bmatrix}=\begin{bmatrix}\mathbf{A}\mathbf{b}_{1} & \mathbf{A}\mathbf{b}_{2} & \cdots & \mathbf{A}\mathbf{b}_{n}\end{bmatrix}
+A=\begin{bmatrix}\boldsymbol{a}_{1} \\ \boldsymbol{a}_{2} \\ \vdots \\\boldsymbol{a}_{n}\end{bmatrix}
+$$
+
+，把 $B$ 的每一列看成一个新的元素，则 $B=\begin{bmatrix}\boldsymbol{b}_{1} & \boldsymbol{b}_{2} & \cdots & \boldsymbol{b}_{n}\end{bmatrix}$ 。
+那么可以把 $AB$ 看成
+$$
+AB=\begin{bmatrix}
+A
+\end{bmatrix}\begin{bmatrix}\boldsymbol{b}_{1} & \boldsymbol{b}_{2} & \cdots & \boldsymbol{b}_{n}\end{bmatrix}=\begin{bmatrix}A\boldsymbol{b}_{1} & A\boldsymbol{b}_{2} & \cdots & A\boldsymbol{b}_{n}\end{bmatrix}
 $$
 或
 $$
-\mathbf{A}\mathbf{B}=\mathbf{A}=\begin{bmatrix}\mathbf{a}_{1} \\ \mathbf{a}_{2} \\ \vdots \\\mathbf{a}_{n}\end{bmatrix}\begin{bmatrix}
-\mathbf{B}
+AB=\begin{bmatrix}\boldsymbol{a}_{1} \\ \boldsymbol{a}_{2} \\ \vdots \\\boldsymbol{a}_{n}\end{bmatrix}\begin{bmatrix}
+B
 \end{bmatrix}
-=\mathbf{A}=\begin{bmatrix}\mathbf{a}_{1}\mathbf{B} \\ \mathbf{a}_{2}\mathbf{B} \\ \vdots \\\mathbf{a}_{n}\mathbf{B}\end{bmatrix}
+=\begin{bmatrix}\boldsymbol{a}_{1}B \\ \boldsymbol{a}_{2}B \\ \vdots \\\boldsymbol{a}_{n}B\end{bmatrix}
 $$
 注意分块的矩阵尺寸要保证可乘。
 
 ## 矩阵的秩
 
-线性相关（Linear Dependent）：设 $\mathbf{v}_{1}, \mathbf{v}_{2},\dots \mathbf{v}_{n}\in V$，若 $c_{1}\mathbf{v}_{1}+c_{2}\mathbf{v}_{2}+\dots+c_{n}\mathbf{v}_{n}=\mathbf{0}$ 当且仅当 $c_{1}=c_{2}=\dots =c_{n}=0$，则称这组向量线性无关。否则，称为线性相关。
-- 线性相关：存在 $c_{i}\neq 0$ 使得 $c_{i}\mathbf{v}_{i}=\sum _{j\neq i} c_{j}\mathbf{v}_{j}$，即 $\mathbf{v}_{i}=\sum_{j\neq i} \frac{c_{j}}{c_{i}}\mathbf{v}_{j}$ ，即存在一个向量可以表示为其他向量的线性组合。
+线性相关（Linear Dependent）：设 $\boldsymbol{v}_{1}, \boldsymbol{v}_{2},\dots \boldsymbol{v}_{n}\in V$，若 $c_{1}\boldsymbol{v}_{1}+c_{2}\boldsymbol{v}_{2}+\dots+c_{n}\boldsymbol{v}_{n}=\boldsymbol{0}$ 当且仅当 $c_{1}=c_{2}=\dots =c_{n}=0$，则称这组向量线性无关。否则，称为线性相关。
+- 线性相关：存在 $c_{i}\neq 0$ 使得 $c_{i}\boldsymbol{v}_{i}=\sum _{j\neq i} c_{j}\boldsymbol{v}_{j}$，即 $\boldsymbol{v}_{i}=\sum_{j\neq i} \frac{c_{j}}{c_{i}}\boldsymbol{v}_{j}$ ，即存在一个向量可以表示为其他向量的线性组合。
 
-判断向量是否线性相关等价于判断 $\begin{bmatrix}\mathbf{v}_{1} & \mathbf{v}_{2}  & \dots & \mathbf{v}_{n}\end{bmatrix}\mathbf{x}=\mathbf{0}$ 是否存在非零解。
-$\mathbf{A}$ 的列线性无关当且仅当 $N(\mathbf{A})=\{ \mathbf{0} \}$。
+判断向量是否线性相关等价于判断 $\begin{bmatrix}\boldsymbol{v}_{1} & \boldsymbol{v}_{2}  & \dots & \boldsymbol{v}_{n}\end{bmatrix}\boldsymbol{x}=\boldsymbol{0}$ 是否存在非零解。
+$A$ 的列线性无关当且仅当 $N(A)=\{ \boldsymbol{0} \}$。
 
 >  零向量与任何向量线性相关。
 >  行阶梯矩阵的非零行之间是线性无关的。
@@ -176,26 +188,26 @@ $\mathbf{A}$ 的列线性无关当且仅当 $N(\mathbf{A})=\{ \mathbf{0} \}$。
 >  在 $\mathbb{R}^m$ 中，任何 $n(n>m)$ 个向量必然线性相关。
 
 
-矩阵 $\mathbf{A}$ 的秩（Rank）：
-- 主元的个数，记作 $r$ 或 $\text{rank}(\mathbf{A})$。
+矩阵 $A$ 的秩（Rank）：
+- 主元的个数，记作 $r$ 或 $\operatorname{rank}(A)$。
 - 极大的线性无关（Linearly Independent）的行/列的个数。
 
 关于秩的一些性质：
 - $r\leq \min(m,n)$
-- $r(\mathbf{A}\mathbf{B})\leq \min(r(\mathbf{A}), r(\mathbf{B}))$
+- $r(AB)\leq \min(r(A), r(B))$
 
-**秩一矩阵（Rank 1 matrix）** 可以拆成一个列向量乘一个行向量。这是因为，它的列空间的维数 $\text{dim} C(\mathbf{A})=\text{rank}(\mathbf{A})=1$。
+**秩一矩阵（Rank 1 matrix）** 可以拆成一个列向量乘一个行向量。这是因为，它的列空间的维数 $\dim C(A)=\operatorname{rank}(A)=1$。
 
-若 $P$ 是一个可逆矩阵，则 $r(\mathbf{P}\mathbf{A})=r(\mathbf{A}\mathbf{P})=r(\mathbf{A})$。
+若 $P$ 是一个可逆矩阵，则 $r(PA)=r(AP)=r(A)$。
 
-若 $AB=O$，则有 $C(B) \subseteq N(A)$，则有 $\text{rank}(B)\leq n-\text{rank(A)}$，也就是：
+若 $AB=O$，则有 $C(B) \subseteq N(A)$，则有 $\operatorname{rank}(B)\leq n-\operatorname{rank}(A)$，也就是：
 $$
-\text{rank}(A)+\text{rank}(B)\leq n
+\operatorname{rank}(A)+\operatorname{rank}(B)\leq n
 $$
-一般的，有$$\text{rank}(AB)=\text{rank}(B)-\text{dim}(N(A)\cap C(B))\geq\text{rank}(B)-\text{dim}N(A)=\text{rank}(B)-\text{rank(A)}+n$$ 故而有
+一般的，有$$\operatorname{rank}(AB)=\operatorname{rank}(B)-\dim(N(A)\cap C(B))\geq\operatorname{rank}(B)-\dim N(A)=\operatorname{rank}(B)+\operatorname{rank}(A)-n$$ 故而有
 $$
-\text{rank}(A)+\text{rank}(B)-n\leq\text{rank}(AB)
+\operatorname{rank}(A)+\operatorname{rank}(B)-n\leq\operatorname{rank}(AB)
 $$
 
-一些题目中的结论： $\text{rank}(A^TA)=\text{rank}(A)$， $\text{rank}(A+B)\leq\text{rank}(A)+\text{rank}(B)$。
-$Ax=b$ 有解等价于 $A$ 与 $\begin{bmatrix}A |b\end{bmatrix}$ 的秩相等。
+一些题目中的结论： $\operatorname{rank}(A^{\top}A)=\operatorname{rank}(A)$， $\operatorname{rank}(A+B)\leq\operatorname{rank}(A)+\operatorname{rank}(B)$。
+$A\boldsymbol{x}=\boldsymbol{b}$ 有解等价于 $A$ 与 $\begin{bmatrix}A \mid \boldsymbol{b}\end{bmatrix}$ 的秩相等。

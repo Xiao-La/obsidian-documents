@@ -5,7 +5,7 @@
 $$
 \frac{Q^{2}}{2C}+ \frac{1}{2}Li^{2}=U
 $$
-这是一个关于 $q$ 的二阶微分方程（假定电流流进正极板，才有 $i=\frac{dQ}{dt}$），类似与弹簧振子。那么有
+这是一个关于 $q$ 的二阶微分方程（假定电流流进正极板，才有 $i=\frac{\mathrm{d}Q}{\mathrm{d}t}$），类似与弹簧振子。那么有
 $$
 q=Q\cos(\omega t+\phi)
 $$
@@ -27,10 +27,10 @@ $$
 \implies V_{R}=iR=I_{m}R\sin(\omega t-\phi)
 $$
 $$
-V_{L}=L \frac{di}{dt}=L\omega I_{m}\sin\left( \omega t-\phi+\frac{\pi}{2} \right)
+V_{L}=L \frac{\mathrm{d}i}{\mathrm{d}t}=L\omega I_{m}\sin\left( \omega t-\phi+\frac{\pi}{2} \right)
 $$
 $$
-V_{C} = \frac{\int idt}{C}= \frac{1}{\omega C} I_{m} \sin\left( \omega t-\phi-\frac{\pi}{2} \right)
+V_{C} = \frac{\int i\,\mathrm{d}t}{C}= \frac{1}{\omega C} I_{m} \sin\left( \omega t-\phi-\frac{\pi}{2} \right)
 $$
 **直观理解：电感是对抗电流的变化的，所以电压提前于电流；电容器是先有电流充电才有电压的，所以电压落后于电流。**
 这里称 $X_{L}=\omega L$ 为感抗（Inductive Reactance），$X_{C}=\frac{1}{\omega C}$ 为容抗（Capacitive Reactance）。上方是相图（Phasor Diagram），因此电感的电势差相位领先电流 $\frac{\pi}{2}$，电容的落后电流 $\frac{\pi}{2}$。
@@ -51,20 +51,20 @@ $$
 在 $X_{L}<X_{C}$ 时，$\phi<0$，$I_{m}$ 随 $\omega_{d}$ 增加而增加（称为容性/mainly capacitive，此时电压落后于电流）；在 $X_{L}>X_{C}$ 时， $\phi>0$，$I_{m}$ 随 $\omega_{d}$ 增加而减小（称为感性/mainly inductive，此时电压提前于电流）。
 **直观理解：$\omega_{d}$ 从 $0$ 增加到 $\infty$ 时，感抗在从 $0$ 增加到 $\infty$，容抗在从 $\infty$ 减小到 $0$。总阻抗取决于它们差值的大小，当他们相等的时候阻抗最小，电流幅值最大。左边，容抗大，为电容性；右边，感抗大，为电感性。**
 
-另外，定义 **功率因数（Power Factor）** 为 $\cos \phi=\frac{R}{Z}$，即有功功率和总功率的比值。
+另外，定义 **功率因数（Power Factor）** 为 $\cos \phi=\frac{R}{Z}$，即有功功率和视在功率的比值。
 
 ### 交流电路（AC）中的功率
 
 $$
-I_{\text{rms}}=\frac{I}{\sqrt{ 2 }}, V_{\text{rms}}= \frac{V}{\sqrt{ 2 }}, \varepsilon_{\text{rms}} = \frac{\varepsilon _{m}}{\sqrt{ 2 }}
+I_{\mathrm{rms}}=\frac{I}{\sqrt{ 2 }}, V_{\mathrm{rms}}= \frac{V}{\sqrt{ 2 }}, \varepsilon_{\mathrm{rms}} = \frac{\varepsilon _{m}}{\sqrt{ 2 }}
 $$
 $$
-P_{\text{avg}}=I^{2}_{\text{rms}}R
+P_{\mathrm{avg}}=I^{2}_{\mathrm{rms}}R
 $$
 在包含 $\varepsilon,C,L,R$ 的电路中：
 
 $$
-P_{\text{avg}}=I_{\text{rms}}^{2}R= \frac{\varepsilon_{\text{rms}}}{Z}I_{\text{rms}}R=\varepsilon_{\text{rms}}I_{\text{rms}}\cos \phi
+P_{\mathrm{avg}}=I_{\mathrm{rms}}^{2}R= \frac{\varepsilon_{\mathrm{rms}}}{Z}I_{\mathrm{rms}}R=\varepsilon_{\mathrm{rms}}I_{\mathrm{rms}}\cos \phi
 $$
 ### 变压器（Transformer）
 
@@ -85,13 +85,13 @@ $$
 
 位移电流（Displacement Current）为空间中的电场变化的等效电流，它会产生磁场：
 $$
-i_{D}=\varepsilon_{0} \frac{d\Phi_{E}}{dt}=\varepsilon_{0} \frac{d}{dt}\int \vec{E}\cdot d\vec{A}
+i_{D}=\varepsilon_{0} \frac{\mathrm{d}\Phi_{E}}{\mathrm{d}t}=\varepsilon_{0} \frac{\mathrm{d}}{\mathrm{d}t}\int \mathbf{E}\cdot \mathrm{d}\mathbf{A}
 $$
 电容器充放电中，就会产生位移电流。
 根据麦克斯韦理论，为了保持闭合电路中“电流”的连续性，流入电容器极板的传导电流等于极板间的位移电流。
 麦克斯韦修正后的安培定律：
 $$
-\int \vec{B}\cdot d\vec{l}=\mu_{0}(i+i_{D})
+\oint \mathbf{B}\cdot \mathrm{d}\mathbf{l}=\mu_{0}(i+i_{D})
 $$
 ## 麦克斯韦方程组
 
@@ -101,7 +101,7 @@ $$
 
 $$
 \begin{cases}
-\oint \mathbf{E} \cdot \mathrm{d}\mathbf{A} = \frac{q_{\text{enc}}}{\varepsilon_0} & \text{(高斯定律)} \\
+\oint \mathbf{E} \cdot \mathrm{d}\mathbf{A} = \frac{q_{\mathrm{enc}}}{\varepsilon_0} & \text{(高斯定律)} \\
 \oint \mathbf{B} \cdot \mathrm{d}\mathbf{A} = 0 & \text{(高斯磁定律)} \\
 \oint \mathbf{E} \cdot \mathrm{d}\mathbf{l} = -\frac{\mathrm{d}}{\mathrm{d}t} \int \mathbf{B} \cdot \mathrm{d}\mathbf{A} & \text{(法拉第感应定律)} \\
 \oint \mathbf{B} \cdot \mathrm{d}\mathbf{l} = \mu_0 \left( \int \mathbf{J} \cdot \mathrm{d}\mathbf{A} + \varepsilon_0 \frac{\mathrm{d}}{\mathrm{d}t} \int \mathbf{E} \cdot \mathrm{d}\mathbf{A} \right) & \text{(安培-麦克斯韦定律)}
@@ -121,30 +121,30 @@ $$
 
 ![[Synthesis of Electromagnetism - 电磁学综合.png|468]]
 
-电磁波具有以下六个重要特征：
+上述真空平面行波具有以下六个重要特征：
 1. 步调一致 ($E \text{ and } B$ are in phase)：电场 $\mathbf{E}$ 和磁场 $\mathbf{B}$ 是**同相**的。
 2. 相互垂直 ($E \text{ and } B$ are perpendicular)：电场分量和磁场分量不仅彼此相互垂直，而且它们都垂直于波的传播方向。因此电磁波是横波。
-3. 定向传播 ($\hat{E} \times \hat{B} = \hat{c}$)。
+3. 定向传播 ($\hat{\mathbf{E}} \times \hat{\mathbf{B}} = \hat{\mathbf{c}}$)。
  4. 振幅比例固定 ($E_m = cB_m$)：在真空中，电场的峰值大小 $E_m$ 与磁场的峰值大小 $B_m$ 之间保持一个固定的比例关系，这个比例常数就是真空中光速 $c$。
  5. 波速由真空常数决定 ($c = 1/\sqrt{\mu_0\varepsilon_0}$)：电磁波在真空中的传播速度（光速 $c$）仅仅取决于真空磁导率 $\mu_0$ 和真空电容率 $\varepsilon_0$。这一推导证明了光本质上也是一种电磁波。
- 6. 能量均分 ($u_E = u_B$)：电磁波在传播过程中携带着能量。在任何时刻、真空中的任何一点，电场贡献的能量密度 $u_E$ 和磁场贡献的能量密度 $u_B$ 是绝对相等的。
+6. 能量均分 ($u_E=u_B$)：这种真空平面行波的电场能量密度与磁场能量密度处处相等。
 
 
-为了描述电磁波在某一时刻、某一点传输能量的方向和速率，物理学引入了**坡印廷矢量（Poynting vector） $\vec{S}$**。其定义式（矢量形式）为：
-$$ \vec{S} = \frac{1}{\mu_0} \vec{E} \times \vec{B} $$
+为了描述电磁波在某一时刻、某一点传输能量的方向和速率，物理学引入了**坡印廷矢量（Poynting vector） $\mathbf{S}$**。其定义式（矢量形式）为：
+$$ \mathbf{S} = \frac{1}{\mu_0} \mathbf{E} \times \mathbf{B} $$
 
-*   **方向：** $\vec{S}$ 的方向由 $\vec{E} \times \vec{B}$ 决定，这意味着能量是沿着波的传播方向流动的。
-*   **大小推导：** 因为 $\vec{E}$ 和 $\vec{B}$ 相互垂直，所以叉乘的大小直接等于乘积 $EB$。再利用真空中电场和磁场的幅值关系 $E = cB$，可以推导出 $\vec{S}$ 大小的多种等效表达形式。光学中常用只含 $E$ 的形式。
+*   **方向：** $\mathbf{S}$ 的方向由 $\mathbf{E} \times \mathbf{B}$ 决定，这意味着能量是沿着波的传播方向流动的。
+*   **大小推导：** 因为 $\mathbf{E}$ 和 $\mathbf{B}$ 相互垂直，所以叉乘的大小直接等于乘积 $EB$。再利用真空中电场和磁场的幅值关系 $E = cB$，可以推导出 $\mathbf{S}$ 大小的多种等效表达形式。光学中常用只含 $E$ 的形式。
 $$ S = \frac{1}{\mu_0} EB = \frac{1}{c\mu_0} E^2 = \frac{c}{\mu_0} B^2 $$
-*   **物理意义：** 量纲为 **功率/面积 ($W/m^2$)**。它表示单位时间内，垂直穿过单位面积的电磁能量。
+*   **物理意义：** 量纲为 **功率/面积 ($\mathrm{W}/\mathrm{m}^{2}$)**。它表示单位时间内，垂直穿过单位面积的电磁能量。
 
-由于电磁波的电场 $E$ 和磁场 $B$ 是极高频周期性变化的，坡印廷矢量 $\vec{S}$ 也在快速振荡。考察一段时间内能量传输的**平均效果**，这个时间平均值就被称为电磁波的**强度 (Intensity)**，用字母 $I$ 表示：
-$$ I = \langle S \rangle = \frac{1}{c\mu_0} \langle E^2 \rangle = \frac{1}{2c\mu_0} E_m^2 = \frac{1}{c\mu_0} E_{\text{rms}}^2 $$
+由于电磁波的电场 $E$ 和磁场 $B$ 是极高频周期性变化的，坡印廷矢量 $\mathbf{S}$ 也在快速振荡。考察一段时间内能量传输的**平均效果**，这个时间平均值就被称为电磁波的**强度 (Intensity)**，用字母 $I$ 表示：
+$$ I = \langle S \rangle = \frac{1}{c\mu_0} \langle E^2 \rangle = \frac{1}{2c\mu_0} E_m^2 = \frac{1}{c\mu_0} E_{\mathrm{rms}}^2 $$
 
-*   $\langle S \rangle$ 表示对瞬时值 $S$ 取时间平均。对于正弦波，周期内平方的平均值 $\langle E^2 \rangle = \frac{1}{2} E_m^2$ （其中 $E_m$ 是电场的峰值/最大幅值）。$E_{\text{rms}}$ 代表电场的**有效值** (均方根值, Root Mean Square)，$E_{\text{rms}} = E_m / \sqrt{2}$。因此 $\frac{1}{2} E_m^2$ 等于 $E_{\text{rms}}^2$。
+*   $\langle S \rangle$ 表示对瞬时值 $S$ 取时间平均。对于正弦波，周期内平方的平均值 $\langle E^2 \rangle = \frac{1}{2} E_m^2$ （其中 $E_m$ 是电场的峰值/最大幅值）。$E_{\mathrm{rms}}$ 代表电场的**有效值** (均方根值, Root Mean Square)，$E_{\mathrm{rms}} = E_m / \sqrt{2}$。因此 $\frac{1}{2} E_m^2$ 等于 $E_{\mathrm{rms}}^2$。
 
 强度的本质是：
-$$ \left( \frac{\text{power}}{\text{area}} \right)_{avg} $$
+$$ \left( \frac{\text{power}}{\text{area}} \right)_{\mathrm{avg}} $$
 即：**平均辐射功率除以受照面积**。
 
 如果产生电磁波的是一个向四面八方均匀辐射的**点辐射源 (Point source)**，能量会在空间中以球面波的形式向外扩散。根据能量守恒定律，辐射源发出的总平均功率（average power）在距离源为 $r$ 时，会均匀分布在半径为 $r$ 的整个球面上：
@@ -162,7 +162,7 @@ $$ P = \frac{U}{c} $$
 *(注：$c$ 为真空中光速)*
 
 当一束强度为 $I$ 的电磁波在 $\Delta t$ 时间内照射到面积为 $A$ 的物体表面时，传递的总能量为 $U = I A \Delta t$。根据表面性质的不同，物体获得的动量变化量 $\Delta P$ 有两种极端情况：
-*   **完全吸收 (Totally absorbed)：** 
+*   **完全吸收 (Totally absorbed)：**
     物体吸收所有入射光子。
     $$ \Delta P = \frac{U}{c} = \frac{IA\Delta t}{c} $$
 *   **完全反射 (Totally reflected)：**
@@ -181,15 +181,15 @@ $$ P = \frac{U}{c} $$
 *   完全吸收：$$ p = \frac{I}{c} $$
 *   完全反射：$$ p = \frac{2I}{c} $$
 通过单位（量纲）理解辐射压本质的直观对应关系：
-$$ \frac{I}{c} = \frac{S_{avg}}{c} = \frac{\text{energy}/(m^2 \cdot sec)}{c} $$
+$$ \frac{I}{c} = \frac{S_{\mathrm{avg}}}{c} = \frac{\text{energy}/(\mathrm{m}^{2}\,\mathrm{s})}{c} $$
 由于 **$\text{energy} / c = \text{momentum}$ (能量/光速 = 动量)**，上式可理解为：
 **单位时间、单位面积上所传递的动量**。由动量定理可知，这正是**压强 (pressure)** 的物理定义。
 
 ### 偏振（Polarization）
 
-*   **偏振面定义：** 电磁波中**电场 $\vec{E}$** 振动所在的平面。
-*   **线偏振光：** 电场 $\vec{E}$ 只在单一固定方向上振动的光。
-*   **非偏振光 (自然光)：** 电场 $\vec{E}$ 在各个方向振动概率相等的随机光。可等效为**两个相互垂直、强度相等的线偏振光叠加**。
+*   **偏振面定义：** 电磁波中**电场 $\mathbf{E}$** 振动所在的平面。
+*   **线偏振光：** 电场 $\mathbf{E}$ 只在单一固定方向上振动的光。
+*   **非偏振光 (自然光)：** 电场 $\mathbf{E}$ 在各个方向振动概率相等的随机光。可等效为**两个相互垂直、强度相等的线偏振光叠加**。
 
 ![[Synthesis of Electromagnetism - 电磁学综合-1.png|326]]
 

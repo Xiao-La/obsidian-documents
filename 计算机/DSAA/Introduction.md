@@ -3,7 +3,7 @@
 定义：一个良定义的计算步骤，接受输入（input）并产生输出（output）
 - 用于解决计算问题（Computational problem）
 例如：排序问题 (Sorting Problems)
-- 输入： 一个包含 $n$ 个数字的序列 
+- 输入： 一个包含 $n$ 个数字的序列
 - 输出：一个输入序列的排列，使得这些数呈升序。
 一个具体的输入叫做实例（instance）。
 算法应能解决所有可能的实例。
@@ -23,7 +23,7 @@
 假设所有的操作都消耗相同的时间。
 算法的运行时间（Runtime）取决于初等操作的次数。
 
-### 插入排序 
+### 插入排序
 
 ![[Introduction.png|437]]
 
@@ -40,7 +40,7 @@ Proof by loop invariant （通过循环不变量证明）
 
 通过粗暴的对每一行计算运行的次数再求和，我们可以得到一个这样的式子：
 $$
-T(n)=c_{1}n+c_{2}(n-1)+c_{4}(n-1)+c_{5}\sum_{j=2}^nt_{j}+(c_{6}+c_{7})\sum_{j=2}^n (t_{j}-1) +c_{8}(n-1) 
+T(n)=c_{1}n+c_{2}(n-1)+c_{4}(n-1)+c_{5}\sum_{j=2}^nt_{j}+(c_{6}+c_{7})\sum_{j=2}^n (t_{j}-1) +c_{8}(n-1)
 $$
 最好的情况（Best case）下（数组已排序），$t_{j}=1$：
 $$
@@ -68,7 +68,7 @@ $$
 这里 $\Theta(g(n))$ 同时表示了 $f(n)$ 的上界和下界。另外有 $O(g(n))$，只表示上界（Upper bound）；以及 $\Omega(g(n))$，只表示下界（Lower bound）。形式化的定义方式与 $\Theta$ 类似。
 ![[Introduction-1.png|576]]
 $O$ 与 $\Omega$ 都弱于 $\Theta$。同时满足这两个可以得出 $\Theta$。
-另外还有 $o(g(n))$ 表示严格小于某个上界（对**任意**常数 $c$，$f(n)<cg(n)$，也就是说 $\lim_{ n \to \infty }f(n)/g(n)=0$），$\omega(g(n))$ 表示严格大于某个上界。若 $f(n)=o(g(n))$，我们说 $f(n)$ 渐进小于（Asymptotically Smaller） $g(n)$。类似的有渐进大于（Asymptotically larger）
+另外还有 $o(g(n))$ 表示严格小于某个上界（对**任意**常数 $c$，$f(n)<cg(n)$，也就是说 $\lim_{ n \to \infty }f(n)/g(n)=0$），$\omega(g(n))$ 表示渐近严格大于 $g(n)$（对任意 $c>0$，最终有 $f(n)>cg(n)$）。若 $f(n)=o(g(n))$，我们说 $f(n)$ 渐进小于（Asymptotically Smaller） $g(n)$。类似的有渐进大于（Asymptotically larger）
 ![[Introduction-2.png|583]]
 常用的：
 ![[Introduction-3.png|314]]
@@ -82,7 +82,7 @@ $O$ 与 $\Omega$ 都弱于 $\Theta$。同时满足这两个可以得出 $\Theta$
 - $f(n)+g(n)=\Theta(\max(f(n), g(n)))$
 - $\Theta(f(n))\cdot\Theta(g(n))=\Theta(f(n)\cdot g(n))$
 
-我们可以写 $O(n)=O(n^{2})$，这里指的是子集的关系，$O(n)\subset O(n^{2})$。但是不能写 $O(n^{2})\subset O(n)$。
+我们可以写 $O(n)=O(n^{2})$，这里指的是子集的关系，$O(n)\subseteq O(n^{2})$。但是不能写 $O(n^{2})\subseteq O(n)$。
 这样的式子： $2n^{2}+\Theta(n)=\Theta(n^{2})$ 指的是，对于任意的左边的匿名函数（Anonymous Function） $f(n)\in \Theta(n)$, 总存在一个右边的匿名函数 $g(n)\in \Theta(n^{2})$，使得等式成立。
 
 并不是任意两个函数都是渐进可比的。

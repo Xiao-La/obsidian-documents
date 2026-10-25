@@ -1,14 +1,14 @@
 * emergence（涌现）
 ### The history of cell biology
 
-- The size of a cell: $100 \mu m$
+- Typical cell sizes: eukaryotic cells $10\text{–}100\,\mu\mathrm{m}$; prokaryotic cells $0.1\text{–}5\,\mu\mathrm{m}$.
 - The invention of **microscope** 
   - Objective lens and eye lens
 - The word "cell": Robert Hooke
 - The father of Microbiology: Anton van Leeuwenhoek
-- The original Cell Theory (1838, Schwann & Schleiden)
+- The original Cell Theory: Schleiden (1838, plants) & Schwann (1839, animals)
 - Cells derive from pre-existing cells (1855, Rudolf Virchow)
-- Observation of Cell Devision (1880)
+- Observation of Cell Division (1880)
 
 Modern Cell Theory:
 - All living organisms are composed of one or more cells.
@@ -42,8 +42,8 @@ S. J. Singer and G. L. Nicolson: The fluid mosaic model (流动镶嵌模型)
 Transport Across Cell Membranes (跨膜运输)
 
 Endocytosis (内吞作用) 
-- Pinocytosis (胞饮作用): No receptor, small amount
-- Phagocytosis (胞吞作用): Receptor, Happens in specific types of cells, e.g. macrophages (巨噬细胞) and neutrophils (中性粒细胞).
+- Pinocytosis (胞饮作用): Uptake of extracellular fluid and dissolved solutes; often non-specific
+- Phagocytosis (吞噬作用): Receptor, Happens in specific types of cells, e.g. macrophages (巨噬细胞) and neutrophils (中性粒细胞).
 - Clathrin-Mediated Endocytosis (网格蛋白介导的内吞作用)
 - Receptor-Mediated Endocytosis (受体介导的内吞作用）
 
