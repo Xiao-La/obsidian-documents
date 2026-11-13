@@ -8,7 +8,12 @@ $$
 \exists c>0,n_0,\ \forall n>n_0 , \lvert f(n) \rvert\leq c \lvert g(n) \rvert  
 $$
 结论：$f(x)=\sum_{i=0}^{n} a_{i}x^{i}=O(x^{n})$。（多项式的主项决定增长速度）
-![[Algorithm - 算法.png|332]]
+- $1+2+\cdots+n=O(n^{2})$
+- $n!=O(n^{n})$
+- $\log n!=O(n\log n)$
+- $\log_{a}n=O(n)$，$a\geq 2$ 为整数
+- $n^{a}=O(n^{b})$，$a\leq b$ 为整数
+- $n^{a}=O(2^{n})$，$a$ 为整数
 - $n^{n}$ 并不是 $O(n!)$ 的。
 - 但是，$n\log n=O(\log n!)$。
 - 这是因为，$n^{n}\leq(n!)^{2}$。

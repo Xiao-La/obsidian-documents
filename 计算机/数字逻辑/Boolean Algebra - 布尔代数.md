@@ -13,7 +13,15 @@
 - 一些公理和定理
 公理和定理都保持对偶性（Duality）。
 - 把 $\cdot$ 替换为 $+$，同时把 $0$ 替换为 $1$，等号仍然成立。
- ![[Boolean Algebra - 布尔代数.png|474]]
+
+| #   | Theorem          | Dual form        | Name         |
+| --- | ---------------- | ---------------- | ------------ |
+| 1   | $x+0=x$          | $x\cdot 1=x$     | Identity     |
+| 2   | $x+1=1$          | $x\cdot 0=0$     | Null Element |
+| 3   | $x+x=x$          | $x\cdot x=x$     | Idempotency  |
+| 4   | $(x')'=x$        |                  | Involution   |
+| 5   | $x+x'=1$         | $x\cdot x'=0$    | Complements  |
+
 运算优先级
 - 括号>NOT>AND>OR
 

@@ -121,7 +121,25 @@ Symbol：
 ### 特性表（Characteristic Table）
 
 对于 FF，我们知道 Clock 信号不变的时候，输出的值是不变的；我们只关心上升沿的瞬间。因此，可以把 Function Table 进行简化，只看上升沿时 $Q$ 和 $D$，这里 D 是在第 t 个时间周期， Q 是在第 t+1 个时间周期 的关系：
-![[Sequential Logic - 时序逻辑-16.png]]
+
+Function table
+
+| Clk | D   | Q      | Q'      |           |
+| --- | --- | ------ | ------- | --------- |
+| 0   | X   | last Q | last Q' | no change |
+| 1   | X   | last Q | last Q' | no change |
+| ↑   | 0   | 0      | 1       | Q follows D |
+| ↑   | 1   | 1      | 0       | Q follows D |
+
+Convert to Characteristic table：
+
+D Flip-Flop Characteristic table
+
+| D   | Q(t + 1) |       |
+| --- | -------- | ----- |
+| 0   | 0        | Reset |
+| 1   | 1        | Set   |
+
 这里就有 Characteristic Equation（特性方程 ）：
 $$
 Q_{t+1}=D' \cdot 0+ D \cdot 1=D
@@ -204,7 +222,29 @@ $$
 y(t)=(Q_{A}(t)+Q_{B}(t))x'(t)\leftrightarrow y=(Q_{A}+Q_{B})x'
 $$
 - 从而得到 state table：
-![[Sequential Logic - 时序逻辑-24.png|570]]
+
+*First Form of the State Table*
+
+| Present State $Q_AQ_B$ | Input $x$ | Next State $Q_AQ_B$ | Output $y$ |
+| :---: | :---: | :---: | :---: |
+| 00 | 0 | 00 | 0 |
+| 00 | 1 | 01 | 0 |
+| 01 | 0 | 00 | 1 |
+| 01 | 1 | 11 | 0 |
+| 10 | 0 | 00 | 1 |
+| 10 | 1 | 10 | 0 |
+| 11 | 0 | 00 | 1 |
+| 11 | 1 | 10 | 0 |
+
+*Second Form of the State Table*
+
+| Present State $Q_AQ_B$ | Next State ($x=0$) | Next State ($x=1$) | Output $y$ ($x=0$) | Output $y$ ($x=1$) |
+| :---: | :---: | :---: | :---: | :---: |
+| 00 | 00 | 01 | 0 | 0 |
+| 01 | 00 | 11 | 1 | 0 |
+| 10 | 00 | 10 | 1 | 0 |
+| 11 | 00 | 10 | 1 | 0 |
+
 - 进一步可以画出 state diagram：
 ![[Sequential Logic - 时序逻辑-25.png|399]]
 这里每一个节点表示 $Q_{A},Q_{B}$ 的值（也就是一个状态），一条边表示从一个状态到下一个状态，边上写这个状态转移发生时的 input / output。
@@ -238,7 +278,27 @@ $$
 ### 赋值（Assignment）
 
 在上面的表里面，化简后有五种状态 $a,b,c,d,e$，它们可以根据实际的用途进行具体的赋值。例如这样的三种：
-![[Sequential Logic - 时序逻辑-33.png|459]]
+
+*Three Possible Binary State Assignments*
+
+| State | Assignment 1, Binary | Assignment 2, Gray Code | Assignment 3, One-Hot |
+| :---: | :---: | :---: | :---: |
+| $a$ | 000 | 000 | 00001 |
+| $b$ | 001 | 001 | 00010 |
+| $c$ | 010 | 011 | 00100 |
+| $d$ | 011 | 010 | 01000 |
+| $e$ | 100 | 110 | 10000 |
+
+*Reduced State Table with Binary Assignment 1*
+
+| Present State | Next State ($x=0$) | Next State ($x=1$) | Output ($x=0$) | Output ($x=1$) |
+| :---: | :---: | :---: | :---: | :---: |
+| 000 | 000 | 001 | 0 | 0 |
+| 001 | 010 | 011 | 0 | 0 |
+| 010 | 000 | 011 | 0 | 0 |
+| 011 | 100 | 011 | 0 | 1 |
+| 100 | 000 | 011 | 0 | 1 |
+
 
 ### 激励表（Excitation Table）
 

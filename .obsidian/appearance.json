@@ -1,4 +1,7 @@
 {
   "cssTheme": "GitHub Theme",
-  "showRibbon": true
+  "showRibbon": true,
+  "enabledCssSnippets": [
+    "course-images"
+  ]
 }

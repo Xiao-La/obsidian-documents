@@ -112,7 +112,15 @@ $$
 C_{v}=\frac{f}{2}R, C_{p}=\left( \frac{f}{2}+1 \right)R
 $$
 实际上，气体分子的自由度还和温度有关。在低温状态下，转动和振动自由度会被冻结。温度升高之后，转动自由度会先解冻，然后是振动自由度。
-![[Gas-Kinetics-1.png]]
+
+Only considered translational and rotational freedom:
+
+| Molecule | Degrees | $C_V$ | $C_p$ |
+| --- | --- | --- | --- |
+| Monatomic | $t=3$ | $3R/2$ | $5R/2$ |
+| Diatomic | $t+r=3+2=5$ | $5R/2$ | $7R/2$ |
+| Polyatomic (non-linear) | $t+r=3+3=6$ | $3R$ | $4R$ |
+
 基于**能量均分定理**，可通过自由度的比例算出动能大小，例如对于常温下的双原子分子，平动动能为 $\frac{3}{5}E_{\mathrm{int}}$。
 
 ### 热力学过程计算

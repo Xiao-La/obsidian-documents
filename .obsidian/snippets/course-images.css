@@ -1,0 +1,17 @@
+/* Course screenshots: the same framed card the blog uses (css/courses.css),
+   so slides from different sources sit on the page the same way. */
+.markdown-rendered .internal-embed.image-embed img,
+.markdown-source-view .internal-embed.image-embed img {
+  box-sizing: border-box;
+  padding: 0.35em;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.markdown-rendered .internal-embed.image-embed,
+.markdown-source-view .internal-embed.image-embed {
+  display: block;
+  text-align: center;
+  margin: 0.6em 0;
+}

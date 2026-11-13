@@ -44,7 +44,17 @@
 
 MUX 从许多的（通常是 $2^{n}$）输入信号中，根据 $n$ 位的选择信号 S 来选择其中的 1 个，送到一个单个的输出信号。
 例如一个 2:1 MUX：
-![[Standard Component - 标准组件-4.png|210]]
+
+Function table
+
+| S   | Y     |
+| --- | ----- |
+| 0   | $I_0$ |
+| 1   | $I_1$ |
+
+Logic equation
+$Y = S'I_0 + SI_1$
+
 例如一个 4:1 MUX：
 ![[Standard Component - 标准组件-5.png|198]]
 具体实现上，生成选择信号的就是 Decoder。所以可以看成：

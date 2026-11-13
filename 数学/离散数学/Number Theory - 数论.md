@@ -639,7 +639,12 @@ $$
 **Diffie-Hellman Key Exchange Protocol**
 这里 $\alpha$ 是 $\mathbb{Z}_{p}$ 的一个生成元，$X_{A},X_{B}$ 保密作为私钥，于是就在只交换 $Y_{A},Y_{B}$ 的情况下得到了相同的密钥 $k$。
 
-![[Number Theory - 数论-12.png]]
+| User A | User B |
+| --- | --- |
+| Generate random $X_A<p$ | Generate random $X_B<p$ |
+| Calculate $Y_A=\alpha^{X_A}\bmod p$ | Calculate $Y_B=\alpha^{X_B}\bmod p$ |
+| $Y_A\rightarrow$ | $\leftarrow Y_B$ |
+| Calculate $k=(Y_B)^{X_A}\bmod p$ | Calculate $k=(Y_A)^{X_B}\bmod p$ |
 
 量子计算对于大整数分解问题与离散对数问题有较快的解决，因此挑战了公钥密码学。后量子时代的公钥密码学需要解决密钥封装（KEM），数字签名；需要找其他的困难问题。技术路线有：
 - Lattice, Code, Isogeny, Multivariable, Hash

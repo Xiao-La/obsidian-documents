@@ -25,7 +25,24 @@
 
 ### 插入排序
 
-![[Introduction.png|437]]
+```pseudo
+\begin{algorithm}
+\begin{algorithmic}
+\Procedure{Insertion-Sort}{$A$}
+\For{$j = 2$ to $A.\mathit{length}$}
+\State $\mathit{key} = A[j]$
+\State \Comment{Insert $A[j]$ into the sorted sequence $A[1 \dots j-1]$.}
+\State $i = j - 1$
+\While{$i > 0$ and $A[i] > \mathit{key}$}
+\State $A[i+1] = A[i]$
+\State $i = i - 1$
+\EndWhile
+\State $A[i+1] = \mathit{key}$
+\EndFor
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
 
 #### 证明正确性
 
@@ -79,7 +96,17 @@ $O$ 与 $\Omega$ 都弱于 $\Theta$。同时满足这两个可以得出 $\Theta$
 | $f(n)=\omega(g(n))$ | $f$ grows faster than $g$ | “$f>g$” |
 
 常用的：
-![[Introduction-3.png|314]]
+
+| 增长                  | 名称                |
+| ------------------- | ----------------- |
+| $\Theta(1)$         | constant time     |
+| $\Theta(\log n)$   | logarithmic time  |
+| $\Theta(n)$         | linear time       |
+| $\Theta(n^{2})$     | quadratic time    |
+| $\Theta(n^{3})$     | cubic time        |
+| $n^{k}$ for $k=\Theta(1)$ | polynomial time |
+| $2^{n}$             | exponential time  |
+
 其中，任何 $\log n$ 的多项式都比 $n$ 的多项式增长得慢；任何 $n$ 的多项式都比 $2^{n^{\varepsilon}}$ 增长得慢。
 渐进记号表示的是运行时间的增长速度和 $g(n)$ 之间的关系（一样快/至少/至多/大于/小于...）
 
@@ -179,7 +206,9 @@ $$
 其中 $a\geq 1, b>1$。
 我们称 $f(n)$ 为 driving function（表示 divide 和 combine 的代价），而 $T(n)$ 称为 master recurrence（表示我们分成 $a$ 个子问题，每个需要 $T(n / b)$ 的时间解决）。另外称 $n^{\log_{b}a}$ 为 watershed function。
 那么 **The Master Theorem** 指出：
-![[Introduction-7.png|476]]
+1. If there exists a constant $\epsilon>0$ such that $f(n)=O(n^{\log_{b}a-\epsilon})$, then $T(n)=\Theta(n^{\log_{b}a})$.
+2. If there exists a constant $k\geq 0$ such that $f(n)=\Theta(n^{\log_{b}a}\lg^{k}n)$, then $T(n)=\Theta(n^{\log_{b}a}\lg^{k+1}n)$.
+3. If there exists a constant $\epsilon>0$ such that $f(n)=\Omega(n^{\log_{b}a+\epsilon})$, and if $f(n)$ additionally satisfies the ***regularity condition*** $af(n/b)\leq cf(n)$ for some constant $c<1$ and all sufficiently large $n$, then $T(n)=\Theta(f(n))$.
 三种情况分别为：
 - $f(n)$ 相比于 watershed 来说小一个多项式的量级（慢  $\Theta(n^{\varepsilon})$）。
 - $f(n)$ 和 watershed 差不多量级（差的只是 $\log^kn$ 的量级）。

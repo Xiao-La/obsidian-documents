@@ -202,9 +202,25 @@ $$
 ### 二元函数的泰勒公式
 
 在 $(a,b)$ 处的 $n+1$ 阶泰勒公式：
-![[Partial Derivatives -  偏导数.png]]
+
+$$
+\begin{aligned}
+f(a+h,b+k)={}&f(a,b)+\left(hf_x+kf_y\right)\Big\vert_{(a,b)}+\frac{1}{2!}\left(h^2f_{xx}+2hkf_{xy}+k^2f_{yy}\right)\Big\vert_{(a,b)}\\
+&+\frac{1}{3!}\left(h^3f_{xxx}+3h^2kf_{xxy}+3hk^2f_{xyy}+k^3f_{yyy}\right)\Big\vert_{(a,b)}+\cdots+\frac{1}{n!}\left(h\frac{\partial}{\partial x}+k\frac{\partial}{\partial y}\right)^{n}f\Big\vert_{(a,b)}\\
+&+\frac{1}{(n+1)!}\left(h\frac{\partial}{\partial x}+k\frac{\partial}{\partial y}\right)^{n+1}f\Big\vert_{(a+ch,\,b+ck)}.
+\end{aligned}\tag{7}
+$$
+
 把这里的 $h,k$ 换成 $x,y$，可以写出在原点处的 $n+1$ 阶泰勒公式：
-![[Partial Derivatives -  偏导数-1.png]]
+
+$$
+\begin{aligned}
+f(x,y)={}&f(0,0)+xf_x+yf_y+\frac{1}{2!}\left(x^2f_{xx}+2xyf_{xy}+y^2f_{yy}\right)\\
+&+\frac{1}{3!}\left(x^3f_{xxx}+3x^2yf_{xxy}+3xy^2f_{xyy}+y^3f_{yyy}\right)+\cdots+\frac{1}{n!}\left(x^n\frac{\partial^n f}{\partial x^n}+nx^{n-1}y\frac{\partial^n f}{\partial x^{n-1}\partial y}+\cdots+y^n\frac{\partial^n f}{\partial y^n}\right)\\
+&+\frac{1}{(n+1)!}\left(x^{n+1}\frac{\partial^{n+1} f}{\partial x^{n+1}}+(n+1)x^ny\frac{\partial^{n+1} f}{\partial x^n\partial y}+\cdots+y^{n+1}\frac{\partial^{n+1} f}{\partial y^{n+1}}\right)\Bigg\vert_{(cx,\,cy)}
+\end{aligned}\tag{8}
+$$
+
 也就是说（算子展开为各阶偏导时，系数 $x,y$ 视为常数）
 $$
 f(x,y)=\sum_{k=0}^{n}\frac{1}{k!}\left[\left(x\frac{\partial}{\partial x}+y\frac{\partial}{\partial y}\right)^k f\right]_{(0,0)}+\frac{1}{(n+1)!}\left[\left(x\frac{\partial}{\partial x}+y\frac{\partial}{\partial y}\right)^{n+1}f\right]_{(cx,cy)},\quad 0<c<1
