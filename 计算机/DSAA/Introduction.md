@@ -69,7 +69,15 @@ $$
 ![[Introduction-1.png|576]]
 $O$ 与 $\Omega$ 都弱于 $\Theta$。同时满足这两个可以得出 $\Theta$。
 另外还有 $o(g(n))$ 表示严格小于某个上界（对**任意**常数 $c$，$f(n)<cg(n)$，也就是说 $\lim_{ n \to \infty }f(n)/g(n)=0$），$\omega(g(n))$ 表示渐近严格大于 $g(n)$（对任意 $c>0$，最终有 $f(n)>cg(n)$）。若 $f(n)=o(g(n))$，我们说 $f(n)$ 渐进小于（Asymptotically Smaller） $g(n)$。类似的有渐进大于（Asymptotically larger）
-![[Introduction-2.png|583]]
+
+| Notation | Meaning | Analogy |
+| --- | --- | --- |
+| $f(n)=O(g(n))$ | $f$ grows at most as fast as $g$ | “$f\le g$” |
+| $f(n)=\Omega(g(n))$ | $f$ grows at least as fast as $g$ | “$f\ge g$” |
+| $f(n)=\Theta(g(n))$ | $f$ grows as fast as $g$ | “$f=g$” |
+| $f(n)=o(g(n))$ | $f$ grows slower than $g$ | “$f<g$” |
+| $f(n)=\omega(g(n))$ | $f$ grows faster than $g$ | “$f>g$” |
+
 常用的：
 ![[Introduction-3.png|314]]
 其中，任何 $\log n$ 的多项式都比 $n$ 的多项式增长得慢；任何 $n$ 的多项式都比 $2^{n^{\varepsilon}}$ 增长得慢。
@@ -99,8 +107,50 @@ A design paradigms: Divide-and-conquer.
 - 递归地排序两个更小的数组。
 - 合并两个子数组。
 
-![[Introduction-4.png|517]]
-![[Introduction-5.png|522]]
+```pseudo
+\begin{algorithm}
+\begin{algorithmic}
+\Procedure{Merge}{$A, p, q, r$}
+\State $n_1 = q - p + 1$
+\State $n_2 = r - q$
+\State let $L[1 \ldots n_1 + 1]$ and $R[1 \ldots n_2 + 1]$ be new arrays
+\For{$i = 1$ to $n_1$}
+\State $L[i] = A[p + i - 1]$
+\EndFor
+\For{$j = 1$ to $n_2$}
+\State $R[j] = A[q + j]$
+\EndFor
+\State $L[n_1 + 1] = \infty$
+\State $R[n_2 + 1] = \infty$
+\State $i = 1$
+\State $j = 1$
+\For{$k = p$ to $r$}
+\If{$L[i] \le R[j]$}
+\State $A[k] = L[i]$
+\State $i = i + 1$
+\Else
+\State $A[k] = R[j]$
+\State $j = j + 1$
+\EndIf
+\EndFor
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
+```pseudo
+\begin{algorithm}
+\begin{algorithmic}
+\Procedure{Merge-Sort}{$A, p, r$}
+\If{$p < r$}
+\State $q = \lfloor (p + r)/2 \rfloor$
+\State \Call{Merge-Sort}{$A, p, q$}
+\State \Call{Merge-Sort}{$A, q + 1, r$}
+\State \Call{Merge}{$A, p, q, r$}
+\EndIf
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
 
 归并排序的正确性证明
 - 对于函数 Merge()，我们可以用 Loop Invariant 证明。这里的 Invariant 可以选为：“在每次迭代开始时，$A[p\dots k-1]$ 包含了 $L[p\dots q]$ 和 $R[q+1\dots r]$ 中最小的 $k-p$ 个元素且是排好序的；而且 $L[i]$ 和 $R[j]$ 分别是在 $L$ 和 $R$ 还没复制到 $A$ 中的元素中最小的。”

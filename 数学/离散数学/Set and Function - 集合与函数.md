@@ -73,7 +73,14 @@ $$
 ![[Set Theory - 集合论-2.png|302]]
 要证明这些恒等式：
 - 与真值表相对的，使用成员表（其中 0 表示不在集合中，1 表示在集合中）：
-![[Set Theory - 集合论-3.png|383]]
+
+| $A$ | $B$ | $\overline{A}$ | $\overline{B}$ | $\overline{A \cap B}$ | $\overline{A} \cup \overline{B}$ |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 1 | 0 | 0 | 0 | 0 |
+| 1 | 0 | 0 | 1 | 1 | 1 |
+| 0 | 1 | 1 | 0 | 1 | 1 |
+| 0 | 0 | 1 | 1 | 1 | 1 |
+
 - 也可以通过证明对应的逻辑表达式 $\forall x (x\in \text{LHS}\leftrightarrow x\in \text{RHS})$
 - 也可以结合 Set builder 和逻辑等价律。
 计算机中若全集确定且有限，可以通过一个比特串表示集合。

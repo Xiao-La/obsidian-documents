@@ -16,7 +16,7 @@ $$
 一个集合配上它的一个拓扑，记为  $(X,\mathscr{T})$ ，就是一个**拓扑空间（Topological Space）**。
 一些特殊的拓扑空间：
 - **离散拓扑。**$(X,\mathscr{T}=\mathscr{P})$，开子集最多。
-- **凝聚拓扑。**$(X,\mathscr{T}=\{ \varnothing ,S\})$，开子集最少。
+- **凝聚拓扑。**$(X,\mathscr{T}=\{ \varnothing ,X\})$，开子集最少。
 - 对 $X=\mathbb{R}^{n}$：先定义开球（Open Ball）：
 $$
 B(x_{0},r)=\{ x\in \mathbb{R}^{n}| \lvert x-x_{0} \rvert<r \}

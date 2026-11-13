@@ -17,7 +17,18 @@
 运算优先级
 - 括号>NOT>AND>OR
 
-![[Boolean Algebra - 布尔代数-1.png|473]]
+|  | Theorem | Dual form | Name |
+| --- | --- | --- | --- |
+| 6 | $xy = yx$ | $x + y = y + x$ | Commutativity |
+| 7 | $(xy)z = x(yz)$ | $(x + y) + z = x + (y + z)$ | Associativity |
+| 8 | $x(y + z) = xy + xz$ | $x + yz = (x + y)(x + z)$ | Distributivity |
+| 9 | $x + xy = x$ | $x(x + y) = x$ | Absorption |
+| 10 | $xy + xy' = x$ | $(x + y)(x + y') = x$ | Combining |
+| 11 | $(x + y')y = xy$ | $xy' + y = x + y$ | Simplification |
+| 12 | $xy + x'z + yz$<br>$= xy + x'z$ | $(x + y)(x' + z)(y + z)$<br>$= (x + y)(x' + z)$ | Consensus |
+| 13 | $(x + y)' = x'y'$ | $(xy)' = x' + y'$ | DeMorgan’s law |
+
+Note: 8’s Dual differs from traditional algebra: OR (+) distributes over AND (•)
 
 这些定理可以用真值表或代数方法证明。
 
@@ -39,7 +50,18 @@
 - 最大项（Maxterm）：每个变量恰好出现一次（原变量或其补）的 OR 项。
   - 例如，对两个变量 $x,y$ ，最大项： $x+y,x+y',x'+y,x'+y'(M_{0}\sim M_{3})$。 
 这个编号就是对应变量的十进制值。另外有 $M_{i}=m_{i}'$。
-![[Boolean Algebra - 布尔代数-2.png|521]]
+
+| $x$ | $y$ | $z$ | Minterm Term | Minterm Designation | Maxterm Term | Maxterm Designation |
+| --- | --- | --- | --- | --- | --- | --- |
+| $0$ | $0$ | $0$ | $x'y'z'$ | $m_0$ | $x + y + z$ | $M_0$ |
+| $0$ | $0$ | $1$ | $x'y'z$ | $m_1$ | $x + y + z'$ | $M_1$ |
+| $0$ | $1$ | $0$ | $x'yz'$ | $m_2$ | $x + y' + z$ | $M_2$ |
+| $0$ | $1$ | $1$ | $x'yz$ | $m_3$ | $x + y' + z'$ | $M_3$ |
+| $1$ | $0$ | $0$ | $xy'z'$ | $m_4$ | $x' + y + z$ | $M_4$ |
+| $1$ | $0$ | $1$ | $xy'z$ | $m_5$ | $x' + y + z'$ | $M_5$ |
+| $1$ | $1$ | $0$ | $xyz'$ | $m_6$ | $x' + y' + z$ | $M_6$ |
+| $1$ | $1$ | $1$ | $xyz$ | $m_7$ | $x' + y' + z'$ | $M_7$ |
+
 Standard Form（不唯一）
 - Sum of product (sop) 例如 $F=y'+xy+x'yz'$
 - Product of sum (pos) 例如 $F=x(y'+z)(x'+y+z')$
@@ -47,7 +69,18 @@ Standard Form（不唯一）
 那么一个真值表可以表达成 Canonical Form（唯一）：
 - Sum-of-minterms (som)。
 - Product-of-maxterms (pom)。
-![[Boolean Algebra - 布尔代数-3.png|69]]
+
+| $x$ | $y$ | $z$ | $F$ |
+| --- | --- | --- | --- |
+| 0 | 0 | 0 | 0 |
+| 0 | 0 | 1 | 1 |
+| 0 | 1 | 0 | 0 |
+| 0 | 1 | 1 | 1 |
+| 1 | 0 | 0 | 0 |
+| 1 | 0 | 1 | 0 |
+| 1 | 1 | 0 | 1 |
+| 1 | 1 | 1 | 1 |
+
 例如这个函数 $F$ 可以写成：
 - Som：$F=m_{1}+m_{3}+m_{6}+m_{7}=\sum(1,3,6,7)$
 - Pom：$F=(x+y+z)(x+y'+z)(x'+y+z)(x'+y+z')=M_{0}\cdot M_{2}\cdot M_{4}\cdot M_{5}=\prod(0,2,4,5)$ 

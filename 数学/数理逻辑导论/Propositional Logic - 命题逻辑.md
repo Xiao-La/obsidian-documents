@@ -108,9 +108,28 @@ $\leftrightarrow$ 的真值表：
 - 真值表
 
 逻辑等价（Logical Equivalence）：在任意赋值下，两个式子都有相同的值，则称它们等价。也就是说，$A\leftrightarrow B$ 是永真式。
-![[Propositional Logic - 命题逻辑-3.png|440]]
-![[Propositional Logic - 命题逻辑-4.png|540]]
-![[Propositional Logic - 命题逻辑-5.png|541]]
+
+| Equivalence | Name |
+| --- | --- |
+| $p \land T \equiv p$<br>$p \lor F \equiv p$ | Identity laws<br>恒等率 |
+| $p \lor T \equiv T$<br>$p \land F \equiv F$ | Domination laws<br>支配率 |
+| $p \lor p \equiv p$<br>$p \land p \equiv p$ | Idempotent laws<br>幂等率 |
+| $\neg(\neg p) \equiv p$ | Double negation laws<br>双非率 |
+| $p \lor q \equiv q \lor p$<br>$p \land q \equiv q \land p$ | Commutative laws<br>交换率 |
+
+| Equivalence | Name |
+| --- | --- |
+| $(p \lor q) \lor r \equiv p \lor (q \lor r)$<br>$(p \land q) \land r \equiv p \land (q \land r)$ | Associative laws<br>结合率 |
+| $p \lor (q \land r) \equiv (p \lor q) \land (p \lor r)$<br>$p \land (q \lor r) \equiv (p \land q) \lor (p \land r)$ | Distributive laws<br>分配率 |
+| $\neg(p \land q) \equiv \neg p \lor \neg q$<br>$\neg(p \lor q) \equiv \neg p \land \neg q$ | De Morgan’s laws<br>德摩根率 |
+| $p \lor (p \land q) \equiv p$<br>$p \land (p \lor q) \equiv p$ | Absorption laws<br>吸收率 |
+| $p \lor \neg p \equiv T$<br>$p \land \neg p \equiv F$ | Negation laws<br>否定率 |
+
+| Equivalence | Name |
+| --- | --- |
+| $p \to q \equiv \neg p \lor q$ | Implication |
+| $p \to q \equiv \neg q \to \neg p$ | Contrapositive (逆否) |
+| $p \leftrightarrow q \equiv (p \to q) \land (q \to p)$ | Equivalence |
 
 **代换实例（Substitution Instance）：** 将公式中的原子命题统一替换为其他公式，且保持替换的一致性（同一原子命题的所有出现均替换为同一公式）得到的式子。
 - 一个永真式的代换实例仍然是永真式。

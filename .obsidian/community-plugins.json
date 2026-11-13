@@ -5,9 +5,8 @@
   "obsidian-git",
   "obsidian-image-layouts",
   "obsidian-pandoc",
-  "pseudocode-in-obs",
   "obsidian-paste-image-rename",
   "better-export-pdf",
-  "claude-sidebar",
-  "obsidian-latex-suite"
+  "obsidian-latex-suite",
+  "pseudocode-suite"
 ]

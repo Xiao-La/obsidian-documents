@@ -96,10 +96,18 @@ $$
 $$
 p(x_{1},x_{2},\dots,x_{n})=p_{X_{1}}(x_{1})p_{X_{2}}(x_{2})\dots p_{X_{n}}(x_{n})
 $$
-若连续随机变量 $X_{1},X_{2},\dots,X_{n}$ 相互独立，那么
+若连续随机变量 $X_{1},X_{2},\dots,X_{n}$ 相互独立，那么下式几乎处处成立（反之也成立）：
 $$
 f(x_{1},x_{2},\dots,x_{n})=f_{X_{1}}(x_{1})f_{X_{2}}(x_{2})\dots f_{X_{n}}(x_{n})
 $$
+几乎处处（a.e.）：除一个零测集之外成立（二维时就是面积为 $0$ 的集合）。PDF 在零测集上的取值不影响概率。
+
+要说明 $X,Y$ 不独立，单点不满足乘积分解一般不够；证明 $f(x,y)\neq f_{X}(x)f_{Y}(y)$ 在一个面积非零的集合上成立即可，不一定要算积分。也可以找一个区域 $D$，使得
+$$
+\iint_{D} f(x,y)\,\mathrm{d}x\mathrm{d}y\neq\iint_{D} f_{X}(x)f_{Y}(y)\,\mathrm{d}x\mathrm{d}y
+$$
+若两边的密度在该点附近连续，单点不等就能推出一个邻域内不等，因此也可以判断不独立。
+
 若 $X,Y$ 是相互独立的，那么对任意函数 $g$ 和 $h$，有
 $$
 \mathrm{E}(g(X)h(Y))=\mathrm{E}(g(X))\mathrm{E}(h(Y))
@@ -175,10 +183,13 @@ $$
 $$
 ## 多随机变量的变换
 
+
 若连续随机变量  $Z=g(X,Y)$，则 $z$ 的 CDF 可以这样去求：
 $$
-F_{Z}(z)=P(g(X,Y)\leq z)= \int _{g(x,y)\leq z} f(x,y)\,\mathrm{d}x \mathrm{d}y
+F_{Z}(z)=P(g(X,Y)\leq z)= \iint _{g(x,y)\leq z} f(x,y)\,\mathrm{d}x \mathrm{d}y
 $$
+
+### 随机变量之和
 
 若 $Z=X+Y$，有如下结论，可以直接算出 PDF：
 $$
@@ -211,6 +222,22 @@ $$
 
 再比如，独立的泊松分布随机变量的和也是泊松分布，且 $\lambda$ 为这些随机变量的 $\lambda$ 之和。
 
+### 随机变量求最值
+
+若 $Z=\max(X,Y)$，且 $X,Y$ 相互独立，那么有：
+$$
+F_{Z}(z)= F_{X}(z)F_{Y}(z)
+$$
+若 $Z=\min(X,Y)$，且 $X,Y$ 相互独立，那么有：
+$$
+F_{Z}(z)= 1-(1-F_{X}(z))(1-F_{Y}(z))
+$$
+特别地，若 $X_{1},X_{2}, \dots , X_{n} \overset{\text{i.i.d.}}{\sim}F(x)$，那么
+$$
+F_{\max}(z)=(F(z))^{n},\quad F_{\min}(z)=1-(1-F(z))^{n}
+$$
+
+
 ## 中心极限定理（Central Limit Theorem, CLT）
 
 若 $X_{1},X_{2}, \dots$ 是一系列 i.i.d 随机变量，令 $\mu \triangleq \mathrm{E}(X_{i}), \sigma ^{2}\triangleq \operatorname{Var}(X_{i})$。令 $S_{n}=X_{1}+X_{2}+\dots+X_{n}$，以及 $\overline{X}_{n}=S_{n} / n$，考虑 $S_{n}$ 的标准化的版本：
@@ -240,3 +267,88 @@ $$
 **连续性修正。**
 ![[Joint Probability - 联合概率.png|559]]
 对整数值随机变量应用中心极限定理的时候（例如估计二项分布），若要算一个区间上的概率，先写成整数端点的闭区间，再把区间左右各扩大 $0.5$ 会算得更准确。极端情况： $P(X=x)$ 转而计算 $P(x-0.5\leq X\leq x+0.5)$。
+
+## 多元正态分布
+
+二元随机变量 $(X,Y)$ 是二元正态分布，当它的 PDF 为
+$$
+f(x,y)=\frac{1}{2\pi \sigma _{X}\sigma _{Y}\sqrt{1-\rho ^{2}}} \exp\left( - \frac{1}{2(1-\rho ^{2})} \left[  \frac{(x-\mu _{X})^{2}}{\sigma _{X}^{2}} -2\rho \frac{(x-\mu _{X})(y-\mu _{Y})}{\sigma _{X}\sigma _{Y}}+ \frac{(y-\mu _{Y})^{2}}{\sigma _{Y}^{2}}\right]\right)
+$$
+这里 $\mu _{X},\mu _{Y}$ 就是 $X,Y$ 的均值，$\sigma _{X},\sigma _{Y}$ 为标准差，$\rho$ 是 $X,Y$ 之间的相关系数。
+这可以写成：
+$$
+\begin{bmatrix}
+X \\
+Y
+\end{bmatrix}\sim N(\begin{bmatrix}
+\mu _{X} \\
+\mu _{Y}
+\end{bmatrix}, \begin{bmatrix}
+\sigma _{X}^{2} & \rho \sigma _{X}\sigma _{Y} \\
+ \rho \sigma _{X}\sigma _{Y} & \sigma _{Y}^{2}
+\end{bmatrix})= N(\boldsymbol{\mu}, \boldsymbol{\Sigma})
+$$
+这里 $\boldsymbol{\mu}$ 称为均值向量（Mean Vector），而 $\boldsymbol{\Sigma}$ 称为方差-协方差矩阵（Variance-Covariance Matrix）。
+特别地，若 $\mu _{X}=\mu _{Y}=0,\sigma _{X}=\sigma _{Y}=1,\rho=0$，那么称为**标准二元正态分布**：
+$$
+N(\boldsymbol{0},\boldsymbol{I})
+$$
+
+**性质 1：** 若 $\begin{bmatrix}X_{1} \\  X_{2}\end{bmatrix}\sim N(\boldsymbol{\mu},\boldsymbol{\Sigma})$，那么 $X\sim N(\mu _{X},\sigma _{X}^{2}),Y\sim N(\mu _{Y},\sigma _{Y}^{2})$，且 $\rho _{XY}=\rho$。
+
+**性质 2：** 对于二元正态分布，若 $X,Y$ 不相关，那么 $X,Y$ 相互独立。(多元正态分布中，变量之间只存在线性关系)
+- 注意，这个“相关推独立”需要 $(X,Y)$ 服从**二元正态分布**。如果 $X,Y$ 只是各自服从正态，不会有这个结论。
+- 一个反例：令 $X\sim N(0,1)$，$Z$ 与 $X$ 独立，满足 $P(Z=1)=P(Z=-1)=0.5$，那么随机变量 $Y=ZX$ 也服从 $N(0,1)$，且 $X,Y$ 不相关。
+- 但是，$X,Y$ 并不相互独立。
+- 这里还有一个结论：若 $X,Y$ 各自服从正态，且它们相互独立，那么 $(X,Y)$ 满足二元正态分布。
+
+**性质3：** 若 $\begin{bmatrix}X \\  Y \end{bmatrix}\sim N(\boldsymbol{\mu},\boldsymbol{\Sigma})$ ，那么有
+$$
+X\mid Y=y\sim N\left( \mu _{X}+ \frac{\rho \sigma _{X}}{\sigma _{Y}}(y-\mu _{Y}) , (1-\rho ^{2})\sigma _{X} ^{2}\right)
+$$
+$$
+Y\mid X = x\sim N\left( \mu _{Y}+ \frac{ \rho \sigma _{Y}}{\sigma _{X}}(x-\mu _{X}), (1-\rho ^{2})\sigma _{Y}^{2} \right)
+$$
+也就是说，条件分布也是正态分布，且也能看出线性关系：
+$$
+\mathrm{E}(Y\mid X=x)=a+bx
+$$
+![[Joint Probability - 联合概率-1.png|485]]
+
+**性质 4：** 若 $\begin{bmatrix}X \\  Y \end{bmatrix}\sim N(\boldsymbol{\mu},\boldsymbol{\Sigma})$ ，那么对于任意常数 $c_{1},c_{2}$ 有
+$$
+c_{1}X+c_{2}Y\sim N(c_{1}\mu _{X}+c_{2}\mu _{Y},c_{1}^{2}\sigma _{X}^{2}+2c_{1}c_{2}\rho \sigma _{X}\sigma _{Y}+c_{2}^{2}\sigma _{Y}^{2})
+$$
+更一般的情况：对于任何 $2\times2$ 实矩阵 $A$，有：
+$$
+\boldsymbol{A}\begin{bmatrix}
+X \\
+Y
+\end{bmatrix} \sim N(\boldsymbol{A}\boldsymbol{\mu},\boldsymbol{A}\boldsymbol{\Sigma}\boldsymbol{A}^{\top})
+$$
+
+
+扩展成多元的情况：
+$$
+\boldsymbol{X}=\begin{bmatrix}
+X_{1} \\
+X_{2} \\
+\vdots \\
+X_{n}
+\end{bmatrix},\quad \boldsymbol{\mu}=\mathrm{E}(\boldsymbol{X})=\begin{bmatrix}
+\mathrm{E}(X_{1}) \\
+\mathrm{E}(X_{2}) \\
+\vdots \\
+\mathrm{E}(X_{n})
+\end{bmatrix}
+$$
+以及方差-协方差矩阵：
+$$
+\boldsymbol{\Sigma}=\operatorname{Cov}(\boldsymbol{X})=\mathrm{E}[(\boldsymbol{X}-\mathrm{E}(\boldsymbol{X}))(\boldsymbol{X}-\mathrm{E}(\boldsymbol{X}))^{\top}]=\begin{bmatrix}
+\operatorname{Var}(X_{1}) & \operatorname{Cov}(X_{1}, X_{2}) & \cdots & \operatorname{Cov}(X_{1}, X_{n}) \\
+\operatorname{Cov}(X_{1}, X_{2}) & \operatorname{Var}(X_{2})  &  & \vdots \\
+\vdots &  & \ddots & \vdots \\
+\operatorname{Cov}(X_{1}, X_{n}) & \cdots & \cdots & \operatorname{Var}(X_{n})
+\end{bmatrix}
+$$
+

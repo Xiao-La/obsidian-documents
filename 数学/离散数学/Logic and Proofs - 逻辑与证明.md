@@ -15,7 +15,14 @@
 真值表（Truth table）：表示不同的命题之间，所有真值（T/F）之间的关系。
 - 行数：若涉及 $n$ 个命题，则有 $2^{n}$ 行。
 例如异或的真值表：
-![[Logic - 逻辑.png|233]]
+
+| $p$ | $q$ | $p \oplus q$ |
+| --- | --- | --- |
+| T | T | F |
+| T | F | T |
+| F | T | T |
+| F | F | F |
+
 - $p\oplus q\equiv \neg(p\leftrightarrow q)$
 - $p\to q \equiv \neg p\lor q$ (Useful Law)
 
@@ -127,6 +134,7 @@ $$
 ![[Logic - 逻辑-5.png|437]]
 
 ## 数学证明（Mathematical Proof）
+
 **Axiom（公理）：** 在一个理论中选定、不经证明而作为推理起点的命题。
 **Theorem（定理）：** 可以证明的命题。
 **Lemma（引理）：** 可以证明的命题，用于证明其他命题。
@@ -141,6 +149,7 @@ $$
 - Proof by contradiction（说明 $p\land \neg q$ 不可能发生以说明 $p\to q$）
 - Proof by cases （$(p_{1}\lor\dots \lor p_{n})\to q \equiv(p_{1}\to q)\land(p_{2}\to q)\land\dots \land(p_{n}\to q)$）
 - Proof of equivalence （$p\leftrightarrow q\equiv(p\to q)\land(q\to p)$）
+
 Vacuous Proof：证明 $p$ 永远是假的，那么 $p\to q$ 就是真的。
 Trivial Proof：证明 $q$ 永远是真的，那么 $p\to q$ 就是真的。
 证明含量词的命题
@@ -148,4 +157,27 @@ Trivial Proof：证明 $q$ 永远是真的，那么 $p\to q$ 就是真的。
 - Counterexample
 - Constructive proof
 - Non constructive - proof by contradiction
+## 数学归纳法
+
+数学归纳法（Mathematical Induction），其实是把反证法（非直接证明）转换成一个直接的证明的结果。
+
+**Proof by Smallest Counterexample.**  要证明 $P(n)$ 成立 $\forall n=0,1,2, \dots$：
+- 假设有反例。首先验证 $P(0)$ 成立。那么就可以令 $m>0$ 是 **最小的** 使得 $P(n)$ 为假的反例。
+- 那么 $P(m')$ 成立 $\forall0\leq m'<m$。用这件事去说明 $P(m)$ 是真的，那就导致了矛盾。
+- 于是没有反例，也就是说 $P(n)$ 成立 $\forall n=0,1,2, \dots$。
+
+要使用这种“找最小反例”的证明，需要证明的集合需要是 **良序集（Well-Ordered Set）**。自然数/正整数的集合自然就是良序集。
+
+Proof by Smallest Counterexample 的证明过程，其实就相当于数学归纳法。因此有：
+**The Weak Principle of Mathematical Induction.**
+- （Base Step）：若 $P(b)$ 成立。
+- （Inductive Step）：$P(n-1)\to P(n)$ 对所有 $n> b$ 成立，那么 $P(n)$ 对所有 $n\geq b$ 成立。
+
+另外还有：
+**The Strong Principle of Mathematical Induction.**
+- （Base Step）：若 $P(b)$ 成立。
+- （Inductive Step）：$P(b)\land P(b+1)\land\dots  \land P(n-1)\to P(n)$ 对所有 $n> b$ 成立，那么 $P(n)$ 对所有 $n\geq b$ 成立。
+
+格式：
+![[Logic and Proofs - 逻辑与证明-1.png|440]]
 

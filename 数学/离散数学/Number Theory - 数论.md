@@ -120,21 +120,122 @@ $$
 那么要从 $n$ 构造它的 base-$b$ 展开，就相当于不停去除以 $b$，取余数，就得到了 $b$ 进制下的低位到高位。
 
 二进制的加法，乘法运算：
-![[Number Theory - 数论-2.png]]![[Number Theory - 数论-3.png]]这是因为：
+```pseudo
+\begin{algorithm}
+\begin{algorithmic}
+\Procedure{add}{$a, b$: positive integers}
+\State \Comment{the binary expansions of $a$ and $b$ are $(a_{n-1}, a_{n-2}, \ldots, a_0)_2$ and $(b_{n-1}, b_{n-2}, \ldots, b_0)_2$, respectively}
+\State $c := 0$
+\For{$j := 0$ to $n - 1$}
+\State $d := \lfloor (a_j + b_j + c)/2 \rfloor$
+\State $s_j := a_j + b_j + c - 2d$
+\State $c := d$
+\EndFor
+\State $s_n := c$
+\Return $(s_0, s_1, \ldots, s_n)$ \Comment{the binary expansion of the sum is $(s_n, s_{n-1}, \ldots, s_0)_2$}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
+$O(n)$ bit additions
+
+```pseudo
+\begin{algorithm}
+\begin{algorithmic}
+\Procedure{multiply}{$a, b$: positive integers}
+\State \Comment{the binary expansions of $a$ and $b$ are $(a_{n-1}, a_{n-2}, \ldots, a_0)_2$ and $(b_{n-1}, b_{n-2}, \ldots, b_0)_2$, respectively}
+\For{$j := 0$ to $n - 1$}
+\If{$b_j = 1$}
+\State $c_j = a$ shifted $j$ places
+\Else
+\State $c_j := 0$
+\EndIf
+\EndFor
+\State \Comment{$c_0, c_1, \ldots, c_{n-1}$ are the partial products}
+\State $p := 0$
+\For{$j := 0$ to $n - 1$}
+\State $p := p + c_j$
+\EndFor
+\Return $p$ \Comment{$p$ is the value of $ab$}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
+$O(n^{2})$ shifts and $O(n^{2})$ bit additions
+
+这是因为：
 $$
 ab=b_{0}(a\cdot2^{0})+b_{1}(a\cdot2^{1})+\dots+b_{n-1}(a\cdot2^{n-1})
 $$
 那么只需要把 $b_{j}=1$ 的那些 $a$ 的移位加起来。
 
 一个朴素的除法：
-![[Number Theory - 数论-4.png|501]]
-补充：若 $a<0$ 且恰好整除（$r=0$），图中还需令 $q=-q$。
+```pseudo
+\begin{algorithm}
+\begin{algorithmic}
+\Procedure{division-algorithm}{$a$: integer, $d$: positive integer}
+\State $q := 0$
+\State $r := \vert a \vert$
+\While{$r \ge d$}
+\State $r := r - d$
+\State $q := q + 1$
+\EndWhile
+\If{$a < 0$ and $r > 0$}
+\State $r := d - r$
+\State $q := -(q + 1)$
+\EndIf
+\Return $(q, r)$ \Comment{$q = a$ \textbf{div} $d$ is the quotient, $r = a$ \textbf{mod} $d$ is the remainder}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
+$O(q \log a)$ bit operations. But there exist more efficient algorithms with complexity $O(n^{2})$, where $n = \max(\log a, \log d)$
+
+补充：若 $a<0$ 且恰好整除（$r=0$），上面的算法中还需令 $q=-q$。
 可以通过分治来优化：
-![[Number Theory - 数论-5.png|392]]
+```pseudo
+\begin{algorithm}
+\begin{algorithmic}
+\Procedure{division2}{$a, d \in \mathbb{N},\ d \ge 1$}
+\If{$a < d$}
+\Return $(q, r) = (0, a)$
+\EndIf
+\State $(q, r) =$ \Call{division2}{$\lfloor a/2 \rfloor, d$}
+\State $q = 2q,\ r = 2r$
+\If{$a$ is odd}
+\State $r = r + 1$
+\EndIf
+\If{$r \ge d$}
+\State $r = r - d$
+\State $q = q + 1$
+\EndIf
+\Return $(q, r)$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
+
 这相当于把 $a=dq+r$ 写成 $a / 2=d \cdot q / 2+r / 2$，然后去处理奇偶性细节。每次缩小一半，所以这个是 $O(\log q \log a)=O(n^{2})$ 的。
 
 模指数算法：
-![[Number Theory - 数论-6.png]]
+```pseudo
+\begin{algorithm}
+\begin{algorithmic}
+\Procedure{modular-exponentiation}{$b$: integer, $n = (a_{k-1}a_{k-2} \ldots a_1 a_0)_2$, $m$: positive integers}
+\State $x := 1$
+\State $\mathit{power} := b \bmod m$
+\For{$i := 0$ to $k - 1$}
+\If{$a_i = 1$}
+\State $x := (x \cdot \mathit{power}) \bmod m$
+\EndIf
+\State $\mathit{power} := (\mathit{power} \cdot \mathit{power}) \bmod m$
+\EndFor
+\Return $x$ \Comment{$x$ equals $b^{n} \bmod m$}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
+
 复杂度是 $O((\log m) ^{2}\log n)=O(n^{3})$。
 这是因为：
 $$
@@ -159,9 +260,26 @@ $$
 $$
 ### 欧几里得算法（辗转相除法, Euclidean Algorithm）
 
-![[Number Theory - 数论-7.png|366]]
+```pseudo
+\begin{algorithm}
+\begin{algorithmic}
+\Procedure{gcd}{$a, b$: positive integers}
+\State $x := a$
+\State $y := b$
+\While{$y \neq 0$}
+\State $r := x \bmod y$
+\State $x := y$
+\State $y := r$
+\EndWhile
+\Return $x$ \Comment{$\gcd(a, b)$ is $x$}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
+
 
 设 $a>b$，欧几里得算法中，while 循环执行的次数是 $O(\log b)$。若考虑除法操作的复杂度 $O(\log ^{2}a)$，总的复杂度可以写成 $O(\log ^{3}a)$。这是多项式时间的。
+### 正确性
 
 欧几里得算法的正确性依赖于这个引理：
 $$
@@ -175,6 +293,36 @@ $$
 - 若 $d$ 是 $a,b$ 的因数，那它也是 $r=a-bq$ 的因数，即 $\text{LHS}\subseteq\text{RHS}$。
 - 若 $d$ 是 $b,r$ 的因数，那它也是 $a=bq+r$ 的因数，即 $\text{RHS}\subseteq\text{LHS}$。
 - 那么 $\text{LHS}=\text{RHS}$。
+### 时间复杂度证明
+
+ while 循环的次数 $n=O(\log b)$ 的。一种证明方法：
+- 每次除法：$r_{i+2}=r_{i}\bmod r_{i+1}$，这里 $r_{1}=b$。
+- 我们声称 $r_{i+2}< \frac{1}{2}r_{i}$。分类证明：
+- 若 $r_{i+1}\leq \frac{1}{2}r_{i}$，那么直接得到 $r_{i+2}<r_{i+1}\leq \frac{1}{2}r_{i}$。
+- 若 $r_{i+1}> \frac{1}{2} r_{i}$，那么得到 $r_{i+2}=r_{i}\bmod r_{i+1}=r_{i}-r_{i+1}< \frac{1}{2}r_{i}$.
+- 最后 $r_{n}\geq1$，于是：
+$$
+b=r_{1}>2r_{3}>2^{2}r_{5}> \dots> 2^{i}r_{2i+1} > \dots > 2^{(n-1)/2} r_{n}\geq 2^{(n-1) / 2}
+$$
+- 于是 $\frac{n-1}{2}\leq \log(b)$，有 $n=O(\log b)$。
+另一种证明方法：注意到
+$$
+q_{1},q_{2}, \dots, q _{n-1}\geq1, \quad q _{n} \geq2
+$$
+那么
+$$
+\begin{aligned}
+&r_{n}\geq 1 = f_{2} \\
+\implies &r_{n-1}\geq 2r_{n} \geq 2f_{2}=f_{3} \\
+\implies &r_{n-2}\geq r_{n-1}+r_{n}\geq f_{3} + f_{2} = f_{4} \\
+&\dots \\
+\implies & r_{2}\geq r_{3}+r_{4}\geq f_{n-1}+f_{n-2}=f_{n} \\
+\implies & b=r_{1}\geq r_{2}+r_{3}\geq f_{n+1}=\Omega(c^{n}) 
+\end{aligned}
+$$
+于是 $n=O(\log b)$。
+
+
 
 ### 裴蜀定理（Bezout's Theorem）
 
@@ -327,7 +475,145 @@ $$
 模素数 $p$ 的本原根是一个整数 $r\in \mathbb{Z}_{p}$ 使得所有 $\mathbb{Z}_{p}$ 中的非零元素都是 $r$ 的幂。
 - 例如，$3$ 是 $\mathbb{Z}_{7}$ 的本原根。
 
-## 汇总
+## 总结
 
 
 ![[Number Theory - 数论-10.png]]
+
+
+## 应用
+
+### 伪随机数生成器
+
+**线性同余法（Linear Congruential Method）。** 四个参数：
+- 模数 $m$
+- 乘数 $a$
+- 增量 $c$
+- 种子 $x_{0}$
+那么可以得到伪随机数序列 $x_{1},x_{2},\dots,x_{n},\dots$，这里 $0\leq x_{i}<m$：
+$$
+x_{n+1}=(ax_{n}+c)\pmod{m}
+$$
+这种方法很容易被攻击，不能用于安全性依赖于随机性的情景。
+
+### 哈希函数
+
+把任意长度的数据映射到固定长度。
+例如简单地使用哈希函数 $h(x)=x\bmod n$，把 $x$ 存到位置 $h(x)$ 就是一种数据结构：哈希表。遇到哈希冲突，可以向后移一位存，或者在那个位置开一个链表。
+**Bloom Filter：** 一种概率性的数据结构，查询在常数时间，且让“假阳性”的概率尽可能低。
+
+## 数论在密码学中的应用
+
+Cryptography（密码学）=kryptos（秘密）+graphos（写）
+这个词来自 Edgar Allan Poe。
+
+### 对称密码学
+
+直到 1970s。
+对称：加密和解密的钥匙是相同的。因此，要提前协商一个私钥（Private Key）$k$。
+例如凯撒密码：
+- 加密： $i\to(i+k)\bmod26$
+- 解密：$j\to (j-k) \bmod26$
+- 问题在于，密钥只有 $26$ 种。
+- 更进一步，有更一般的置换密码（Substitution Cipher）：把原字母表对应到另一个顺序的字母表，这样就有 $26!$ 种密钥了。
+- 但是，仍然可以通过统计字母（的组合）出现的频率来破解密钥。
+
+Kerckhoffs's Principle：即使算法已知了，只要密钥未知，系统也应该安全。
+### 非对称密码学
+
+概念：1976 W.Diffie, M.Hellman, ***New directions in cryptography***: **"We stand today on the brink of a revolution in cryptography."**
+实现：R.**R**ivest, A.**S**hamir, L.**A**dleman,  ***A method for obtaining digital signatures and public-key cryptosystems***
+![[Number Theory - 数论-11.png]]
+在公钥密码学中，不再需要提前协商密钥了。不过由于效率比较慢，通常可以通过 **公钥密码学** 来传递 **对称密码学** 的 **密钥**，然后后续使用对称加密。
+另一方面，可以存在 **数字签名** 了。私钥可以用来证明身份，所有人都能用公钥来核验。
+
+**RSA 算法。** （Plain RSA）选择两个不同的大质数 $p,q$，令 $n=pq$，那么 $\phi(n)=(p-1)(q-1)$。加密（Encryption）和解密（Decryption）的密钥 $e,d$ 需要满足：
+$$
+\gcd(e,\phi(n))=1
+$$
+$$
+ed\equiv 1 \pmod{\phi(n)}
+$$
+那么加密：
+$$
+C=M^{e} \bmod n
+$$
+解密：
+$$
+M=C^{d} \bmod n
+$$
+这里公钥就是 $(e,n)$，私钥就是 $d$。
+
+正确性证明：只需要证明
+$$
+\forall x\in \mathbb{Z}_{n},x^{ed}\equiv x\pmod{n}
+$$
+- Case 1: $\gcd(x,n)=1$。那么由欧拉定理，$x^{\phi(n)}\equiv1 \pmod{n}$。于是
+$$
+x^{ed}\equiv x^{k\phi(n)+1}\equiv(x^{\phi(n)})^{k}\cdot x\equiv x \pmod{n}
+$$
+- 这也可以通过费马小定理+中国剩余定理证明。
+- Case 2: $\gcd(x,n)=p$。那么 $x=tp,\gcd(t,q)=1$。 只需证明
+$$
+x^{ed}-x=x(x^{ed-1}-1)\equiv0 \pmod{n}
+$$
+- 这里 $x$ 有因子 $p$，$x^{ed-1}-1=x^{k(p-1)(q-1)}-1$ 有因子 $q$（由费马小定理），于是成立。
+- Case 3: $\gcd(x,n)=q$。这与 Case 2 相同。
+- Case 4: $\gcd(x,n)=n$，那么 $x=0$，显然成立。
+
+安全性：给定了 $e$ 和 $n$，算出 $\phi(n)$ 和分解 $n$ 一样都很难，进而算出 $d$ 也是很难的。实际使用上，RSA 的密钥大概是 1024 到 2048 位。
+
+应用：SSL/TLS 协议；数字签名。
+数字签名：最朴素的方法就是
+$$
+S=M^{d}\bmod n
+$$
+验证签名：
+$$
+M=S^{e} \bmod n
+$$
+但是这不安全，因为可以从已有的签名 $(M_{1},S_{1}),(M_{2},S_{2})$中构造新的签名 $(M_{1}M_{2},S_{1}S_{2})$。
+实际上需要一整套安全的标准。
+
+### 离散对数问题
+
+整数 $y$ 以 $b$ 为底的 **离散对数（Discrete Logarithm）$x$**，为满足下式：
+$$
+b^{x}\equiv y\pmod n
+$$
+给定 $b,y,n$，计算 $x$ 就是离散对数问题，这是很困难的。
+
+**El Gamal 加密。**
+- 私钥：$x$。这里 $1<x<p-2$。
+- 公钥：$p,g,y$。这里 $p$ 是一个素数，$g$ 是 $\mathbb{Z}_{p}$ 的一个生成元，且 $y=g ^{x}\bmod p$。
+- 加密：要加密 $M$。选一个随机数 $k\in \mathbb{Z}_{p-1}$，令
+$$
+a=g ^{k} \bmod p, b=My ^{k} \bmod p
+$$
+- 那么密文就是 $(a,b)$。
+- 解密： $M=b(a^{x})^{-1}\bmod p$。
+
+用于数字签名：选取随机数 $k$，满足 $\gcd(k,p-1)=1$。
+$$
+a=g ^{k} \bmod p, b= k ^{-1} (M-xa)\bmod (p-1)
+$$
+验证：
+$$
+y ^{a} a^{b} \equiv g ^{M} \pmod{p}
+$$
+
+**Diffie-Hellman Key Exchange Protocol**
+这里 $\alpha$ 是 $\mathbb{Z}_{p}$ 的一个生成元，$X_{A},X_{B}$ 保密作为私钥，于是就在只交换 $Y_{A},Y_{B}$ 的情况下得到了相同的密钥 $k$。
+
+![[Number Theory - 数论-12.png]]
+
+量子计算对于大整数分解问题与离散对数问题有较快的解决，因此挑战了公钥密码学。后量子时代的公钥密码学需要解决密钥封装（KEM），数字签名；需要找其他的困难问题。技术路线有：
+- Lattice, Code, Isogeny, Multivariable, Hash
+密码学除了加密解密之外：
+- 数字签名
+- 零知识证明
+- 保护隐私的数据查询
+- 网上（无需信任中心化服务器与彼此）的打牌
+- 电子投票（E-Voting）
+- 电子拍卖
+- 全同态加密（加密 $E(m)$，且要可以用来算 $E(f(m))$）

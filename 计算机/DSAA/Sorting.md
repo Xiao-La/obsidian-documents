@@ -19,12 +19,44 @@ $$
 - 不断拿出堆顶的最大元素放到数组的末尾，然后维护堆的性质（Max-Heapify）。这里用 $A.\text{heap-size}$ 表示还没有放到末尾的元素个数。
 
 $\text{Max-Heapify}(A,i)$：考虑以 $i$ 为根的子树。假设 $\text{Left}(i),\text{Right}(i)$ 都是大根堆，但 $i$ 处可能破坏堆的性质。那么，可以通过不断向下调整（"float down"），把 $i$ 与它的**较大的**子节点（如果比 $i$ 大）交换，不断递归地重复即可。
-![[Sorting-1.png|493]]
+```pseudo
+\begin{algorithm}
+\begin{algorithmic}
+\Procedure{Max-Heapify}{$A, i$}
+\State $l =$ \Call{Left}{$i$}
+\State $r =$ \Call{Right}{$i$}
+\If{$l \le A.\mathit{heap}\text{-}\mathit{size}$ and $A[l] > A[i]$}
+\State $\mathit{largest} = l$
+\Else
+\State $\mathit{largest} = i$
+\EndIf
+\If{$r \le A.\mathit{heap}\text{-}\mathit{size}$ and $A[r] > A[\mathit{largest}]$}
+\State $\mathit{largest} = r$
+\EndIf
+\If{$\mathit{largest} \neq i$}
+\State exchange $A[i]$ with $A[\mathit{largest}]$
+\State \Call{Max-Heapify}{$A, \mathit{largest}$}
+\EndIf
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
 运行时间：我们说树中一个节点的高度（height）是它到叶子节点的最长简单路径的长度。那么若 $i$ 的高度为 $h$，则运行时间是 $O(h)$ 的。（不是 $\Omega (h)$，因为可能提前停下）这里 $h$ 最多是 $\log n$，因为高度为 $h$ 的完全二叉树至少有 $1+2+4+\dots+2^{h-1}+1=2^{h}$ 个节点。
 正确性：对高度进行归纳证明。Base case 就是叶子节点。假设对 $i-1$ 高度已经成立，那么对 $i$ 高度，交换之后就化为了 $i-1$ 的情况，所以也成立。
 
 $\text{Build-Max-Heap}(A,n)$：从叶子节点开始，从下至上不断执行 $\text{Max-Heapify}$。这是因为 $\text{Max-Heapify}$ 假设了 $\text{Left}(i)$ 和 $\text{Right}(i)$ 都是大根堆。另外我们注意到 $A[( \lfloor n / 2 \rfloor + 1),\dots,n]$ 都是叶子节点，所以不需要操作就自然形成大根堆。那么只需要从 $\lfloor n / 2 \rfloor$ 开始往前做即可。
-![[Sorting-2.png|267]]
+```pseudo
+\begin{algorithm}
+\begin{algorithmic}
+\Procedure{Build-Max-Heap}{$A, n$}
+\State $A.\mathit{heap}\text{-}\mathit{size} = n$
+\For{$i = \lfloor n/2 \rfloor$ downto $1$}
+\State \Call{Max-Heapify}{$A, i$}
+\EndFor
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
 正确性：可以通过 Loop invariant “在迭代 $i$ 开始时，$i+1,i+2,\dots,n$ 都是一个大根堆的根节点“ 证明。
 运行时间：显然是 $O(n\log n)$ 的。一个更紧的界是 $\Theta(n)$。
 - 这是因为，大多数节点的高度都很小。实际上，高度为 $h$ 的节点最多只有 $\left\lceil  \frac{n}{2^{h+1}}  \right\rceil$ 个。
@@ -37,7 +69,20 @@ $$
 - 因此是 $\Theta(n)$ 的。
 
 结合上面的两个函数，得到堆排序：
-![[Sorting-3.png|484]]
+```pseudo
+\begin{algorithm}
+\begin{algorithmic}
+\Procedure{Heap-Sort}{$A$}
+\State \Call{Build-Max-Heap}{$A$}
+\For{$i = A.\mathit{length}$ downto $2$}
+\State exchange $A[1]$ with $A[i]$
+\State $A.\mathit{heap}\text{-}\mathit{size} = A.\mathit{heap}\text{-}\mathit{size} - 1$
+\State \Call{Max-Heapify}{$A, 1$}
+\EndFor
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
 运行时间是 $O(n)+(n-1)\cdot O(\log n)=O(n\log n)$ 的。
 可以通过循环不变量证明正确性。
 
@@ -50,7 +95,19 @@ $$
 - Combine：不需要。
 
 伪代码：
-![[Sorting-4.png|434]]
+```pseudo
+\begin{algorithm}
+\begin{algorithmic}
+\Procedure{Quick-Sort}{$A, p, r$}
+\If{$p < r$}
+\State $q =$ \Call{Partition}{$A, p, r$}
+\State \Call{Quick-Sort}{$A, p, q - 1$}
+\State \Call{Quick-Sort}{$A, q + 1, r$}
+\EndIf
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
 ![[Sorting-5.png|438]]
 
 Partition 的正确性可以用 loop invariant 证明。在每次迭代开始时：
@@ -99,7 +156,17 @@ $$
 #### 平均情况
 
 **随机化。** 为了避免最坏情况，我们可以在 partition 前面让我们选的 pivot 是随机的：
-![[Sorting-6.png|441]]
+```pseudo
+\begin{algorithm}
+\begin{algorithmic}
+\Procedure{Randomized-Partition}{$A, p, r$}
+\State $i =$ \Call{Random}{$p, r$}
+\State exchange $A[r]$ with $A[i]$
+\Return \Call{Partition}{$A, p, r$}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
 
 当数组元素互异时，随机化的 QuickSort 的**期望运行时间**是 $\Theta(n\log n)$。
 - **直觉：** 一个好的 partition 是把数组分成它的某个常数比例，例如，分成 $3:1$。一个不好的 partition 是把数组分成 $0$ 和 $n-1$。如果好的和坏的等可能交替出现，那好的 partition 会主导，导致 $\Theta(n\log n)$。
@@ -148,3 +215,57 @@ T(n)=\Omega(h)=\Omega(\log (n!))=\Omega(n\log n)
 $$
 
 
+
+## 线性排序
+
+在值域满足特定性质的时候，可以实现线性排序。
+### 计数排序（Counting Sort）
+
+适用于元素为 $0$ 到 $k$ 的整数的数组。
+
+伪代码：
+
+```pseudo
+\begin{algorithm}
+\begin{algorithmic}
+\Procedure{Counting-Sort}{$A, B, k$}
+\State let $C[0 \ldots k]$ be a new array
+\For{$i = 0$ to $k$}
+\State $C[i] = 0$
+\EndFor
+\For{$j = 1$ to $A.\mathit{length}$}
+\State $C[A[j]] = C[A[j]] + 1$
+\EndFor
+\For{$i = 1$ to $k$}
+\State $C[i] = C[i] + C[i-1]$
+\EndFor
+\For{$j = A.\mathit{length}$ downto $1$}
+\State $B[C[A[j]]] = A[j]$
+\State $C[A[j]] = C[A[j]] - 1$
+\EndFor
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
+
+时间复杂度：$\Theta(n+k)$，其中 $n$ 为数组长度，$k$ 为最大元素。若 $k=O(n)$，则时间复杂度为 $\Theta (n)$。
+正确性可以用 Loop Invariant 证明。
+
+计数排序是稳定的（Stable）：排序之后，**相等的元素** 在输出数组中的顺序和在输入数组中的顺序相同。
+
+### 基数排序（Radix Sort）
+
+从最低位到最高位，用 Stable Sort 对每一位排序。
+```pseudo
+\begin{algorithm}
+\begin{algorithmic}
+\Procedure{Radix-Sort}{$A, d$}
+\For{$i = 1$ to $d$}
+\State use a stable sort to sort array $A$ on digit $i$
+\EndFor
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
+
+每一位用计数排序时，运行时间为 $\Theta(d(n+k))$，其中 $d$ 为位数，$k$ 为每一位的最大值。
