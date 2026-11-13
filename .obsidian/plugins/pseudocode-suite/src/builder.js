@@ -1,20 +1,17 @@
 /* Builder modal. */
 ((PS) => {
-  const CONTAINERS = new Set(['if', 'while', 'for', 'repeat', 'function']);
-  const bodyOf = (node) => PS.bodyOf(node);
-  const isMathValue = (value) => String(value == null ? '' : value).trim() !== ''
-    && !/[\u4e00-\u9fff]/.test(String(value));
-  const mathText = (value) => PS.normalizeOperators(value);
+  const IS_MAC = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform || '');
+  const MOD = IS_MAC ? '⌘' : 'Ctrl+';
+  const ALT = IS_MAC ? '⌥' : 'Alt+';
+  const SHIFT = IS_MAC ? '⇧' : 'Shift+';
+  const HISTORY_LIMIT = 100;
+
+  const hasCjk = (value) => /[一-鿿]/.test(String(value));
+  const hasTex = (value) => /[\\$]/.test(String(value || ''));
 
   function cloneNode(node) {
-    const copy = JSON.parse(JSON.stringify(node, (key, value) => (key === 'id' ? undefined : value)));
-    const assign = (current) => {
-      current.id = PS.nextId();
-      if (Array.isArray(current.branches)) current.branches.forEach((branch) => branch.body.forEach(assign));
-      if (Array.isArray(current.elseBody)) current.elseBody.forEach(assign);
-      if (Array.isArray(current.body)) current.body.forEach(assign);
-    };
-    assign(copy);
+    const copy = JSON.parse(JSON.stringify(node));
+    PS.walk([copy], (child) => { child.id = PS.nextId(); });
     return copy;
   }
 
@@ -25,718 +22,889 @@
       case 'for': return PS.node('for', { init: '', bound: '', downto: false, body: [] });
       case 'forall': return PS.node('for', { all: true, init: '', bound: '', downto: false, body: [] });
       case 'repeat': return PS.node('repeat', { body: [], until: '' });
-      case 'function': return PS.node('function', { kind: 'Function', name: '', args: '', body: [] });
+      case 'function': return PS.node('function', { kind: 'Procedure', name: '', args: '', body: [] });
       case 'call': return PS.node('call', { name: '', args: '' });
+      case 'break':
+      case 'continue': return PS.node(type);
       default: return PS.node(type, { text: '' });
     }
   }
 
-class BuilderModal extends Modal {
-  constructor(app, options) {
-    super(app);
-    this.model = options.model;
-    this.settings = options.settings || {};
-    this.sourcePath = options.sourcePath || '';
-    this.onSave = options.onSave;
-    this.index = new Map();
-    this.selectedId = null;
-    this.focusId = null;
-    this.dragId = null;
-    this.dropTarget = null;
-    this.previewTimer = null;
-    this.previewComponent = new Component();
-  }
+  /* Row layouts. A part is a literal word, an input ({ key }) or a select. */
+  const field = (key, placeholder, math = true) => ({ key, placeholder, math });
+  const ROWS = {
+    state: { chip: 'statement', parts: [field('text', 'e.g. S1.top = 0')] },
+    require: { chip: 'require', parts: [field('text', 'input, e.g. A, n')] },
+    ensure: { chip: 'ensure', parts: [field('text', 'output, e.g. A is sorted')] },
+    return: { chip: 'return', parts: [field('text', 'value (optional)')] },
+    print: { chip: 'print', parts: [field('text', 'value')] },
+    break: { chip: 'break', parts: [] },
+    continue: { chip: 'continue', parts: [] },
+    call: { chip: 'call', parts: [field('name', 'procedure name', false), '(', field('args', 'args, e.g. A, i'), ')'] },
+    raw: { chip: 'raw', parts: [field('text', 'unrecognized raw line', false)] },
+    comment: { chip: '//', parts: [field('text', 'comment text', false)], noComment: true },
+    while: { chip: 'while', parts: [field('cond', 'condition, e.g. k > 0')] },
+    forall: { chip: 'for all', parts: [field('init', 'variable in set, e.g. x in S')] },
+    for: {
+      chip: 'for',
+      parts: [
+        field('init', 'start, e.g. j = 2'),
+        { select: 'downto', options: [['to', false], ['downto', true]] },
+        field('bound', 'end, e.g. n'),
+      ],
+    },
+    function: {
+      chip: 'procedure',
+      parts: [
+        { select: 'kind', options: [['Procedure', 'Procedure'], ['Function', 'Function']] },
+        field('name', 'name, e.g. PushS1', false),
+        '(', field('args', 'args, e.g. A, x'), ')',
+      ],
+    },
+  };
 
-  onOpen() {
-    this.history = [];
-    this.modalEl.addClass('pb-modal');
-    this.titleEl.setText('Pseudocode Builder');
-    this.buildLayout();
-    this.renderTree();
-    this.renderPreview();
-    this.onUndoKey = (event) => {
-      if (!(event.metaKey || event.ctrlKey)) return;
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        this.save();
-        return;
-      }
-      if (event.key.toLowerCase() !== 'z') return;
-      event.preventDefault();
-      this.undo();
-    };
-    this.modalEl.addEventListener('keydown', this.onUndoKey);
-  }
+  const PRIMARY_INSERTS = [
+    ['Statement', 'state'], ['If', 'if'], ['For', 'for'], ['While', 'while'],
+    ['Return', 'return'], ['Call', 'call'], ['Procedure', 'function'],
+  ];
+  const MORE_INSERTS = [
+    ['For all', 'forall'], ['Repeat … until', 'repeat'], ['Require', 'require'], ['Ensure', 'ensure'],
+    ['Break', 'break'], ['Continue', 'continue'], ['Print', 'print'], ['Comment line', 'comment'],
+  ];
 
-  onClose() {
-    this.modalEl.removeEventListener('keydown', this.onUndoKey);
-    clearTimeout(this.previewTimer);
-    this.previewComponent.unload();
-    this.contentEl.empty();
-  }
-
-  buildLayout() {
-    const { contentEl } = this;
-    contentEl.empty();
-    contentEl.addClass('pb-content');
-
-    const wrap = contentEl.createDiv('pb-wrap');
-    const left = wrap.createDiv('pb-left');
-    const right = wrap.createDiv('pb-right');
-
-    const captionRow = left.createDiv('pb-row pb-caption');
-    captionRow.createSpan({ cls: 'pb-chip', text: 'Title' });
-    const captionInput = captionRow.createEl('input', {
-      cls: 'pb-input',
-      attr: { type: 'text', placeholder: 'Algorithm title (optional)' },
-    });
-    captionInput.value = this.model.caption || '';
-    captionInput.addEventListener('input', () => {
-      this.model.caption = captionInput.value;
-      this.schedulePreview();
-    });
-
-    const toolbar = left.createDiv('pb-toolbar');
-    const addButton = (label, factory) => {
-      toolbar.createEl('button', { text: label }, (button) => {
-        button.addEventListener('click', () => this.insertNode(factory()));
-      });
-    };
-    addButton('+ Statement', () => newNode('state'));
-    addButton('+ If', () => newNode('if'));
-    addButton('+ While', () => newNode('while'));
-    addButton('+ For', () => newNode('for'));
-    addButton('+ For all', () => newNode('forall'));
-    addButton('+ Repeat', () => newNode('repeat'));
-    addButton('+ Procedure', () => newNode('function'));
-    addButton('+ Require', () => newNode('require'));
-    addButton('+ Ensure', () => newNode('ensure'));
-    addButton('+ Return', () => newNode('return'));
-    addButton('+ Call', () => newNode('call'));
-    addButton('+ Break', () => newNode('break'));
-    addButton('+ Continue', () => newNode('continue'));
-    addButton('+ Print', () => newNode('print'));
-    addButton('+ Comment', () => newNode('comment'));
-
-    this.listEl = left.createDiv('pb-list');
-
-    this.previewEl = right.createDiv('pb-preview');
-    const details = right.createEl('details', { cls: 'pb-latex' });
-    details.createEl('summary', { text: 'Show generated LaTeX' });
-    this.latexEl = details.createEl('pre');
-
-    const footer = contentEl.createDiv('pb-footer');
-    footer.createEl('button', { text: 'Cancel' }, (button) => {
-      button.addEventListener('click', () => this.close());
-    });
-    footer.createEl('button', { cls: 'mod-cta', text: 'Save' }, (button) => {
-      button.addEventListener('click', () => this.save());
-    });
-  }
-
-  /* ---- tree rendering ---- */
-
-  pushHistory() {
-    try {
-      this.history.push(JSON.stringify(this.model));
-      if (this.history.length > 50) this.history.shift();
-    } catch (error) { /* ignore */ }
-  }
-
-  undo() {
-    if (!this.history.length) return;
-    this.model = JSON.parse(this.history.pop());
-    this.selectedId = null;
-    this.renderTree();
-    this.schedulePreview();
-  }
-
-  buildIndex() {
-    this.index.clear();
-    const walk = (array, owner, ownerArray) => {
-      array.forEach((node, position) => {
-        this.index.set(node.id, { node, array, position, owner, ownerArray });
-        if (node.type === 'if') {
-          node.branches.forEach((branch) => walk(branch.body, node, array));
-          if (node.elseBody) walk(node.elseBody, node, array);
-        } else if (Array.isArray(node.body)) {
-          walk(node.body, node, array);
-        }
-      });
-    };
-    walk(this.model.nodes, null, null);
-  }
-
-  renderTree() {
-    this.buildIndex();
-    this.listEl.empty();
-    this.renderNodes(this.model.nodes, 0);
-    if (this.focusId) {
-      const id = this.focusId;
-      this.focusId = null;
-      const input = this.listEl.querySelector('input[data-id="' + id + '"]');
-      if (input) {
-        input.focus();
-        input.select();
-      }
+  class ConfirmModal extends Modal {
+    constructor(app, { title, message, choices }) {
+      super(app);
+      this.titleText = title;
+      this.message = message;
+      this.choices = choices;
     }
-    if (this.focusCommentId) {
-      const id = this.focusCommentId;
-      this.focusCommentId = null;
-      const input = this.listEl.querySelector('input.pb-comment-input[data-id="' + id + '"]');
-      if (input) input.focus();
+
+    onOpen() {
+      this.modalEl.addClass('pb-confirm');
+      this.titleEl.setText(this.titleText);
+      this.contentEl.createEl('p', { text: this.message });
+      const buttons = this.contentEl.createDiv('modal-button-container');
+      this.choices.forEach(({ label, cls, run }) => {
+        const button = buttons.createEl('button', { text: label, cls });
+        button.addEventListener('click', () => {
+          this.close();
+          run();
+        });
+      });
+    }
+
+    onClose() {
+      this.contentEl.empty();
     }
   }
 
-  renderNodes(nodes, depth) {
-    for (const node of nodes) this.renderNode(node, depth);
-  }
-
-  row(node, depth, chip) {
-    const labels = {
-      state: 'statement', statement: 'statement', function: 'function', procedure: 'procedure',
-      require: 'require', ensure: 'ensure', return: 'return', call: 'call', break: 'break',
-      continue: 'continue', print: 'print', comment: 'comment', raw: 'raw', if: 'if',
-      'else if': 'else if', else: 'else', while: 'while', for: 'for', 'for all': 'for all',
-      repeat: 'repeat', until: 'until',
-    };
-    const element = this.listEl.createDiv('pb-row');
-    element.dataset.id = node.id;
-    element.style.paddingLeft = depth * 16 + 4 + 'px';
-    if (this.selectedId === node.id) element.addClass('pb-selected');
-
-    const handle = element.createEl('button', {
-      cls: 'pb-drag',
-      text: '⠿',
-      attr: { type: 'button', draggable: 'true', 'aria-label': 'Drag to reorder', title: 'Drag to reorder' },
-    });
-    handle.addEventListener('dragstart', (event) => {
-      this.dragId = node.id;
-      if (event.dataTransfer) {
-        event.dataTransfer.effectAllowed = 'move';
-        try { event.dataTransfer.setData('text/plain', node.id); } catch (error) { /* ignore */ }
-      }
-      element.addClass('pb-dragging');
-    });
-    handle.addEventListener('dragend', () => {
+  class BuilderModal extends Modal {
+    constructor(app, options) {
+      super(app);
+      this.model = options.model;
+      this.settings = options.settings || {};
+      this.sourcePath = options.sourcePath || '';
+      this.onSave = options.onSave;
+      this.initialLatex = PS.serializeLatex(this.model);
+      this.index = new Map();
+      this.undoStack = [];
+      this.redoStack = [];
+      this.typingKey = null;
+      this.selected = null; // { id, slot }
+      this.pendingFocus = null; // focus key to restore after the next render
+      this.collapsed = new Set();
+      this.openComments = new Set();
       this.dragId = null;
-      element.removeClass('pb-dragging');
-      this.clearDropStyles();
-    });
-
-    if (CONTAINERS.has(node.type)) {
-      const toggle = element.createEl('button', {
-        cls: 'pb-toggle',
-        text: node.__collapsed ? '▸' : '▾',
-        attr: { type: 'button', 'aria-label': node.__collapsed ? 'Expand' : 'Collapse', title: node.__collapsed ? 'Expand' : 'Collapse' },
-      });
-      toggle.addEventListener('click', (event) => {
-        event.stopPropagation();
-        node.__collapsed = !node.__collapsed;
-        this.renderTree();
-      });
+      this.dropTarget = null;
+      this.previewTimer = null;
+      this.previewToken = 0;
+      this.previewComponent = null;
+      this.forceClose = false;
     }
 
-    element.createSpan({ cls: 'pb-chip', text: labels[chip] || chip });
-    element.addEventListener('click', () => {
-      this.selectedId = node.id;
-      this.refreshSelection();
-    });
-    element.addEventListener('dragover', (event) => this.handleDragOver(event, node, element));
-    element.addEventListener('dragleave', (event) => {
-      if (!element.contains(event.relatedTarget)) {
-        element.removeClass('pb-drop-before', 'pb-drop-after', 'pb-drop-inside');
-      }
-    });
-    element.addEventListener('drop', (event) => this.handleDrop(event, node));
-    return element;
-  }
-
-  clearDropStyles() {
-    this.dropTarget = null;
-    this.listEl.querySelectorAll('.pb-row').forEach((row) => {
-      row.removeClass('pb-drop-before', 'pb-drop-after', 'pb-drop-inside');
-    });
-  }
-
-  handleDragOver(event, node, element) {
-    if (!this.dragId || this.dragId === node.id) return;
-    event.preventDefault();
-    if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
-    const rect = element.getBoundingClientRect();
-    const ratio = (event.clientY - rect.top) / Math.max(1, rect.height);
-    let mode = ratio < 0.5 ? 'before' : 'after';
-    if (CONTAINERS.has(node.type) && ratio > 0.3 && ratio < 0.7) mode = 'inside';
-    this.dropTarget = { id: node.id, mode };
-    this.listEl.querySelectorAll('.pb-row').forEach((row) => {
-      row.removeClass('pb-drop-before', 'pb-drop-after', 'pb-drop-inside');
-    });
-    element.addClass('pb-drop-' + mode);
-  }
-
-  handleDrop(event, node) {
-    event.preventDefault();
-    const target = this.dropTarget;
-    this.clearDropStyles();
-    if (!this.dragId || !target) return;
-    this.pushHistory();
-    const movedId = this.dragId;
-    if (!PS.reorder(this.model.nodes, movedId, node.id, target.mode)) return;
-    this.selectedId = movedId;
-    this.dragId = null;
-    this.renderTree();
-    this.schedulePreview();
-  }
-
-  refreshSelection() {
-    this.listEl.querySelectorAll('.pb-row').forEach((element) => {
-      element.toggleClass('pb-selected', element.dataset.id === this.selectedId);
-    });
-  }
-
-  field(parent, node, value, apply, placeholder) {
-    const input = parent.createEl('input', {
-      cls: 'pb-input',
-      attr: { type: 'text', placeholder: placeholder || '' },
-    });
-    input.value = value || '';
-    input.dataset.id = node.id;
-    input.addEventListener('input', () => {
-      apply(input.value);
-      this.schedulePreview();
-    });
-    input.addEventListener('keydown', (event) => this.onKeyDown(event, node));
-    return input;
-  }
-
-  actions(parent, node, extraButtons = []) {
-    const box = parent.createDiv('pb-actions');
-    const button = (label, title, handler) => {
-      const element = box.createEl('button', { text: label, attr: { title, 'aria-label': title } });
-      element.addEventListener('click', (event) => {
-        event.stopPropagation();
-        handler();
-      });
-    };
-    button('↑', 'Move up', () => this.move(node, -1));
-    button('↓', 'Move down', () => this.move(node, 1));
-    button('⇤', 'Outdent', () => this.outdent(node));
-    button('⇥', 'Indent', () => this.indent(node));
-    if (CONTAINERS.has(node.type)) {
-      button('+', 'Add statement inside', () => {
-        this.pushHistory();
-        const child = newNode('state');
-        bodyOf(node).push(child);
-        this.focusId = child.id;
-        this.renderTree();
-        this.schedulePreview();
-      });
-      button('+after', 'Add statement after', () => {
-        this.pushHistory();
-        const info = this.index.get(node.id);
-        if (!info) return;
-        const child = newNode('state');
-        info.array.splice(info.position + 1, 0, child);
-        this.selectedId = child.id;
-        this.focusId = child.id;
-        this.renderTree();
-        this.schedulePreview();
-      });
-    }
-    button('//', 'Trailing comment', () => {
-      this.pushHistory();
-      node.__showComment = !node.__showComment;
-      this.focusCommentId = node.id;
+    onOpen() {
+      this.modalEl.addClass('pb-modal');
+      this.titleEl.setText('Pseudocode Builder');
+      this.buildLayout();
       this.renderTree();
-    });
-    button('⧉', 'Duplicate', () => this.duplicate(node));
-    extraButtons.forEach(([label, title, handler]) => button(label, title, handler));
-    button('✕', 'Delete', () => this.remove(node));
-  }
+      this.renderPreview();
+      this.onKey = (event) => this.handleKey(event);
+      this.modalEl.addEventListener('keydown', this.onKey);
+      // Start typing right away: first field, or the title for a new block.
+      // (Deferred: Modal.open() moves focus after onOpen.)
+      window.setTimeout(() => {
+        const first = this.listEl.querySelector('input.pb-input');
+        (first || this.captionInput).focus();
+      }, 0);
+    }
 
-  // get/set pick which comment a row edits: if and else-if rows keep theirs
-  // on the branch, the else row on node.elseComment.
-  maybeComment(parent, node, get = () => node.comment, set = (value) => { node.comment = value; }) {
-    if (get() == null && !node.__showComment) return;
-    const anchor = parent.querySelector(':scope > .pb-actions');
-    const mount = (element) => {
-      if (anchor) parent.insertBefore(element, anchor);
-      else parent.appendChild(element);
-      return element;
-    };
-    mount(parent.createSpan({ cls: 'pb-word', text: '//' }));
-    const input = mount(parent.createEl('input', {
-      cls: 'pb-input pb-comment-input',
-      attr: { type: 'text', placeholder: 'trailing comment' },
-    }));
-    input.dataset.id = node.id;
-    input.value = get() || '';
-    input.addEventListener('input', () => {
-      set(input.value);
+    onClose() {
+      this.modalEl.removeEventListener('keydown', this.onKey);
+      clearTimeout(this.previewTimer);
+      this.previewToken += 1;
+      if (this.previewComponent) this.previewComponent.unload();
+      this.contentEl.empty();
+    }
+
+    isDirty() {
+      return PS.serializeLatex(this.model) !== this.initialLatex;
+    }
+
+    /** Esc, the close button and clicking outside all land here. */
+    close() {
+      if (this.forceClose || !this.isDirty()) {
+        super.close();
+        return;
+      }
+      new ConfirmModal(this.app, {
+        title: 'Discard changes?',
+        message: 'This pseudocode block has unsaved changes.',
+        choices: [
+          { label: 'Keep editing', run: () => {} },
+          { label: 'Discard', cls: 'mod-warning', run: () => this.closeNow() },
+          { label: 'Save', cls: 'mod-cta', run: () => this.save() },
+        ],
+      }).open();
+    }
+
+    closeNow() {
+      this.forceClose = true;
+      this.close();
+    }
+
+    buildLayout() {
+      const { contentEl } = this;
+      contentEl.empty();
+      contentEl.addClass('pb-content');
+
+      const wrap = contentEl.createDiv('pb-wrap');
+      const left = wrap.createDiv('pb-left');
+      const right = wrap.createDiv('pb-right');
+
+      const captionRow = left.createDiv('pb-caption');
+      captionRow.createSpan({ cls: 'pb-chip', text: 'title' });
+      this.captionInput = captionRow.createEl('input', {
+        cls: 'pb-input',
+        attr: { type: 'text', placeholder: 'Algorithm title (optional)' },
+      });
+      this.captionInput.value = this.model.caption || '';
+      this.captionInput.addEventListener('input', () => {
+        this.beginTyping('caption');
+        this.model.caption = this.captionInput.value;
+        this.schedulePreview();
+      });
+
+      const toolbar = left.createDiv('pb-toolbar');
+      PRIMARY_INSERTS.forEach(([label, type]) => {
+        const button = toolbar.createEl('button', { text: `+ ${label}` });
+        button.addEventListener('click', () => this.insertNode(newNode(type)));
+      });
+      const more = toolbar.createEl('button', { text: 'More…', attr: { 'aria-label': 'More statement types' } });
+      more.addEventListener('click', (event) => {
+        const menu = new Menu();
+        MORE_INSERTS.forEach(([label, type]) => menu.addItem((item) => item.setTitle(label).onClick(() => this.insertNode(newNode(type)))));
+        this.showMenu(menu, event, more);
+      });
+
+      this.listEl = left.createDiv('pb-list');
+      this.listEl.addEventListener('focusin', (event) => {
+        const row = event.target.closest('.pb-row');
+        if (row) this.select(row.dataset.id, row.dataset.slot);
+      });
+
+      this.previewEl = right.createDiv('pb-preview');
+      const details = right.createEl('details', { cls: 'pb-latex' });
+      details.createEl('summary', { text: 'Generated LaTeX' });
+      this.latexEl = details.createEl('pre');
+
+      const footer = contentEl.createDiv('pb-footer');
+      footer.createDiv({
+        cls: 'pb-hints',
+        text: `Enter new line · ${ALT}↑↓ move · ${MOD}[ ${MOD}] indent · ${MOD}/ comment · ${MOD}Z undo · ${MOD}↵ save`,
+      });
+      footer.createEl('button', { text: 'Cancel' }).addEventListener('click', () => this.close());
+      footer.createEl('button', { cls: 'mod-cta', text: 'Save' }).addEventListener('click', () => this.save());
+    }
+
+    showMenu(menu, event, anchor) {
+      if (event && event.type === 'contextmenu') {
+        menu.showAtMouseEvent(event);
+        return;
+      }
+      const rect = anchor.getBoundingClientRect();
+      menu.showAtPosition({ x: rect.left, y: rect.bottom + 2 });
+    }
+
+    /* ---- history ---- */
+
+    snapshot() {
+      return JSON.stringify(this.model);
+    }
+
+    record(before) {
+      this.undoStack.push(before);
+      if (this.undoStack.length > HISTORY_LIMIT) this.undoStack.shift();
+      this.redoStack = [];
+    }
+
+    /** First keystroke of a typing run (per field) becomes one undo step. */
+    beginTyping(key) {
+      if (this.typingKey === key) return;
+      this.record(this.snapshot());
+      this.typingKey = key;
+    }
+
+    /**
+     * Run a structural change. `change` returns false when nothing happened,
+     * so no-op moves don't leave empty undo steps.
+     */
+    mutate(change) {
+      const before = this.snapshot();
+      if (change() === false) return false;
+      this.record(before);
+      this.typingKey = null;
+      this.renderTree();
       this.schedulePreview();
-    });
-  }
+      return true;
+    }
 
-  duplicate(node) {
-    this.pushHistory();
-    const info = this.index.get(node.id);
-    if (!info) return;
-    const copy = cloneNode(node);
-    info.array.splice(info.position + 1, 0, copy);
-    this.selectedId = copy.id;
-    this.renderTree();
-    this.schedulePreview();
-  }
+    restore(from, to) {
+      if (!from.length) return;
+      to.push(this.snapshot());
+      this.model = JSON.parse(from.pop());
+      this.typingKey = null;
+      const active = document.activeElement;
+      if (active && active.dataset && active.dataset.focus) this.pendingFocus = active.dataset.focus;
+      this.captionInput.value = this.model.caption || '';
+      this.renderTree();
+      this.schedulePreview();
+    }
 
-  renderNode(node, depth) {
-    switch (node.type) {
-      case 'if': {
-        node.branches.forEach((branch, branchIndex) => {
-          if (node.__collapsed && branchIndex > 0) return;
-          const element = this.row(node, depth, branchIndex === 0 ? 'if' : 'else if');
-          this.field(element, node, branch.cond, (value) => {
-            branch.cond = mathText(value);
-            branch.condMath = isMathValue(value);
-          }, 'condition, e.g. i == 0');
-          this.actions(element, node, node.elseBody ? [] : [
-            ['+else if', 'Add else-if branch', () => {
-              this.pushHistory();
-              node.branches.push({ cond: '', body: [] });
-              this.renderTree();
-              this.schedulePreview();
-            }],
-            ['+else', 'Add else branch', () => {
-              this.pushHistory();
-              node.elseBody = [];
-              this.renderTree();
-              this.schedulePreview();
-            }],
-            ...(branchIndex > 0 ? [['-branch', 'Remove this branch', () => {
-              this.pushHistory();
-              node.branches.splice(branchIndex, 1);
-              this.renderTree();
-              this.schedulePreview();
-            }]] : []),
-          ]);
-          if (branchIndex === 0) this.maybeComment(element, node);
-          else this.maybeComment(element, node, () => branch.comment, (value) => { branch.comment = value; });
-          if (!node.__collapsed) this.renderNodes(branch.body, depth + 1);
+    undo() {
+      this.restore(this.undoStack, this.redoStack);
+    }
+
+    redo() {
+      this.restore(this.redoStack, this.undoStack);
+    }
+
+    /* ---- keyboard ---- */
+
+    handleKey(event) {
+      const mod = event.metaKey || event.ctrlKey;
+      const key = event.key.toLowerCase();
+      const run = (fn) => {
+        event.preventDefault();
+        event.stopPropagation();
+        fn();
+      };
+
+      if (mod && event.key === 'Enter') return run(() => this.save());
+      if (mod && key === 'z') return run(() => (event.shiftKey ? this.redo() : this.undo()));
+      if (mod && key === 'y') return run(() => this.redo());
+
+      const rowEl = event.target.closest && event.target.closest('.pb-row');
+      const info = rowEl ? this.index.get(rowEl.dataset.id) : null;
+      if (!info) return undefined;
+      const row = { node: info.node, slot: parseSlot(rowEl.dataset.slot), kind: rowEl.dataset.kind };
+
+      if (event.altKey && !mod && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+        return run(() => this.move(row.node, event.key === 'ArrowUp' ? -1 : 1));
+      }
+      if (mod && (event.key === ']' || event.key === '[')) {
+        return run(() => (event.key === ']' ? this.indent(row.node) : this.outdent(row.node)));
+      }
+      if (mod && event.key === '/') return run(() => this.toggleComment(row));
+      if (mod && event.shiftKey && key === 'd') return run(() => this.duplicate(row.node));
+      if (mod && event.shiftKey && key === 'k') return run(() => this.removeRow(row));
+
+      if (event.target.tagName !== 'INPUT') return undefined;
+      if (!mod && !event.altKey && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+        return run(() => this.focusNeighbour(event.target, event.key === 'ArrowUp' ? -1 : 1));
+      }
+      if (event.key === 'Enter' && !event.isComposing) {
+        return run(() => {
+          if (PS.isContainer(row.node) && row.kind !== 'until' && !event.shiftKey) this.addInside(row.node, row.slot);
+          else this.addAfter(row.node);
         });
-        if (node.elseBody && !node.__collapsed) {
-          const element = this.row(node, depth, 'else');
-          this.actions(element, node, [['-else', 'Remove else branch', () => {
-            this.pushHistory();
-            node.elseBody = null;
-            this.renderTree();
-            this.schedulePreview();
-          }]]);
-          this.maybeComment(element, node, () => node.elseComment, (value) => { node.elseComment = value; });
-          this.renderNodes(node.elseBody, depth + 1);
+      }
+      return undefined;
+    }
+
+    focusNeighbour(input, step) {
+      const inputs = Array.from(this.listEl.querySelectorAll('input.pb-input:not(.pb-comment-input)'));
+      const current = input.classList.contains('pb-comment-input')
+        ? inputs.indexOf(input.closest('.pb-row').querySelector('input.pb-input'))
+        : inputs.indexOf(input);
+      const next = inputs[current + step];
+      if (next) {
+        next.focus();
+        next.setSelectionRange(next.value.length, next.value.length);
+      }
+    }
+
+    /* ---- tree rendering ---- */
+
+    buildIndex() {
+      this.index.clear();
+      PS.walk(this.model.nodes, (node, array, index, parent) => {
+        this.index.set(node.id, { node, array, index, parent });
+      });
+    }
+
+    select(id, slot) {
+      this.selected = id ? { id, slot: parseSlot(slot) } : null;
+      this.listEl.querySelectorAll('.pb-row').forEach((element) => {
+        element.toggleClass('pb-selected', !!this.selected
+          && element.dataset.id === this.selected.id
+          && parseSlot(element.dataset.slot) === this.selected.slot);
+      });
+    }
+
+    renderTree() {
+      this.buildIndex();
+      if (this.selected && !this.index.has(this.selected.id)) this.selected = null;
+      const scroll = this.listEl.scrollTop;
+      this.listEl.empty();
+      if (!this.model.nodes.length) {
+        this.listEl.createDiv({ cls: 'pb-empty', text: 'Empty. Add a statement or procedure from the toolbar above.' });
+      }
+      this.renderNodes(this.model.nodes, 0);
+      this.listEl.scrollTop = scroll;
+      if (this.selected) this.select(this.selected.id, this.selected.slot);
+      if (this.pendingFocus) {
+        const key = this.pendingFocus;
+        this.pendingFocus = null;
+        const input = this.listEl.querySelector(`[data-focus="${CSS.escape(key)}"]`);
+        if (input) {
+          input.focus();
+          if (input.select) input.select();
+          input.scrollIntoView({ block: 'nearest' });
         }
-        return;
       }
-      case 'while': {
-        const element = this.row(node, depth, 'while');
-        this.field(element, node, node.cond, (value) => {
-          node.cond = mathText(value);
-          node.condMath = isMathValue(value);
-        }, 'condition, e.g. k > 0');
-        this.actions(element, node);
-        this.maybeComment(element, node);
-        if (!node.__collapsed) this.renderNodes(node.body, depth + 1);
-        return;
-      }
-      case 'for': {
-        if (node.all) {
-          const element = this.row(node, depth, 'for all');
-          this.field(element, node, node.init, (value) => {
-            node.init = mathText(value);
-            node.initMath = isMathValue(value);
-          }, 'variable in set, e.g. x in S');
-          this.actions(element, node);
-          this.maybeComment(element, node);
-          if (!node.__collapsed) this.renderNodes(node.body, depth + 1);
+    }
+
+    renderNodes(nodes, depth) {
+      for (const node of nodes) this.renderNode(node, depth);
+    }
+
+    renderNode(node, depth) {
+      const collapsed = this.collapsed.has(node.id);
+      switch (node.type) {
+        case 'if':
+          node.branches.forEach((branch, index) => {
+            if (collapsed && index > 0) return;
+            this.renderRow({
+              node, depth, slot: index, kind: index === 0 ? 'node' : 'branch',
+              chip: index === 0 ? 'if' : 'else if',
+              target: branch,
+              parts: [field('cond', 'condition, e.g. i == 0')],
+              comment: index === 0 ? { target: node, key: 'comment' } : { target: branch, key: 'comment' },
+            });
+            if (!collapsed) this.renderNodes(branch.body, depth + 1);
+          });
+          if (node.elseBody && !collapsed) {
+            this.renderRow({
+              node, depth, slot: 'else', kind: 'else', chip: 'else', parts: [],
+              comment: { target: node, key: 'elseComment' },
+            });
+            this.renderNodes(node.elseBody, depth + 1);
+          }
           return;
+
+        case 'repeat':
+          this.renderRow({ node, depth, chip: 'repeat', parts: [], comment: { target: node, key: 'comment' } });
+          if (!collapsed) {
+            this.renderNodes(node.body, depth + 1);
+            this.renderRow({
+              node, depth, kind: 'until', slot: 'until', chip: 'until',
+              parts: [field('until', 'condition, e.g. m == 9')],
+              comment: { target: node, key: 'untilComment' },
+            });
+          }
+          return;
+
+        default: {
+          const spec = ROWS[node.type === 'for' && node.all ? 'forall' : node.type] || ROWS.raw;
+          this.renderRow({
+            node, depth, chip: spec.chip, parts: spec.parts,
+            comment: spec.noComment ? null : { target: node, key: 'comment' },
+          });
+          if (PS.isContainer(node) && !collapsed) this.renderNodes(node.body, depth + 1);
         }
-        const element = this.row(node, depth, 'for');
-        this.field(element, node, node.init, (value) => {
-          node.init = mathText(value);
-          node.initMath = isMathValue(value);
-        }, 'start, e.g. j = 2');
-        const direction = element.createEl('select', { cls: 'pb-select' });
-        [['to', 'to'], ['downto', 'downto']].forEach(([value, label]) => {
-          const option = direction.createEl('option', { text: label, value });
-          if ((node.downto ? 'downto' : 'to') === value) option.selected = true;
-        });
-        direction.addEventListener('change', () => {
-          node.downto = direction.value === 'downto';
-          this.schedulePreview();
-        });
-        this.field(element, node, node.bound, (value) => {
-          node.bound = mathText(value);
-          node.boundMath = isMathValue(value);
-        }, 'end, e.g. n');
-        this.actions(element, node);
-        this.maybeComment(element, node);
-        if (!node.__collapsed) this.renderNodes(node.body, depth + 1);
-        return;
-      }
-      case 'repeat': {
-        const head = this.row(node, depth, 'repeat');
-        this.actions(head, node);
-        if (!node.__collapsed) this.renderNodes(node.body, depth + 1);
-        const tail = this.row(node, depth, 'until');
-        this.field(tail, node, node.until, (value) => {
-          node.until = mathText(value);
-          node.untilMath = isMathValue(value);
-        }, 'condition, e.g. m == 9');
-        return;
-      }
-      case 'function': {
-        const element = this.row(node, depth, 'function');
-        const kind = element.createEl('select', { cls: 'pb-select' });
-        ['Function', 'Procedure'].forEach((option) => {
-          const item = kind.createEl('option', { text: option, value: option });
-          if (node.kind === option) item.selected = true;
-        });
-        kind.addEventListener('change', () => {
-          node.kind = kind.value;
-          this.schedulePreview();
-        });
-        this.field(element, node, node.name, (value) => { node.name = value; }, 'name, e.g. PushS1');
-        element.createSpan({ cls: 'pb-word', text: '(' });
-        this.field(element, node, node.args, (value) => {
-          node.args = mathText(value);
-          node.argsMath = isMathValue(value);
-        }, 'args, e.g. A, x');
-        element.createSpan({ cls: 'pb-word', text: ')' });
-        this.actions(element, node);
-        this.maybeComment(element, node);
-        if (!node.__collapsed) this.renderNodes(node.body, depth + 1);
-        return;
-      }
-      case 'call': {
-        const element = this.row(node, depth, 'call');
-        this.field(element, node, node.name, (value) => { node.name = value; }, 'procedure name');
-        element.createSpan({ cls: 'pb-word', text: '(' });
-        this.field(element, node, node.args, (value) => {
-          node.args = mathText(value);
-          node.argsMath = isMathValue(value);
-        }, 'args, e.g. A, i');
-        element.createSpan({ cls: 'pb-word', text: ')' });
-        this.actions(element, node);
-        this.maybeComment(element, node);
-        return;
-      }
-      case 'comment': {
-        const element = this.row(node, depth, '//');
-        this.field(element, node, node.text, (value) => { node.text = value; }, 'comment text');
-        this.actions(element, node);
-        this.maybeComment(element, node);
-        return;
-      }
-      case 'require':
-      case 'ensure': {
-        const element = this.row(node, depth, node.type);
-        this.field(element, node, node.text, (value) => {
-          node.text = mathText(value);
-          node.textMath = isMathValue(value);
-        }, node.type === 'require' ? 'input, e.g. A, n' : 'output, e.g. A is sorted');
-        this.actions(element, node);
-        this.maybeComment(element, node);
-        return;
-      }
-      case 'return':
-      case 'print': {
-        const element = this.row(node, depth, node.type);
-        this.field(element, node, node.text, (value) => {
-          node.text = mathText(value);
-          node.textMath = isMathValue(value);
-        }, 'value (optional)');
-        this.actions(element, node);
-        this.maybeComment(element, node);
-        return;
-      }
-      case 'break':
-      case 'continue': {
-        const element = this.row(node, depth, node.type);
-        this.actions(element, node);
-        this.maybeComment(element, node);
-        return;
-      }
-      case 'raw': {
-        const element = this.row(node, depth, 'raw');
-        this.field(element, node, node.text, (value) => { node.text = value; }, 'unrecognized raw line');
-        this.actions(element, node);
-        this.maybeComment(element, node);
-        return;
-      }
-      default: {
-        const element = this.row(node, depth, 'statement');
-        this.field(element, node, node.text, (value) => {
-          node.text = mathText(value);
-          node.textMath = isMathValue(value);
-        }, 'e.g. S1.top = 0');
-        this.actions(element, node);
-        this.maybeComment(element, node);
       }
     }
-  }
 
-  /* ---- structural operations ---- */
+    /**
+     * One editor row. `target` holds the edited fields (the node, or an if
+     * branch); `slot` says which if segment the row heads.
+     */
+    renderRow({ node, depth, chip, parts, slot, kind = 'node', target = node, comment }) {
+      const element = this.listEl.createDiv('pb-row');
+      element.dataset.id = node.id;
+      element.dataset.kind = kind;
+      if (slot != null) element.dataset.slot = String(slot);
+      element.style.setProperty('--pb-depth', String(depth));
+      const row = { node, slot, kind, comment, element };
 
-  insertNode(node) {
-    this.pushHistory();
-    const selected = this.selectedId ? this.index.get(this.selectedId) : null;
-    if (selected && CONTAINERS.has(selected.node.type)) {
-      bodyOf(selected.node).push(node);
-    } else if (selected) {
-      selected.array.splice(selected.position + 1, 0, node);
-    } else {
-      this.model.nodes.push(node);
-    }
-    this.selectedId = node.id;
-    this.focusId = node.id;
-    this.renderTree();
-    this.schedulePreview();
-  }
-
-  insertSiblingAfter(node) {
-    this.pushHistory();
-    const info = this.index.get(node.id);
-    if (!info) return;
-    const sibling = newNode('state');
-    info.array.splice(info.position + 1, 0, sibling);
-    this.selectedId = sibling.id;
-    this.focusId = sibling.id;
-    this.renderTree();
-    this.schedulePreview();
-  }
-
-  move(node, direction) {
-    this.pushHistory();
-    const info = this.index.get(node.id);
-    if (!info) return;
-    const target = info.position + direction;
-    if (target < 0 || target >= info.array.length) return;
-    const [moved] = info.array.splice(info.position, 1);
-    info.array.splice(target, 0, moved);
-    this.renderTree();
-    this.schedulePreview();
-  }
-
-  indent(node) {
-    this.pushHistory();
-    const info = this.index.get(node.id);
-    if (!info || info.position === 0) return;
-    const previous = info.array[info.position - 1];
-    if (!CONTAINERS.has(previous.type)) return;
-    info.array.splice(info.position, 1);
-    bodyOf(previous).push(node);
-    this.renderTree();
-    this.schedulePreview();
-  }
-
-  outdent(node) {
-    this.pushHistory();
-    const info = this.index.get(node.id);
-    if (!info || !info.owner) return;
-    const ownerInfo = this.index.get(info.owner.id);
-    if (!ownerInfo) return;
-    info.array.splice(info.position, 1);
-    ownerInfo.array.splice(ownerInfo.position + 1, 0, node);
-    this.renderTree();
-    this.schedulePreview();
-  }
-
-  remove(node) {
-    this.pushHistory();
-    const info = this.index.get(node.id);
-    if (!info) return;
-    info.array.splice(info.position, 1);
-    if (this.selectedId === node.id) this.selectedId = null;
-    this.renderTree();
-    this.schedulePreview();
-  }
-
-  onKeyDown(event, node) {
-    if (event.key !== 'Enter') return;
-    event.preventDefault();
-    if (CONTAINERS.has(node.type)) {
-      const child = newNode('state');
-      if (node.type === 'if') node.branches[0].body.push(child);
-      else node.body.push(child);
-      this.selectedId = child.id;
-      this.focusId = child.id;
-      this.renderTree();
-      this.schedulePreview();
-      return;
-    }
-    this.insertSiblingAfter(node);
-  }
-
-  /* ---- preview and saving ---- */
-
-  schedulePreview() {
-    clearTimeout(this.previewTimer);
-    this.previewTimer = setTimeout(() => this.renderPreview(), 220);
-  }
-
-  async renderPreview() {
-    const latex = PS.serializeLatex(this.model);
-    if (this.latexEl) this.latexEl.setText(latex);
-    if (!this.previewEl) return;
-    this.previewEl.empty();
-    try {
-      const ast = PS.parseLatex(PS.serializeLatex(this.model));
-      const block = await PS.renderBlock(this.app, ast, this.settings, this.sourcePath, this.previewComponent);
-      block.style.visibility = 'hidden';
-      this.previewEl.appendChild(block);
-      try {
-        await PS.typesetMath(this.app, block, this.sourcePath, this.previewComponent);
-      } finally {
-        block.style.visibility = '';
-      }
-    } catch (error) {
-      this.previewEl.createDiv({ cls: 'pb-error', text: 'Render failed: ' + error.message });
-    }
-  }
-
-  save() {
-    const missing = [];
-    const scan = (nodes) => {
-      nodes.forEach((node) => {
-        if (node.type === 'function' && !String(node.name || '').trim()) missing.push(node);
-        if (Array.isArray(node.branches)) node.branches.forEach((branch) => scan(branch.body));
-        if (Array.isArray(node.elseBody)) scan(node.elseBody);
-        if (Array.isArray(node.body)) scan(node.body);
+      const handle = element.createEl('span', {
+        cls: 'pb-drag',
+        text: '⠿',
+        attr: { draggable: 'true', 'aria-label': 'Drag to reorder' },
       });
-    };
-    scan(this.model.nodes);
-    if (missing.length) {
-      new Notice('Function name is required');
-      this.selectedId = missing[0].id;
-      this.focusId = missing[0].id;
+      this.bindDrag(handle, element, row);
+
+      const container = PS.isContainer(node) && kind === 'node';
+      if (container) {
+        const collapsed = this.collapsed.has(node.id);
+        const toggle = element.createEl('button', {
+          cls: 'pb-toggle clickable-icon',
+          attr: { type: 'button', 'aria-label': collapsed ? 'Expand' : 'Collapse' },
+        });
+        setIcon(toggle, collapsed ? 'chevron-right' : 'chevron-down');
+        toggle.addEventListener('click', (event) => {
+          event.stopPropagation();
+          if (collapsed) this.collapsed.delete(node.id);
+          else this.collapsed.add(node.id);
+          this.renderTree();
+        });
+      } else {
+        element.createSpan('pb-toggle-spacer');
+      }
+
+      element.createSpan({ cls: `pb-chip pb-chip-${kind === 'node' ? node.type : kind}`, text: chip });
+      const fields = element.createDiv('pb-fields');
+      parts.forEach((part) => this.renderPart(fields, row, target, part));
+      if (comment) this.renderComment(fields, row);
+
+      this.renderActions(element, row);
+      element.addEventListener('click', () => this.select(node.id, slot));
+      element.addEventListener('contextmenu', (event) => {
+        event.preventDefault();
+        this.select(node.id, slot);
+        this.showMenu(this.rowMenu(row), event);
+      });
+      return element;
+    }
+
+    renderPart(parent, row, target, part) {
+      if (typeof part === 'string') {
+        parent.createSpan({ cls: 'pb-word', text: part });
+        return;
+      }
+      if (part.select) {
+        const select = parent.createEl('select', { cls: 'dropdown pb-select' });
+        part.options.forEach(([label, value], index) => {
+          const option = select.createEl('option', { text: label, value: String(index) });
+          if ((target[part.select] || false) === value) option.selected = true;
+        });
+        select.addEventListener('change', () => {
+          this.mutate(() => {
+            target[part.select] = part.options[Number(select.value)][1];
+          });
+        });
+        return;
+      }
+
+      const focusKey = `${row.node.id}:${row.slot != null ? row.slot : ''}:${part.key}`;
+      const input = parent.createEl('input', {
+        cls: 'pb-input',
+        attr: { type: 'text', placeholder: part.placeholder || '', spellcheck: 'false' },
+      });
+      input.value = target[part.key] || '';
+      input.dataset.focus = focusKey;
+      if (part.key === 'name') input.addClass('pb-name');
+      const markTex = () => {
+        const tex = hasTex(input.value);
+        input.toggleClass('pb-tex', tex);
+        input.title = tex ? 'Contains LaTeX; kept as written' : '';
+      };
+      markTex();
+      input.addEventListener('input', () => {
+        this.beginTyping(focusKey);
+        const value = input.value;
+        if (part.math) {
+          target[part.key] = PS.normalizeOperators(value);
+          // Prose read from the source (\State Initialize ...) stays prose.
+          const flag = `${part.key}Math`;
+          if (target[flag] !== false) target[flag] = value.trim() !== '' && !hasCjk(value);
+        } else {
+          target[part.key] = value;
+        }
+        markTex();
+        this.schedulePreview();
+      });
+    }
+
+    commentKey(row) {
+      return `${row.node.id}:${row.comment.key}:${row.slot != null ? row.slot : ''}`;
+    }
+
+    renderComment(parent, row) {
+      const { target, key } = row.comment;
+      const id = this.commentKey(row);
+      if (target[key] == null && !this.openComments.has(id)) return;
+      parent.createSpan({ cls: 'pb-word pb-comment-mark', text: '//' });
+      const input = parent.createEl('input', {
+        cls: 'pb-input pb-comment-input',
+        attr: { type: 'text', placeholder: 'trailing comment', spellcheck: 'false' },
+      });
+      input.value = target[key] || '';
+      input.dataset.focus = `comment:${id}`;
+      input.addEventListener('input', () => {
+        this.beginTyping(input.dataset.focus);
+        target[key] = input.value;
+        this.schedulePreview();
+      });
+    }
+
+    toggleComment(row) {
+      row.comment = row.comment || this.commentAccess(row);
+      if (!row.comment) return; // comment lines have no trailing comment
+      const { target, key } = row.comment;
+      const id = this.commentKey(row);
+      const showing = target[key] != null || this.openComments.has(id);
+      if (showing && !String(target[key] || '').trim()) {
+        this.openComments.delete(id);
+        this.mutate(() => {
+          delete target[key];
+        });
+        return;
+      }
+      this.openComments.add(id);
+      this.pendingFocus = `comment:${id}`;
       this.renderTree();
-      return;
     }
-    const latex = PS.serializeLatex(this.model);
-    try {
-      this.onSave(latex);
-    } catch (error) {
-      new Notice('Save failed: ' + error.message);
-      return;
+
+    /** Comment storage for a row described by node/slot/kind. */
+    commentAccess({ node, slot, kind }) {
+      if (node.type === 'if') {
+        if (kind === 'else') return { target: node, key: 'elseComment' };
+        if (Number.isInteger(slot) && slot > 0) return { target: node.branches[slot], key: 'comment' };
+        return { target: node, key: 'comment' };
+      }
+      if (kind === 'until') return { target: node, key: 'untilComment' };
+      const spec = ROWS[node.type];
+      return spec && spec.noComment ? null : { target: node, key: 'comment' };
     }
-    this.close();
+
+    renderActions(element, row) {
+      const box = element.createDiv('pb-actions');
+      const button = (icon, label, handler) => {
+        const control = box.createEl('button', { cls: 'clickable-icon', attr: { type: 'button', 'aria-label': label } });
+        setIcon(control, icon);
+        control.addEventListener('click', (event) => {
+          event.stopPropagation();
+          handler(event, control);
+        });
+      };
+      if (row.kind !== 'until') {
+        const inside = PS.isContainer(row.node);
+        button('plus', inside ? 'Add statement inside (Enter)' : 'Add statement after (Enter)', () => (
+          inside ? this.addInside(row.node, row.slot) : this.addAfter(row.node)
+        ));
+      }
+      button('more-horizontal', 'More actions', (event, control) => {
+        this.select(row.node.id, row.slot);
+        this.showMenu(this.rowMenu(row), event, control);
+      });
+      if (row.kind !== 'until') {
+        button('x', row.kind === 'branch' ? 'Remove branch' : row.kind === 'else' ? 'Remove else' : 'Delete', () => this.removeRow(row));
+      }
+    }
+
+    rowMenu(row) {
+      const { node, slot, kind } = row;
+      const menu = new Menu();
+      const item = (title, icon, run, hint) => menu.addItem((entry) => {
+        entry.setTitle(hint ? `${title}  ${hint}` : title).setIcon(icon).onClick(run);
+      });
+
+      if (PS.isContainer(node) && kind !== 'until') item('Add statement inside', 'corner-down-right', () => this.addInside(node, slot), '↵');
+      item('Add statement after', 'plus', () => this.addAfter(node), PS.isContainer(node) ? `${SHIFT}↵` : '↵');
+      if (node.type === 'if') {
+        menu.addSeparator();
+        item('Add else-if branch', 'git-branch-plus', () => this.mutate(() => {
+          const at = Number.isInteger(slot) ? slot + 1 : node.branches.length;
+          node.branches.splice(at, 0, { cond: '', body: [] });
+          this.pendingFocus = `${node.id}:${at}:cond`;
+        }));
+        if (!node.elseBody) item('Add else branch', 'git-branch', () => this.addElse(node));
+        if (kind === 'branch') item('Remove this branch', 'minus', () => this.removeRow(row));
+        if (kind === 'else') item('Remove else', 'minus', () => this.removeRow(row));
+      }
+      menu.addSeparator();
+      item('Move up', 'arrow-up', () => this.move(node, -1), `${ALT}↑`);
+      item('Move down', 'arrow-down', () => this.move(node, 1), `${ALT}↓`);
+      item('Indent', 'indent', () => this.indent(node), `${MOD}]`);
+      item('Outdent', 'outdent', () => this.outdent(node), `${MOD}[`);
+      menu.addSeparator();
+      if (this.commentAccess(row)) item('Trailing comment', 'message-square', () => this.toggleComment(row), `${MOD}/`);
+      item('Duplicate', 'copy', () => this.duplicate(node), `${MOD}${SHIFT}D`);
+      item(kind === 'branch' ? 'Remove this branch' : kind === 'else' ? 'Remove else' : 'Delete', 'trash-2', () => this.removeRow(row), `${MOD}${SHIFT}K`);
+      return menu;
+    }
+
+    /* ---- drag and drop ---- */
+
+    bindDrag(handle, element, row) {
+      handle.addEventListener('dragstart', (event) => {
+        this.dragId = row.node.id;
+        if (event.dataTransfer) {
+          event.dataTransfer.effectAllowed = 'move';
+          try { event.dataTransfer.setData('text/plain', row.node.id); } catch (error) { /* ignore */ }
+        }
+        element.addClass('pb-dragging');
+      });
+      handle.addEventListener('dragend', () => {
+        this.dragId = null;
+        element.removeClass('pb-dragging');
+        this.clearDropStyles();
+      });
+      element.addEventListener('dragover', (event) => this.handleDragOver(event, row, element));
+      element.addEventListener('dragleave', (event) => {
+        if (!element.contains(event.relatedTarget)) element.removeClass('pb-drop-before', 'pb-drop-after', 'pb-drop-inside');
+      });
+      element.addEventListener('drop', (event) => this.handleDrop(event, row));
+    }
+
+    clearDropStyles(keepTarget = false) {
+      if (!keepTarget) this.dropTarget = null;
+      this.listEl.querySelectorAll('.pb-row').forEach((element) => {
+        element.removeClass('pb-drop-before', 'pb-drop-after', 'pb-drop-inside');
+      });
+    }
+
+    handleDragOver(event, row, element) {
+      if (!this.dragId || this.dragId === row.node.id) return;
+      event.preventDefault();
+      if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+      const rect = element.getBoundingClientRect();
+      const ratio = (event.clientY - rect.top) / Math.max(1, rect.height);
+      let mode = ratio < 0.5 ? 'before' : 'after';
+      // Branch/else/until rows only accept drops into their own segment.
+      if (row.kind !== 'node') mode = row.kind === 'until' ? 'after' : 'inside';
+      else if (PS.isContainer(row.node) && ratio > 0.3 && ratio < 0.7) mode = 'inside';
+      this.dropTarget = { id: row.node.id, mode, slot: row.slot };
+      this.clearDropStyles(true);
+      element.addClass(`pb-drop-${mode}`);
+    }
+
+    handleDrop(event, row) {
+      event.preventDefault();
+      const target = this.dropTarget;
+      const movedId = this.dragId;
+      this.clearDropStyles();
+      this.dragId = null;
+      if (!movedId || !target || target.id !== row.node.id) return;
+      const slot = target.slot === 'until' ? undefined : target.slot;
+      this.mutate(() => {
+        if (!PS.reorder(this.model.nodes, movedId, row.node.id, target.mode, slot)) return false;
+        this.selected = { id: movedId };
+        return true;
+      });
+    }
+
+    /* ---- structural operations ---- */
+
+    /** Put a new node at the selection: inside a selected container, else after it. */
+    insertNode(node) {
+      const info = this.selected ? this.index.get(this.selected.id) : null;
+      this.mutate(() => {
+        if (info && PS.isContainer(info.node) && this.selected.slot !== 'until') {
+          this.collapsed.delete(info.node.id);
+          PS.slotBody(info.node, this.selected.slot).push(node);
+        } else if (info) {
+          info.array.splice(info.index + 1, 0, node);
+        } else {
+          this.model.nodes.push(node);
+        }
+        this.focusNew(node);
+      });
+    }
+
+    focusNew(node) {
+      this.selected = { id: node.id };
+      const first = {
+        if: '0:cond', while: ':cond', for: ':init', repeat: 'until:until', function: ':name', call: ':name',
+      }[node.type] || ':text';
+      this.pendingFocus = `${node.id}:${first}`;
+    }
+
+    addInside(node, slot) {
+      const child = newNode('state');
+      this.mutate(() => {
+        this.collapsed.delete(node.id);
+        PS.slotBody(node, slot).push(child);
+        this.focusNew(child);
+      });
+    }
+
+    addAfter(node) {
+      const info = this.index.get(node.id);
+      if (!info) return;
+      const sibling = newNode('state');
+      this.mutate(() => {
+        info.array.splice(info.index + 1, 0, sibling);
+        this.focusNew(sibling);
+      });
+    }
+
+    addElse(node) {
+      this.mutate(() => {
+        node.elseBody = [newNode('state')];
+        this.focusNew(node.elseBody[0]);
+      });
+    }
+
+    duplicate(node) {
+      const info = this.index.get(node.id);
+      if (!info) return;
+      this.mutate(() => {
+        const copy = cloneNode(node);
+        info.array.splice(info.index + 1, 0, copy);
+        this.selected = { id: copy.id };
+      });
+    }
+
+    move(node, direction) {
+      const info = this.index.get(node.id);
+      if (!info) return;
+      const target = info.index + direction;
+      if (target < 0 || target >= info.array.length) return;
+      this.keepFocus();
+      this.mutate(() => {
+        const [moved] = info.array.splice(info.index, 1);
+        info.array.splice(target, 0, moved);
+      });
+    }
+
+    indent(node) {
+      const info = this.index.get(node.id);
+      const previous = info && info.index > 0 ? info.array[info.index - 1] : null;
+      if (!previous || !PS.isContainer(previous)) return;
+      this.keepFocus();
+      this.mutate(() => {
+        info.array.splice(info.index, 1);
+        this.collapsed.delete(previous.id);
+        PS.bodyOf(previous).push(node);
+      });
+    }
+
+    outdent(node) {
+      const info = this.index.get(node.id);
+      const owner = info && info.parent ? this.index.get(info.parent.id) : null;
+      if (!owner) return;
+      this.keepFocus();
+      this.mutate(() => {
+        info.array.splice(info.index, 1);
+        owner.array.splice(owner.index + 1, 0, node);
+      });
+    }
+
+    /** Delete a node, or the if segment (else-if / else) a row heads. */
+    removeRow(row) {
+      const { node, slot, kind } = row;
+      if (kind === 'branch') {
+        this.mutate(() => { node.branches.splice(slot, 1); });
+        return;
+      }
+      if (kind === 'else') {
+        this.mutate(() => { node.elseBody = null; });
+        return;
+      }
+      const info = this.index.get(node.id);
+      if (!info) return;
+      // Keep the keyboard flowing: focus the row that takes this one's place.
+      const neighbour = info.array[info.index + 1] || info.array[info.index - 1] || info.parent;
+      this.mutate(() => {
+        info.array.splice(info.index, 1);
+        if (this.selected && this.selected.id === node.id) this.selected = null;
+        if (neighbour) {
+          const input = this.listEl.querySelector(`.pb-row[data-id="${neighbour.id}"] input.pb-input`);
+          if (input) this.pendingFocus = input.dataset.focus;
+        }
+      });
+    }
+
+    keepFocus() {
+      const active = document.activeElement;
+      if (active && active.dataset && active.dataset.focus) this.pendingFocus = active.dataset.focus;
+    }
+
+    /* ---- preview and saving ---- */
+
+    schedulePreview() {
+      clearTimeout(this.previewTimer);
+      this.previewTimer = setTimeout(() => this.renderPreview(), 180);
+    }
+
+    async renderPreview() {
+      const token = ++this.previewToken;
+      const latex = PS.serializeLatex(this.model);
+      this.latexEl.setText(latex);
+      const component = new Component();
+      component.load();
+      const holder = document.createElement('div');
+      try {
+        // Same path as a saved block: LaTeX → AST → DOM.
+        const block = PS.renderBlock(PS.parseLatex(latex), this.settings);
+        holder.appendChild(block);
+        await PS.typesetMath(this.app, block, this.sourcePath, component);
+      } catch (error) {
+        holder.replaceChildren();
+        holder.createDiv({ cls: 'pb-error', text: `Render failed: ${error.message}` });
+      }
+      // A newer render started meanwhile: drop this one.
+      if (token !== this.previewToken) {
+        component.unload();
+        return;
+      }
+      this.previewEl.replaceChildren(...holder.childNodes);
+      if (this.previewComponent) this.previewComponent.unload();
+      this.previewComponent = component;
+    }
+
+    validate() {
+      let problem = null;
+      PS.walk(this.model.nodes, (node) => {
+        if (problem) return;
+        if (node.type === 'function' && !String(node.name || '').trim()) problem = { node, message: 'Procedure name is required' };
+        if (node.type === 'call' && !String(node.name || '').trim()) problem = { node, message: 'Call needs a procedure name' };
+      });
+      return problem;
+    }
+
+    async save() {
+      const problem = this.validate();
+      if (problem) {
+        new Notice(problem.message);
+        this.collapsed.clear();
+        this.selected = { id: problem.node.id };
+        this.pendingFocus = `${problem.node.id}::name`;
+        this.renderTree();
+        return;
+      }
+      if (!this.isDirty()) {
+        this.closeNow();
+        return;
+      }
+      try {
+        await this.onSave(PS.serializeLatex(this.model));
+      } catch (error) {
+        new Notice(`Save failed: ${error.message}`);
+        return;
+      }
+      this.closeNow();
+    }
   }
-}
 
-/* ------------------------------------------------------------------------- *
- * Plugin
- * ------------------------------------------------------------------------- */
+  function parseSlot(value) {
+    if (value == null || value === '') return undefined;
+    return /^\d+$/.test(value) ? Number(value) : value;
+  }
 
-const FENCE_OPEN = /^```\s*pseudo\s*$/;
-const FENCE_CLOSE = /^```\s*$/;
-
-PS.BuilderModal = BuilderModal;
+  PS.BuilderModal = BuilderModal;
+  PS.ConfirmModal = ConfirmModal;
 })(PS);

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the single-file Obsidian plugin from src_new/.
+"""Build the single-file Obsidian plugin from src/.
 
 The plugin is split into four plain scripts that share one module scope:
   core.js    — AST, LaTeX parser, serializer
@@ -11,6 +11,8 @@ Run from this directory:  python3 build.py
 """
 
 import os
+import shutil
+import subprocess
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "src")
@@ -22,13 +24,16 @@ HEADER = """/*
 const {
   Plugin,
   Modal,
+  Menu,
   Notice,
   MarkdownRenderer,
+  MarkdownRenderChild,
   Component,
   MarkdownView,
   TFile,
   PluginSettingTab,
   Setting,
+  setIcon,
 } = require('obsidian');
 
 """
@@ -50,6 +55,11 @@ def main():
         styles = handle.read()
     with open(os.path.join(HERE, "styles.css"), "w", encoding="utf-8") as handle:
         handle.write(styles)
+
+    # Catch syntax errors before Obsidian does.
+    node = shutil.which("node")
+    if node:
+        subprocess.run([node, "--check", os.path.join(HERE, "main.js")], check=True)
 
     print("built main.js and styles.css")
 

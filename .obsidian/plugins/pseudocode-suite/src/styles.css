@@ -1,37 +1,7 @@
-@font-face {
-  font-family: 'CM Pseudocode';
-  font-style: normal;
-  font-weight: normal;
-  font-display: swap;
-  src: url('fonts/cm-regular.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'CM Pseudocode';
-  font-style: italic;
-  font-weight: normal;
-  font-display: swap;
-  src: url('fonts/cm-italic.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'CM Pseudocode';
-  font-style: normal;
-  font-weight: bold;
-  font-display: swap;
-  src: url('fonts/cm-bold.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'CM Pseudocode';
-  font-style: italic;
-  font-weight: bold;
-  font-display: swap;
-  src: url('fonts/cm-bolditalic.ttf') format('truetype');
-}
-
 /* ==========================================================================
  * Pseudocode Suite — flat CLRS-style renderer
+ * The 'CM Pseudocode' @font-face rules are injected by main.js with the
+ * plugin folder's real resource URLs (a relative url() here would not load).
  * ========================================================================== */
 
 .ps-block {
@@ -51,11 +21,24 @@
   line-height: 1.5;
 }
 
+/* Caption: a heading for the whole block, ruled off like a LaTeX float. */
 .ps-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.45em;
+  font-size: 1.12em;
   font-weight: 700;
-  padding-bottom: 0.3em;
-  margin-bottom: 0.4em;
-  border-bottom: 1px solid var(--background-modifier-border);
+  line-height: 1.35;
+  padding-bottom: 0.35em;
+  margin-bottom: 0.55em;
+  border-bottom: 1.5px solid var(--text-faint);
+}
+
+.ps-title-label {
+  font-variant: small-caps;
+  font-variant-caps: small-caps;
+  letter-spacing: 0.04em;
 }
 
 .ps-grid {
@@ -85,6 +68,7 @@
 }
 
 .ps-code {
+  padding-left: calc(var(--ps-indent) * var(--ps-depth, 0));
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -96,6 +80,31 @@
   overflow-wrap: anywhere;
 }
 
+/* Comment-only line: no code cell; starts at the line's indent in the code
+ * column and runs to the right edge. */
+.ps-comment.ps-note {
+  grid-column: 2 / -1;
+  padding-left: calc(var(--ps-indent) * var(--ps-depth, 0));
+}
+
+/* Procedure header: leads its body, with air before each later procedure. */
+.ps-row-function > .ps-code {
+  font-size: 1.14em;
+  line-height: 1.4;
+}
+
+.ps-row-function > .ps-code .ps-fn {
+  letter-spacing: 0.04em;
+}
+
+.ps-row-function:not(:first-child) > * {
+  padding-top: 0.8em;
+}
+
+.ps-row-function + .ps-row > * {
+  padding-top: 0.15em;
+}
+
 /* Narrow panes: comments move under their line instead of squeezing code. */
 @media (max-width: 600px) {
   .ps-grid,
@@ -104,16 +113,11 @@
   }
   .ps-comment {
     grid-column: 2;
-    max-width: none;
     padding-left: calc(var(--ps-indent) * var(--ps-depth, 0));
   }
   .ps-comment:empty {
     display: none;
   }
-}
-
-.ps-builder-preview .ps-comment {
-  max-width: 12em;
 }
 
 .ps-kw {
@@ -127,49 +131,72 @@
   letter-spacing: 0.02em;
 }
 
-.ps-math-error {
+.ps-math-error,
+.ps-error {
   color: var(--text-error);
   font-family: var(--font-monospace);
   font-size: 0.9em;
 }
 
 .ps-error {
-  color: var(--text-error);
-  font-family: var(--font-monospace);
-  font-size: 0.9em;
   padding: 0.5em;
   border: 1px dashed var(--text-error);
   border-radius: 4px;
 }
 
-/* Edit button injected into rendered blocks */
-
-.ps-block.ps-has-btn {
-  position: relative;
-}
+/* Edit button on rendered blocks */
 
 .ps-edit-btn {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: 6px;
+  right: 6px;
   z-index: 4;
-  font-size: 11px;
-  line-height: 1;
-  padding: 3px 8px;
-  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 8px;
+  font-family: var(--font-interface);
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  border-radius: var(--radius-s);
   opacity: 0;
   transition: opacity 0.12s;
   cursor: pointer;
 }
 
-.ps-block:hover .ps-edit-btn {
+.ps-edit-icon {
+  display: inline-flex;
+}
+
+.ps-edit-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.ps-block:hover .ps-edit-btn,
+.ps-edit-btn:focus-visible {
   opacity: 1;
+}
+
+/* Live Preview puts its own </> button in the top-right corner. */
+.markdown-source-view .cm-embed-block .ps-edit-btn {
+  top: -4px;
+  right: 42px;
+}
+
+.is-mobile .ps-edit-btn {
+  opacity: 0.8;
 }
 
 @media print {
   .ps-edit-btn {
     display: none !important;
   }
+}
+
+input.ps-invalid {
+  border-color: var(--text-error);
 }
 
 /* ==========================================================================
@@ -179,13 +206,14 @@
 .modal.pb-modal {
   width: min(1120px, 94vw);
   max-width: 94vw;
-  height: min(760px, 88vh);
+  height: min(780px, 88vh);
 }
 
 .pb-modal .modal-content.pb-content {
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0;
   padding-bottom: 0;
 }
 
@@ -212,42 +240,82 @@
   padding-left: 14px;
 }
 
-.pb-row {
+.pb-caption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pb-caption .pb-input {
+  flex: 1 1 auto;
+  font-family: var(--font-text);
+}
+
+.pb-toolbar {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
   gap: 6px;
-  row-gap: 4px;
-  padding: 2px 4px;
-  border-radius: 4px;
+  margin: 10px 0 6px;
 }
 
-.pb-row:hover {
-  background: var(--background-modifier-hover);
-}
-
-.pb-row.pb-selected {
-  background: var(--background-modifier-hover);
-  box-shadow: inset 2px 0 0 var(--interactive-accent);
-}
-
-.pb-drag,
-.pb-toggle {
-  flex: 0 0 auto;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  color: var(--text-faint);
-  font-size: 13px;
-  line-height: 1;
-  padding: 0 2px;
-  min-width: 16px;
-  height: 20px;
-  user-select: none;
+.pb-toolbar button {
+  font-size: var(--font-ui-smaller);
+  padding: 2px 10px;
+  height: 26px;
   cursor: pointer;
 }
 
+.pb-list {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px 2px 12px;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.pb-empty {
+  padding: 24px 8px;
+  color: var(--text-faint);
+  text-align: center;
+}
+
+/* One row: handle · toggle · chip · fields (grow) · actions (fixed). */
+.pb-row {
+  --pb-depth: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 2px 4px 2px calc(var(--pb-depth) * 18px + 4px);
+  border-radius: var(--radius-s);
+  background-image: repeating-linear-gradient(
+    to right,
+    transparent 0 12px,
+    var(--background-modifier-border) 12px 13px,
+    transparent 13px 18px
+  );
+  background-size: calc(var(--pb-depth) * 18px) 100%;
+  background-repeat: no-repeat;
+  background-position: 4px 0;
+}
+
+.pb-row:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+.pb-row.pb-selected {
+  background-color: var(--background-modifier-hover);
+  box-shadow: inset 2px 0 0 var(--interactive-accent);
+}
+
 .pb-drag {
+  flex: 0 0 auto;
+  width: 14px;
+  color: var(--text-faint);
+  font-size: 13px;
+  line-height: 1;
+  text-align: center;
+  user-select: none;
   cursor: grab;
 }
 
@@ -255,10 +323,17 @@
   cursor: grabbing;
 }
 
-.pb-toggle {
-  width: 16px;
-  color: var(--text-muted);
-  font-size: 11px;
+.pb-toggle,
+.pb-toggle-spacer {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+}
+
+.pb-toggle svg {
+  width: 14px;
+  height: 14px;
 }
 
 .pb-row.pb-dragging {
@@ -280,16 +355,42 @@
 
 .pb-chip {
   flex: 0 0 auto;
-  min-width: 42px;
+  min-width: 52px;
   text-align: center;
   font-family: var(--font-monospace);
   font-size: 11px;
   line-height: 18px;
   padding: 0 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-s);
   background: var(--background-secondary);
   color: var(--text-muted);
   user-select: none;
+}
+
+/* Control flow and procedure heads stand out from plain statements. */
+.pb-chip-if,
+.pb-chip-branch,
+.pb-chip-else,
+.pb-chip-while,
+.pb-chip-for,
+.pb-chip-repeat,
+.pb-chip-until {
+  color: var(--text-accent);
+}
+
+.pb-chip-function {
+  color: var(--text-normal);
+  font-weight: 600;
+}
+
+.pb-fields {
+  flex: 1 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  row-gap: 4px;
+  min-width: 0;
 }
 
 .pb-word {
@@ -299,16 +400,26 @@
 }
 
 .pb-input {
-  flex: 1 1 auto;
-  min-width: 60px;
+  flex: 1 1 6em;
+  min-width: 5em;
+  height: 26px;
   font-family: var(--font-monospace);
   font-size: 13px;
-  height: 26px;
+}
+
+.pb-input.pb-name {
+  flex: 0 1 9em;
+}
+
+/* Raw LaTeX in a field: kept as written. */
+.pb-input.pb-tex {
+  box-shadow: inset 2px 0 0 var(--color-orange);
 }
 
 .pb-comment-input {
-  flex: 0 1 12em;
-  min-width: 8em;
+  flex: 1 1 8em;
+  min-width: 6em;
+  color: var(--text-muted);
 }
 
 .pb-select {
@@ -316,75 +427,50 @@
   font-size: 12px;
 }
 
-.pb-caption .pb-input {
-  font-family: var(--font-text);
-}
-
-.pb-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 10px 0 6px;
-}
-
-.pb-toolbar button {
-  font-size: 12px;
-  padding: 2px 10px;
-  height: 26px;
-  cursor: pointer;
-}
-
-.pb-list {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 4px 2px 12px;
-  border-top: 1px solid var(--background-modifier-border);
-}
-
 .pb-actions {
+  flex: 0 0 auto;
   display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
-  margin-left: auto;
-  opacity: 0;
-  transition: opacity 0.1s;
+  gap: 1px;
+  visibility: hidden;
 }
 
 .pb-row:hover .pb-actions,
-.pb-row.pb-selected .pb-actions {
-  opacity: 1;
+.pb-row.pb-selected .pb-actions,
+.pb-row:focus-within .pb-actions {
+  visibility: visible;
 }
 
-.pb-actions button {
-  height: 20px;
-  min-width: 20px;
-  padding: 0 4px;
-  font-size: 12px;
-  line-height: 1;
-  background: transparent;
-  box-shadow: none;
-  cursor: pointer;
+.pb-actions .clickable-icon {
+  width: 22px;
+  height: 22px;
+  padding: 3px;
 }
 
-.pb-actions button:hover {
-  background: var(--background-modifier-border);
+.pb-actions svg {
+  width: 14px;
+  height: 14px;
 }
 
 .pb-footer {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   gap: 8px;
   padding: 10px 0 4px;
   border-top: 1px solid var(--background-modifier-border);
 }
 
-.ps-builder-preview {
-  padding-top: 4px;
+.pb-hints {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.ps-builder-preview .ps-block {
-  display: block;
+.pb-preview .ps-block {
   margin: 0;
 }
 
@@ -393,14 +479,53 @@
   font-size: 12px;
 }
 
+.pb-latex summary {
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
 .pb-latex pre {
   max-height: 220px;
   overflow: auto;
   white-space: pre-wrap;
   font-size: 11px;
+  user-select: text;
 }
 
 .pb-error {
   color: var(--text-error);
   font-size: 12px;
+}
+
+.modal.pb-confirm {
+  width: min(420px, 90vw);
+}
+
+/* Narrow windows and phones: preview goes under the editor. */
+@media (max-width: 760px) {
+  .modal.pb-modal {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100%;
+  }
+  .pb-wrap {
+    flex-direction: column;
+  }
+  .pb-right {
+    flex: 0 0 auto;
+    max-height: 38%;
+    border-left: none;
+    border-top: 1px solid var(--background-modifier-border);
+    padding: 8px 0 0;
+  }
+  .pb-hints {
+    display: none;
+  }
+  .pb-actions {
+    visibility: visible;
+  }
+}
+
+.is-mobile .pb-actions {
+  visibility: visible;
 }

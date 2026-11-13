@@ -1,17 +1,7 @@
-const fs = require('fs');
-const path = require('path');
-const root = path.join(__dirname, '..');
+const { loadPS, suite } = require('./harness');
 
-const core = fs.readFileSync(path.join(root, 'src/core.js'), 'utf8');
-const render = fs.readFileSync(path.join(root, 'src/render.js'), 'utf8');
-
-const scope = {};
-new Function('module', 'exports', core + '\n;module.exports = PS;')(scope, scope);
-const PS = scope.exports;
-new Function('PS', 'document', 'MarkdownRenderer', render)(PS, { createElement: () => ({ style: {}, classList: { add() {} }, appendChild() {} }) }, { render: async () => {} });
-
-let pass = 0, fail = 0;
-const ok = (cond, name, extra) => { if (cond) pass++; else { fail++; console.log('FAIL', name, extra || ''); } };
+const PS = loadPS();
+const { ok, done } = suite();
 
 function rowsOf(src) { return PS.buildRows(PS.parseLatex(src)); }
 
@@ -74,6 +64,9 @@ ok(g[0].depth === 0 && g[1].depth === 1 && g[2].depth === 2, 'depth increases');
 // 8. comment-only state
 const h = rowsOf(`\\State \\Comment{only}`);
 ok(h[0].number === null && h[0].text === '' && h[0].comment === 'only', 'comment-only line unnumbered');
+ok(h[0].note === true, 'comment-only line is a full-width note');
+const notes = rowsOf('\\For{$j = 2$ to $n$}\n\\State $k = 1$\n\\State \\Comment{why}\n\\EndFor');
+ok(notes[2].note === true && notes[2].depth === 1 && notes[1].note !== true, 'note keeps its indent; code rows are not notes', notes);
 
 // 9. repeat
 const i = rowsOf(`\\Repeat
@@ -148,5 +141,14 @@ const mixed = rowsOf('\\If{$Q.tail = Q.size$ and $Q.head = 1$}\n\\State x\n\\End
 ok((mixed.match(/==/g) || []).length === 2, 'single = in mixed condition shown as ==', mixed);
 ok(rowsOf('\\State \\texttt{alph} $\\gets 0$')[0].text.includes('\\texttt{alph}'), 'texttt kept');
 
-console.log(`\n${pass} passed, ${fail} failed`);
-process.exit(fail ? 1 : 0);
+// Prose read from the source renders as text; builder fields render as math.
+const prose = rowsOf('\\State Initialize the array')[0].text;
+ok(prose === 'Initialize the array', 'prose row is plain text', prose);
+const spaced = PS.parseInline(rowsOf('\\State $\\mathit{exchange}\\ A[i]$')[0].text).find((t) => t.type === 'math');
+ok(spaced && spaced.value.includes('\\ '), 'explicit math spaces survive normalization', spaced);
+const trailing = PS.parseInline('$x and$').find((t) => t.type === 'math');
+ok(trailing && !/\s$/.test(trailing.value), 'math tex trimmed (Obsidian rejects "$x $")', trailing);
+const until = rowsOf('\\Repeat\n\\State x\n\\Until{$x = 1$} \\Comment{why}');
+ok(until[2].comment === 'why' && until[2].text.includes('=='), 'until row: comment and comparison', until[2]);
+
+done();
