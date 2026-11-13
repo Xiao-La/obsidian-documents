@@ -125,13 +125,56 @@ $$
 ## Inference
 
 对于命题逻辑有如下的 **Inference Rules:**
-![[Logic - 逻辑-1.png|433]]
-![[Logic - 逻辑-2.png|432]]
-![[Logic - 逻辑-3.png|434]]
-![[Logic - 逻辑-4.png|436]]
+
+**modus ponens** (*law of detachment*) 肯定前件式
+
+$$\begin{array}{l}p\to q\\p\\\hline \therefore q\end{array}\qquad \text{corresponding tautology: } (p\land(p\to q))\to q$$
+
+**modus tollens** 否定后件式
+
+$$\begin{array}{l}p\to q\\\neg q\\\hline \therefore \neg p\end{array}\qquad \text{corresponding tautology: } (\neg q\land(p\to q))\to\neg p$$
+
+**hypothetical syllogism** 假言三段论
+
+$$\begin{array}{l}p\to q\\q\to r\\\hline \therefore p\to r\end{array}\qquad \text{corresponding tautology: } ((p\to q)\land(q\to r))\to(p\to r)$$
+
+**disjunctive syllogism** 选言三段论
+
+$$\begin{array}{l}p\lor q\\\neg p\\\hline \therefore q\end{array}\qquad \text{corresponding tautology: } (\neg p\land(p\lor q))\to q$$
+
+**Addition**
+
+$$\begin{array}{l}p\\\hline \therefore p\lor q\end{array}\qquad \text{corresponding tautology: } p\to(p\lor q)$$
+
+**Simplification**
+
+$$\begin{array}{l}p\land q\\\hline \therefore p\end{array}\qquad \text{corresponding tautology: } (p\land q)\to p$$
+
+**Conjunction**
+
+$$\begin{array}{l}p\\q\\\hline \therefore p\land q\end{array}\qquad \text{corresponding tautology: } ((p)\land(q))\to(p\land q)$$
+
+**Resolution**
+
+$$\begin{array}{l}\neg p\lor r\\p\lor q\\\hline \therefore q\lor r\end{array}\qquad \text{corresponding tautology: } ((p\lor q)\land(\neg p\lor r))\to(q\lor r)$$
 
 对于一阶逻辑：
-![[Logic - 逻辑-5.png|437]]
+
+- **Universal Instantiation** (UI)
+
+  $$\begin{array}{l}\forall x P(x)\\\hline \therefore P(c)\end{array}$$
+
+- **Universal Generalization** (UG)
+
+  $$\begin{array}{l}P(c)\text{ for an arbitrary }c\\\hline \therefore \forall x P(x)\end{array}$$
+
+- **Existential Instantiation** (EI)
+
+  $$\begin{array}{l}\exists x P(x)\\\hline \therefore P(c)\text{ for some element }c\end{array}$$
+
+- **Existential Generalization** (EG)
+
+  $$\begin{array}{l}P(c)\text{ for some element }c\\\hline \therefore \exists x P(x)\end{array}$$
 
 ## 数学证明（Mathematical Proof）
 
@@ -179,5 +222,18 @@ Proof by Smallest Counterexample 的证明过程，其实就相当于数学归�
 - （Inductive Step）：$P(b)\land P(b+1)\land\dots  \land P(n-1)\to P(n)$ 对所有 $n> b$ 成立，那么 $P(n)$ 对所有 $n\geq b$ 成立。
 
 格式：
-![[Logic and Proofs - 逻辑与证明-1.png|440]]
+
+A *typical* proof by mathematical induction, showing that a statement $P(n)$ is true for all integers $n\ge b$ consists of three steps:
+
+1. We show that $P(b)$ is true. – Base Step
+2. We then, $\forall n>b$, show either
+
+   $(*)\quad P(n-1)\to P(n)$
+
+   or
+
+   $(**)\quad P(b)\land P(b+1)\land\cdots\land P(n-1)\to P(n)$
+
+   We need to make the inductive hypothesis of either $P(n-1)$ or $P(b)\land P(b+1)\land\cdots\land P(n-1)$. We then use $(*)$ or $(**)$ to derive $P(n)$.
+3. We conclude on the basis of the principle of mathematical induction that $P(n)$ is true for all $n\ge b$.
 

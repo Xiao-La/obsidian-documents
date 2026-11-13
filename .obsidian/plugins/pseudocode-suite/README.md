@@ -27,15 +27,26 @@ Homeworks 自用的单文件伪代码插件：**自带 flat 渲染器 + 可视�
 
 ## 书写约定（构建器里）
 
-| 写法 | 渲染 |
-|---|---|
-| `S1.top = 0` | S₁.top = 0（赋值用 `=`） |
-| `i == 0` | i == 0（判等用 `==`） |
-| `l <= A.heap-size and A[l] > A[largest]` | l ≤ A.heap-size ∧ A[l] > A[largest] |
-| `OVERFLOW` | OVERFLOW（全大写常量直立） |
-| `x != 0` | x ≠ 0 |
+| 意图 | 可以这样敲 | 渲染 |
+|---|---|---|
+| 赋值 | `=`、`\gets`、`:=`、`<-`、`←` | `x = 1` |
+| 判等 | `=` 或 `==` | `x == 0`（条件里的单个 `=` 也显示为 `==`） |
+| 不等 | `!=`、`\neq`、`<>` | `x ≠ 0` |
+| 比较 | `<=`、`>=`、`\le`、`\ge` | `≤`、`≥` |
+| 逻辑 | `and`、`or`、`not`、`&&`、`||`（或 `\land`、`\lor`、`\lnot`） | `∧`、`∨`、`¬` |
+| 循环 | 初值 + `to/downto` + 终值 | `for i = 0 to k`、`for j = n downto 1` |
+| 全称循环 | `v in S` | `for all v in S` |
+| 调用 | `+ Call` 节点；条件里可写 `\Call{Name}{$args$}` | `NAME(args)` |
+| 注释 | 行尾 `//` | `// note` |
 
-多字母标识符自动正体、字母后数字自动下标；需要原生 LaTeX 时直接写 `$...$` 或反斜杠命令。
+构建器字段会自动按数学模式排版，不需要自己加 `$...$`；多字母标识符自动正体、字母后数字自动下标。
+
+### 直接手写 LaTeX 块
+
+- 数学要放在 `$...$` 里，例如 `\State $x \gets 0$`；不写 `$` 会被当成普通文本。
+- `\For` 的 `to` / `downto` 可以写普通单词，也可以写 `\To` / `\DownTo`。
+- `\ForAll{$v$ in $S$}` 或 `\ForAll{v in S}` 都可以。
+- 调用写成 `\Call{Name}{$args$}`；注释写成 `\Comment{...}`。
 
 ## 支持的 LaTeX 子集
 
@@ -49,6 +60,8 @@ Homeworks 自用的单文件伪代码插件：**自带 flat 渲染器 + 可视�
 - 文本/数学命令：`\Call`、`\texttt`、`\mathit`、`\mathrm`、`\textbf`、`\gets`、`\le`、`\ge`、`\ne`、`\To`、`\ldots` 等；其余命令按原样保留为 raw 行。
 
 ## 渲染细节
+
+- 伪代码正文固定使用 Computer Modern 衬线字体（字体文件随插件放在 `fonts/`，不依赖主题；GitHub Theme 等无衬线主题下也保持 LaTeX 观感）。
 
 - 过程名用小型大写（`PushS1` → PᴜsʜS1），行内 `\Call` 同样。
 - 全大写常量（OVERFLOW / TRUE / FALSE）按文本直立排版，不进数学斜体。

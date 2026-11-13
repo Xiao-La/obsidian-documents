@@ -152,7 +152,7 @@ class PseudocodeSuitePlugin extends Plugin {
     if (index < 0) index = 0;
     const base = section.lineStart - offsets[0].start;
     const chosen = offsets[index];
-    return { start: base + chosen.start, end: base + chosen.end };
+    return { start: base + chosen.start, end: base + chosen.end, source: source };
   }
 
   addEditButton(block, path, fence) {
@@ -208,13 +208,37 @@ class PseudocodeSuitePlugin extends Plugin {
       if (start < 0) {
         if (FENCE_OPEN.test(line)) start = i;
       } else if (FENCE_CLOSE.test(line)) {
-        offsets.push({ start, end: i });
+        offsets.push({ start, end: i, content: lines.slice(start + 1, i).join('\n') });
         start = -1;
       }
     }
     if (!offsets.length) return [];
     const base = lineStart - offsets[0].start;
-    return offsets.map((fence) => ({ start: base + fence.start, end: base + fence.end }));
+    return offsets.map((fence) => ({
+      start: base + fence.start,
+      end: base + fence.end,
+      source: fence.content,
+    }));
+  }
+
+  locateFence(lines, source, approximate) {
+    const normalize = (value) => String(value || '').replace(/\s+/g, ' ').trim();
+    const wanted = normalize(source);
+    const found = [];
+    let start = -1;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (start < 0) {
+        if (FENCE_OPEN.test(line)) start = i;
+      } else if (FENCE_CLOSE.test(line)) {
+        found.push({ start, end: i, content: lines.slice(start + 1, i).join('\n') });
+        start = -1;
+      }
+    }
+    const matches = found.filter((item) => normalize(item.content) === wanted);
+    if (!matches.length) return null;
+    return matches.reduce((best, item) =>
+      Math.abs(item.start - approximate) < Math.abs(best.start - approximate) ? item : best);
   }
 
   async openAtFence(path, fence) {
@@ -224,24 +248,33 @@ class PseudocodeSuitePlugin extends Plugin {
       return;
     }
     const data = await this.app.vault.read(file);
-    const lines = data.split('\n');
-    if (!FENCE_OPEN.test((lines[fence.start] || '').trim())) {
+    const eol = data.includes('\r\n') ? '\r\n' : '\n';
+    const lines = data.split(/\r?\n/);
+    let located = fence.source ? this.locateFence(lines, fence.source, fence.start) : null;
+    if (!located && Number.isInteger(fence.start) && Number.isInteger(fence.end)
+      && FENCE_OPEN.test((lines[fence.start] || '').trim())
+      && FENCE_CLOSE.test((lines[fence.end] || '').trim())) {
+      located = { start: fence.start, end: fence.end };
+    }
+    if (!located) {
       new Notice('The block moved. Reopen the note and try again.');
       return;
     }
-    const source = lines.slice(fence.start + 1, fence.end).join('\n');
-    const model = PS.parseLatex(source);
+    const blockSource = lines.slice(located.start + 1, located.end).join(eol);
+    const model = PS.parseLatex(blockSource);
     new PS.BuilderModal(this.app, {
       model,
       settings: this.settings,
       sourcePath: path,
       onSave: async (latex) => {
         await this.app.vault.process(file, (content) => {
-          const current = content.split('\n');
-          if (!FENCE_OPEN.test((current[fence.start] || '').trim())) return content;
-          return current.slice(0, fence.start + 1)
-            .concat(latex.split('\n'), current.slice(fence.end))
-            .join('\n');
+          const fileEol = content.includes('\r\n') ? '\r\n' : '\n';
+          const current = content.split(/\r?\n/);
+          const target = this.locateFence(current, blockSource, located.start);
+          if (!target) return content;
+          return current.slice(0, target.start + 1)
+            .concat(latex.split('\n'), current.slice(target.end))
+            .join(fileEol);
         });
         new Notice('Pseudocode updated');
       },

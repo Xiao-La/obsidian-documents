@@ -90,7 +90,16 @@ Scope（作用域）：在公式 $\forall x\alpha$ 或 $\exists x\alpha$ 中，$
 另一种定义方式：解析树中，如果一个叶子节点 $x$ 到根节点的路径中不存在 $\forall x$ 或 $\exists x$，则它是一个自由变元。否则，为约束变元。
 ![[FOL - 一阶逻辑-1.png|323]]
 定义：没有自由变量的公式叫做 **Closed Formula / Sentence**（闭公式/句子）。闭公式的真值不依赖于变量赋值；开放公式在给定阐释和变量赋值后也可以决定真或假。
-对闭公式赋予意义需要对其中非逻辑符号（常量，谓词和函数）做阐释（Interpretation）（对应到定定义域上）。例如：![[FOL - 一阶逻辑-2.png]]
+对闭公式赋予意义需要对其中非逻辑符号（常量，谓词和函数）做阐释（Interpretation）（对应到定义域上）。例如：
+
+Let $f^{(1)}$ and $h^{(2)}$ be function symbols, $P^{(1)}$ and $Q^{(2)}$ be predicate symbols, $a,b,c$ be constant symbols.
+Define an interpretation $\mathcal{I}$ by
+
+- Domain: $D=\{1,2,3\}$
+- Constant: $a^{\mathcal{I}}=1,\ b^{\mathcal{I}}=2,\ c^{\mathcal{I}}=3$
+- Functions: $f^{\mathcal{I}}(1)=2,\ f^{\mathcal{I}}(2)=3,\ f^{\mathcal{I}}(3)=1,\ h^{\mathcal{I}}:(x,y)\mapsto\min\{x,y\}$
+- Predicates: $P^{\mathcal{I}}=\{1,3\},\ Q^{\mathcal{I}}=\{\langle1,2\rangle,\langle3,3\rangle,\langle3,1\rangle\}$
+
 对变量也赋予一个值，就是环境（Environment）。例如：$E(x)=1$ 就是说在环境 $E$ 中， $x=1$。
 定义：在 $\mathcal{I}$ 和 $E$ 中，项 $t$ 的值记为 $t^{(\mathcal{I},E)}$。若它是常量，则为 $c^{\mathcal{I}}$。若它为变量，则为 $x^E$。若为函数，则为迭代的产物。
 有了阐释和环境，原子公式（Atom Formula）的值也就可以确定了：$P(t_{1},\dots,t_{n})^{(\mathcal{I},E)}$。进一步，可迭代定义出任何 wff 的值。
@@ -102,7 +111,20 @@ E(y) & \text{if } y\neq x
 \end{cases}
 $$
 那么定义
-![[FOL - 一阶逻辑-3.png]]
+
+$$
+(\forall x\ \alpha)^{(\mathcal{I},E)}=\begin{cases}
+1 & \text{if } \alpha^{(\mathcal{I},E[x\mapsto d])}=1 \text{ for every } d \text{ in the domain of } \mathcal{I} \\
+0 & \text{otherwise}
+\end{cases}
+$$
+
+$$
+(\exists x\ \alpha)^{(\mathcal{I},E)}=\begin{cases}
+1 & \text{if } \alpha^{(\mathcal{I},E[x\mapsto d])}=1 \text{ for some } d \text{ in the domain of } \mathcal{I} \\
+0 & \text{otherwise}
+\end{cases}
+$$
 
 **逻辑等价：**
 对偶性 （Duality）：

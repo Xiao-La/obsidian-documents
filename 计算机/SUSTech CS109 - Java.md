@@ -214,7 +214,45 @@ String concated1 = "hello" + " world";
 
 可变字符串 `StringBuilder` 的操作效率比较高。
 
-![[CS109 - 4.png]]
+```java
+String string = "goodbye";
+char[] charArray = {'a', 'b', 'c', 'd', 'e', 'f'};
+boolean booleanValue = true;
+char charValue = 'Z';
+int intValue = 7;
+long longValue = 10000000000L;
+float floatValue = 2.5f;
+double doubleValue = 33.3333;
+StringBuilder buffer = new StringBuilder();
+StringBuilder lastBuffer = new StringBuilder("last buffer");
+
+buffer.append(string); buffer.append("\n");
+buffer.append(charArray); buffer.append("\n");
+buffer.append(charArray, 0, 3); buffer.append("\n");
+buffer.append(booleanValue); buffer.append("\n");
+buffer.append(charValue); buffer.append("\n");
+buffer.append(intValue); buffer.append("\n");
+buffer.append(longValue); buffer.append("\n");
+buffer.append(floatValue); buffer.append("\n");
+buffer.append(doubleValue); buffer.append("\n");
+buffer.append(lastBuffer);
+
+System.out.printf("buffer contains:\n%s", buffer.toString());
+```
+
+```
+buffer contains:
+goodbye
+abcdef
+abc
+true
+Z
+7
+10000000000
+2.5
+33.3333
+last buffer
+```
 
 包装类（Wrapper Class）可以将八大基础类型作为对象处理：
 ```java
@@ -383,7 +421,14 @@ Payable p1 = new Alipay();
 ```
 一个类只能继承 `extends`  一个类，但可以实现 ` implements `  很多个接口。
 
-![[CS109 - 5.png]]
+**接口 vs 抽象类**
+
+- 抽象类只能继承**一个**类。接口可以继承**任意数量**的接口
+- 抽象类**可以**继承另一个具体类或抽象类。接口**不能**继承类
+- 在抽象类中，**必须使用** `abstract` 关键字来声明抽象方法。在接口中，声明抽象方法**可以省略** `abstract` 关键字
+- 抽象类**可以有**构造函数。接口**不能有**构造函数
+- 抽象类**可以有** `protected` 和 `public` 的抽象方法。接口**只能有** `public` 的抽象方法
+- 抽象类可以具有**任何访问修饰符**的 `static final` 或 `static` 或 `final` 变量。接口只能具有 `public static final` 常量
 
 
 ## 泛型（Generic Methods）

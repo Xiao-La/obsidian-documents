@@ -129,5 +129,24 @@ ok(authoredModel.nodes[2].body[2].body[1].branches.length === 2 && authoredModel
 ok(PS.serializeLatex(authoredModel).includes('\\Function{Dijkstra}'), 'authored function serialized');
 ok(authoredLatex.includes('\\Comment{final}'), 'authored return comment serialized');
 
+// Comments on block lines, constants inside expressions, prose comments.
+const commented = `\\If{$y \\neq z.right$} \\Comment{is $y$ farther down?}
+\\State $x = y$
+\\Else \\Comment{otherwise climb}
+\\State $y = x.p$
+\\EndIf`;
+const cm = rowsOf(commented);
+ok(cm[0].comment === 'is $y$ farther down?' && !cm[0].text.includes('Comment'), 'if-line comment kept on the if row', cm[0]);
+const cmElse = cm.find((r) => r.text === '\\kw{else}');
+ok(cmElse && cmElse.comment === 'otherwise climb', 'else comment kept, no merge', cm.map((r) => r.text));
+ok(PS.serializeLatex(PS.parseLatex(commented)).includes('\\Else \\Comment{otherwise climb}'), 'else comment serialized');
+const nilRow = rowsOf('\\While{$x \\neq \\text{NIL}$ and $k \\neq x.\\mathit{key}$}\n\\State $x = x.\\mathit{left}$\n\\EndWhile');
+const nilMath = PS.parseInline(nilRow[0].text).filter((t) => t.type === 'math').map((t) => t.value);
+ok(nilMath[0].includes('\\text{NIL}') && nilMath[1].includes('\\mathrm{key}'), 'NIL as text, identifiers upright', nilMath);
+ok(PS.parseInline('$p$ is the value of $ab$', true).some((t) => t.type === 'math' && t.value === 'ab'), 'prose comment math untouched');
+const mixed = rowsOf('\\If{$Q.tail = Q.size$ and $Q.head = 1$}\n\\State x\n\\EndIf')[0].text;
+ok((mixed.match(/==/g) || []).length === 2, 'single = in mixed condition shown as ==', mixed);
+ok(rowsOf('\\State \\texttt{alph} $\\gets 0$')[0].text.includes('\\texttt{alph}'), 'texttt kept');
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

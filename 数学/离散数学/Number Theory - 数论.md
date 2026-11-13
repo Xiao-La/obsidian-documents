@@ -333,7 +333,15 @@ $$
 
 证明：考虑欧几里得算法的步骤：
 
-![[Number Theory - 数论-8.png|349]]
+$$
+\begin{aligned}
+r_0 &= r_1q_1+r_2 &\quad 0\le r_2<r_1,\\
+r_1 &= r_2q_2+r_3 &\quad 0\le r_3<r_2,\\
+&\ \ \vdots & \\
+r_{n-2} &= r_{n-1}q_{n-1}+r_n &\quad 0\le r_n<r_{n-1},\\
+r_{n-1} &= r_nq_n\,.
+\end{aligned}
+$$
 
 那么从最后一步开始往前代入：
 $$
@@ -404,7 +412,15 @@ $$\gcd(a,m)=1=sa+tm\implies sa=1-tm=1\pmod{m}\implies \overline{a}=s$$
 当模逆存在时（$\gcd(a,m)=1$），求解线性同余式，只需要找到 $\overline{a}=s$，其中 $1=sa+tm$。
 
 解的个数：
-![[Number Theory - 数论-9.png|443]]
+
+**Theorem**\* Let $d=\gcd(a,m)$ and $m'=m/d$. The congruence $ax\equiv b\pmod m$ has solutions if and only if $d\mid b$. If $d\mid b$, then there are exactly $d$ solutions. If $x_0$ is a solution, then the other solutions are given by $x_0+m',x_0+2m',\dots,x_0+(d-1)m'$.
+
+**Proof.**
+
+1) "only if": If $x_0$ is a solution, then $ax_0-b=km$. Thus, $ax_0-km=b$. Since $d$ divides $ax_0-km$, we must have $d\mid b$.
+2) "if": Suppose that $d\mid b$. Let $b=kd$. There exist integers $s,t$ such that $d=as+mt$. Multiply both sides by $k$. Then $b=ask+mtk$. Let $x_0=sk$. Then $ax_0\equiv b\pmod m$.
+3) "$\#=d$": $ax_0\equiv b\pmod m$ $ax_1\equiv b\pmod m$ imply that $m\mid a(x_1-x_0)$ and $m'\mid a'(x_1-x_0)$. This implies further that $x_1=x_0+km'$, where $k=0,1,\dots,d-1$.
+
 ### 中国剩余定理（The Chinese Remainder Theorem, CRT）
 
 若 $m_{1},m_{2},\dots,m_{n}$ **两两互素**，那么线性同余方程组
@@ -478,7 +494,25 @@ $$
 ## 总结
 
 
-![[Number Theory - 数论-10.png]]
+- Division, Primes
+
+  $a=dq+r\qquad q=a\ \text{div}\ d\qquad r=a\ \text{mod}\ d$
+
+- Congruence
+
+  $a\equiv b\pmod m$ if $m$ divides $a-b$
+
+- Greatest Common Divisor (GCD)
+
+  (extended) Euclidean algorithm
+  find the modular inverse
+  solve linear congruence $ax\equiv b\pmod m$ ($\gcd(a,m)=1$)
+  Chinese Remainder Theorem / back substitution
+
+- Euler's Theorem / Fermat's Little Theorem
+
+  $x^{\phi(n)}\equiv1\bmod n$ if $\gcd(x,n)=1$
+  $x^{p-1}\equiv1\bmod p$ if $x\not\equiv0\bmod p$
 
 
 ## 应用

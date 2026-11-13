@@ -209,7 +209,16 @@ $$
 - 若 $\Sigma=\varnothing$，则简记为 $\vdash A_{n}$。
 
 例如 (Theorem H1) $A\to A$ 的证明：
-![[Propositional Logic - 命题逻辑-6.png|496]]
+
+| # | 公式 | 规则 |
+| --- | --- | --- |
+| 1 | $\vdash (A\to((A\to A)\to A))\to((A\to(A\to A))\to(A\to A))$ | Axiom 2 |
+| 2 | $\vdash A\to((A\to A)\to A)$ | Axiom 1 |
+| 3 | $\vdash (A\to(A\to A))\to(A\to A)$ | MP 1, 2 |
+| 4 | $\vdash A\to(A\to A)$ | Axiom 1 |
+| 5 | $\vdash A\to A$ | MP 3, 4 |
+
+$\blacksquare$
 
 **（可靠性定理/Soundness）若 $\vdash A$，则 $\vDash A$ 。**
 也就是说，任何 Hilbert 系统证明出来的结论都是永真式。
@@ -225,7 +234,19 @@ $$
 \Sigma\cup \{ A \} \vdash B \text{ iff } \Sigma \vdash A\to B
 $$
 例如 (Theorem H2) $(A\to B)\to((B\to C)\to(A\to C))$ 的证明：
-![[Propositional Logic - 命题逻辑-8.png|516]]
+
+*Proof*
+
+| # | 公式 | 规则 |
+| --- | --- | --- |
+| 1 | $\{A\to B,B\to C,A\}\vdash A$ | Assumption |
+| 2 | $\{A\to B,B\to C,A\}\vdash A\to B$ | Assumption |
+| 3 | $\{A\to B,B\to C,A\}\vdash B$ | MP 1, 2 |
+| 4 | $\{A\to B,B\to C,A\}\vdash B\to C$ | Assumption |
+| 5 | $\{A\to B,B\to C,A\}\vdash C$ | MP 3, 4 |
+| 6 | $\{A\to B,B\to C\}\vdash A\to C$ | Deduction 5 |
+| 7 | $\{A\to B\}\vdash[(B\to C)\to(A\to C)]$ | Deduction 6 |
+| 8 | $\vdash(A\to B)\to[(B\to C)\to(A\to C)]$ | Deduction 7 |
 - Contrapositive Rule:
 $$
 \text{if } \Sigma\vdash \neg B\to \neg A, \text{then } \Sigma\vdash  A\to B
@@ -453,7 +474,18 @@ Theorem: 任何式子 $A\in\text{Form}(\mathscr{L}^p)$ 都可以与  CNF 形式�
   - 另外， $A$ 的真值表与 （not row 2 and not row4）相同，即 $A\equiv \neg(\neg p\land q)\land \neg(p\land q)\equiv(p\lor \neg q)\land(\neg p\lor \neg q)$（CNF）.
 
 将任意式子转化为 DNF/CNF：
-![[Propositional Logic - 命题逻辑-11.png|555]]
+
+1. Remove $\to$ and $\leftrightarrow$
+   - $A\to B\equiv\neg A\lor B$
+   - $A\leftrightarrow B\equiv(\neg A\lor B)\land(A\lor\neg B)$
+   - $A\leftrightarrow B\equiv(A\land B)\lor(\neg A\land\neg B)$
+2. Get rid of all double negations and apply DeMorgan's rules wherever possible.
+   - $\neg\neg A\equiv A$
+   - $\neg(A_1\land\dots\land A_n)\equiv\neg A_1\lor\dots\lor\neg A_n$
+   - $\neg(A_1\lor\dots\lor A_n)\equiv\neg A_1\land\dots\land\neg A_n$
+3. Apply the distributivity rule wherever possible.
+   - $A\land(B_1\lor\dots\lor B_n)\equiv(A\land B_1)\lor\dots\lor(A\land B_n)$
+   - $A\lor(B_1\land\dots\land B_n)\equiv(A\lor B_1)\land\dots\land(A\lor B_n)$
 
 定义 $B$ 为 $A$ 的主合取/析取范式（Principal CNF/DNF）：
 - $B$ 是 $A$ 的 CNF/DNF。
@@ -486,7 +518,14 @@ $$
 - 转换为 CNF $\{ p,q,\neg p\lor \neg q \}$。
 - 变成集合记号 $\{ p \}, \{ q \}, \{ \neg p,\neg q \}$。
 - 应用 Resolution Inference。
-![[Propositional Logic - 命题逻辑-12.png]]
+
+| # | 公式 | 规则 |
+| --- | --- | --- |
+| 1 | $\{p\}$ | Premise |
+| 2 | $\{q\}$ | Premise |
+| 3 | $\{\neg p,\neg q\}$ | Premise |
+| 4 | $\{\neg q\}$ | 1,3 |
+| 5 | $\bot$ | 2,4 |
 
 Resolution Proof System 是可靠且完备的。
 

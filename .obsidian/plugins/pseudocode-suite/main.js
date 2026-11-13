@@ -88,6 +88,28 @@ PS.reorder = function reorder(nodes, dragId, targetId, mode) {
   return true;
 };
 
+/** Normalize LaTeX operators typed in the builder, without touching fonts. */
+PS.normalizeOperators = function normalizeOperators(text) {
+  return String(text == null ? '' : text)
+    .replace(/\\neq\b/g, '!=')
+    .replace(/\\ne\b/g, '!=')
+    .replace(/\\le\b/g, '<=')
+    .replace(/\\ge\b/g, '>=')
+    .replace(/\\gets\b/g, '=')
+    .replace(/:=/g, '=')
+    .replace(/<-|←/g, '=')
+    .replace(/<>/g, '!=')
+    .replace(/&&/g, 'and')
+    .replace(/\|\|/g, 'or')
+    .replace(/\\to\b/g, 'to')
+    .replace(/\\land\b/g, 'and')
+    .replace(/\\lor\b/g, 'or')
+    .replace(/\\lnot\b/g, 'not')
+    .replace(/\\And\b/g, 'and')
+    .replace(/\\Or\b/g, 'or')
+    .replace(/\\Not\b/g, 'not');
+};
+
 /* ------------------------------------------------------------------ */
 /* LaTeX helpers                                                       */
 /* ------------------------------------------------------------------ */
@@ -151,8 +173,14 @@ function fromMath(text) {
   }
   value = value
     .replace(/\\gets\b/g, '=')
+    .replace(/:=/g, '=')
+    .replace(/<-|←/g, '=')
+    .replace(/<>/g, '!=')
+    .replace(/&&/g, 'and')
+    .replace(/\|\|/g, 'or')
     .replace(/\\le\b/g, '<=')
     .replace(/\\ge\b/g, '>=')
+    .replace(/\\neq\b/g, '!=')
     .replace(/\\ne\b/g, '!=')
     .replace(/\\land\b/g, 'and')
     .replace(/\\lor\b/g, 'or')
@@ -163,7 +191,8 @@ function fromMath(text) {
     .replace(/\\To\b/g, 'to')
     .replace(/\\DownTo\b/g, 'downto')
     // innermost font commands first; repeat so nested \mathrm{..\text{..}..} unwraps
-    .replace(/\\text(?:bf|it|tt|rm|sf|up)\{([^{}]*)\}/g, '$1')
+    // \texttt marks code identifiers (CS50 notes); keep it.
+    .replace(/\\text(?:bf|it|rm|sf|up)\{([^{}]*)\}/g, '$1')
     .replace(/\\text\{([^{}]*)\}/g, '$1')
     .replace(/\\mathrm\{([^{}]*)\}/g, '$1')
     .replace(/\\mathrm\{([^{}]*)\}/g, '$1')
@@ -191,6 +220,8 @@ PS.fromMath = fromMath;
 /* ------------------------------------------------------------------ */
 /* Parser                                                              */
 /* ------------------------------------------------------------------ */
+
+const BLOCK_LINES = new Set(['Function', 'Procedure', 'If', 'Elif', 'ElsIf', 'ElseIf', 'Else', 'While', 'For', 'ForAll', 'Repeat']);
 
 const OPENERS = {
   If: (node) => [node.branches[0].body],
@@ -228,7 +259,7 @@ PS.parseLatex = function parseLatex(source) {
   for (const rawLine of lines) {
     const line = rawLine.trim();
     if (!line) continue;
-    if (/^\\(?:begin|end)\{algorithm(?:ic)?\}/.test(line)) continue;
+    if (/^\\(?:[Bb]egin|[Ee]nd)\{algorithm(?:ic)?\}/.test(line)) continue;
     if (/^\\label\{/.test(line)) continue;
 
     const match = line.match(/^\\([A-Za-z]+)([\s\S]*)$/);
@@ -237,7 +268,17 @@ PS.parseLatex = function parseLatex(source) {
       continue;
     }
     const name = match[1];
-    const rest = (match[2] || '').trim();
+    let rest = (match[2] || '').trim();
+    // A trailing \Comment on a block line (\If{...} \Comment{...}) belongs to
+    // that line; split it off before reading the line's own groups.
+    let lineComment = null;
+    if (BLOCK_LINES.has(name)) {
+      const split = splitComment(rest);
+      if (split.comment !== null) {
+        rest = split.body.trim();
+        lineComment = split.comment;
+      }
+    }
     const group = firstGroup(rest);
 
     switch (name) {
@@ -257,6 +298,7 @@ PS.parseLatex = function parseLatex(source) {
           argsMath: args ? isSingleMath(args.value) : false,
           body: [],
         };
+        if (lineComment !== null) node.comment = lineComment;
         push(node);
         stack.push({ target: node.body, node });
         break;
@@ -273,6 +315,7 @@ PS.parseLatex = function parseLatex(source) {
           branches: [{ cond: group ? fromMath(group.value) : '', condMath: group ? isSingleMath(group.value) : false, body: [] }],
           elseBody: null,
         };
+        if (lineComment !== null) node.comment = lineComment;
         push(node);
         stack.push({ target: node.branches[0].body, node });
         break;
@@ -283,6 +326,7 @@ PS.parseLatex = function parseLatex(source) {
         const top = stack[stack.length - 1];
         if (!top.node || top.node.type !== 'if') break;
         const branch = { cond: group ? fromMath(group.value) : '', condMath: group ? isSingleMath(group.value) : false, body: [] };
+        if (lineComment !== null) branch.comment = lineComment;
         top.node.branches.push(branch);
         stack[stack.length - 1] = { target: branch.body, node: top.node };
         break;
@@ -291,6 +335,7 @@ PS.parseLatex = function parseLatex(source) {
         const top = stack[stack.length - 1];
         if (!top.node || top.node.type !== 'if') break;
         top.node.elseBody = [];
+        if (lineComment !== null) top.node.elseComment = lineComment;
         stack[stack.length - 1] = { target: top.node.elseBody, node: top.node };
         break;
       }
@@ -305,6 +350,7 @@ PS.parseLatex = function parseLatex(source) {
           condMath: group ? isSingleMath(group.value) : false,
           body: [],
         };
+        if (lineComment !== null) node.comment = lineComment;
         push(node);
         stack.push({ target: node.body, node });
         break;
@@ -315,22 +361,24 @@ PS.parseLatex = function parseLatex(source) {
 
       case 'ForAll': {
         const content = group ? group.value : '';
+        const clean = fromMath(content).replace(/\$/g, '').trim();
         const node = {
           id: PS.nextId(),
           type: 'for',
           all: true,
-          init: fromMath(content),
-          initMath: isSingleMath(content),
+          init: clean,
+          initMath: false,
           bound: '',
           body: [],
         };
+        if (lineComment !== null) node.comment = lineComment;
         push(node);
         stack.push({ target: node.body, node });
         break;
       }
       case 'For': {
         const content = group ? group.value : '';
-        const parts = content.split(/\\(?:To|DownTo)\b/i);
+        const parts = content.split(/\s*(?:\\To|\\DownTo|\bto\b|\bdownto\b)\s*/i);
         const node = {
           id: PS.nextId(),
           type: 'for',
@@ -341,6 +389,7 @@ PS.parseLatex = function parseLatex(source) {
           downto: /\bDownTo\b/i.test(content),
           body: [],
         };
+        if (lineComment !== null) node.comment = lineComment;
         push(node);
         stack.push({ target: node.body, node });
         break;
@@ -351,6 +400,7 @@ PS.parseLatex = function parseLatex(source) {
 
       case 'Repeat': {
         const node = { id: PS.nextId(), type: 'repeat', body: [], until: '' };
+        if (lineComment !== null) node.comment = lineComment;
         push(node);
         stack.push({ target: node.body, node });
         break;
@@ -472,8 +522,12 @@ function normalizeExpr(expr) {
     .replace(/([A-Za-z])_?(\d+)/g, (all, letter, digits) => digits.length === 1 ? `${letter}_${digits}` : `${letter}_{${digits}}`)
     .replace(/([A-Za-z])-([A-Za-z])/g, '$1\\text{-}$2');
 
-  value = value.replace(/(?<!\\)\b[A-Za-z]{2,}\b/g, (word) =>
-    KEYWORD_WORDS.has(word.toLowerCase()) ? word : `\\mathrm{${word}}`);
+  value = value.replace(/(?<!\\)\b[A-Za-z]{2,}\b/g, (word) => {
+    // Constants (NIL, OVERFLOW) and booleans read as text inside expressions too.
+    if (/^[A-Z]{2,}$/.test(word)) return `\\text{${word}}`;
+    if (/^(true|false)$/i.test(word)) return `\\textbf{${word.toLowerCase()}}`;
+    return KEYWORD_WORDS.has(word.toLowerCase()) ? word : `\\mathrm{${word}}`;
+  });
 
   value = value
     .replace(/\band\b/g, '\\land ')
@@ -544,12 +598,12 @@ function emitNodes(nodes, depth, out) {
         break;
       case 'if':
         node.branches.forEach((branch, index) => {
-          const suffix = index === 0 ? commentSuffix(node) : '';
+          const suffix = commentSuffix(index === 0 ? node : branch);
           out.push(`${pad}${index === 0 ? '\\If{' : '\\Elif{'}${mathOrRaw(branch.cond)}}${suffix}`);
           emitNodes(branch.body, depth + 1, out);
         });
         if (node.elseBody) {
-          out.push(`${pad}\\Else`);
+          out.push(`${pad}\\Else${node.elseComment ? ` \\Comment{${node.elseComment}}` : ''}`);
           emitNodes(node.elseBody, depth + 1, out);
         }
         out.push(`${pad}\\EndIf`);
@@ -560,10 +614,16 @@ function emitNodes(nodes, depth, out) {
         out.push(`${pad}\\EndWhile`);
         break;
       case 'for': {
+        if (node.all) {
+          out.push(`${pad}\\ForAll{${node.init || ''}}${commentSuffix(node)}`);
+          emitNodes(node.body, depth + 1, out);
+          out.push(`${pad}\\EndFor`);
+          break;
+        }
         const head = node.bound
           ? `${mathOrRaw(node.init)} ${node.downto ? '\\DownTo' : '\\To'} ${mathOrRaw(node.bound)}`
           : mathOrRaw(node.init);
-        out.push(`${pad}\\${node.all ? 'ForAll' : 'For'}{${head}}${commentSuffix(node)}`);
+        out.push(`${pad}\\For{${head}}${commentSuffix(node)}`);
         emitNodes(node.body, depth + 1, out);
         out.push(`${pad}\\EndFor`);
         break;
@@ -651,14 +711,47 @@ PS.serializeLatex = function serializeLatex(model) {
     return node;
   }
 
-  const expr = (value, isMath) => {
+  // Font commands already present keep their argument as written.
+  const FONT_GROUP = /\\(?:text|textbf|textit|texttt|textrm|textsf|textup|mathrm|mathit|mathbf|mathsf|mathtt|operatorname)\{[^{}]*\}/g;
+
+  /**
+   * Apply the builder's typesetting rules (PS.normalizeExpr) to a math
+   * fragment: multi-letter identifiers upright, all-caps constants as text,
+   * digits after a letter as subscripts. The parser strips \text/\mathit from
+   * the source, so without this NIL would render as the product N·I·L.
+   */
+  function upright(tex) {
+    const kept = [];
+    const masked = String(tex).replace(FONT_GROUP, (group) => `\u0000${kept.push(group) - 1}\u0001`);
+    return PS.normalizeExpr(masked).replace(/\u0000(\d+)\u0001/g, (all, index) => kept[Number(index)]);
+  }
+
+  const expr = (value, isMath, comparison) => {
     const text = String(value == null ? '' : value);
     if (!text) return '';
     if (isMath && !text.includes('$')) {
       // Constants and booleans are text, not a product of variables.
       if (/^[A-Z]{2,}[A-Z0-9_-]*$/.test(text)) return text;
       if (/^(true|false)$/i.test(text)) return `\\textbf{${text.toLowerCase()}}`;
-      return `$${text}$`;
+      let tex = upright(text)
+        .replace(/:=/g, '=')
+        .replace(/<-|←/g, '=')
+        .replace(/<>/g, '\\ne ')
+        .replace(/&&/g, '\\land ')
+        .replace(/\|\|/g, '\\lor ')
+        .replace(/!=/g, '\\ne ')
+        .replace(/<=/g, '\\le ')
+        .replace(/>=/g, '\\ge ')
+        .replace(/->/g, '\\to ')
+        .replace(/(?<!\\)\b(and|or|not)\b/g, (all, word) => (
+          word === 'and' ? '\\land ' : word === 'or' ? '\\lor ' : '\\lnot '
+        ));
+      if (comparison) tex = tex.replace(/(?<![<>=!:])=(?!=)/g, '==');
+      return `$${tex}$`;
+    }
+    // Conditions mixing text and math ($a = b$ and $c$): `=` still means `==`.
+    if (comparison) {
+      return text.replace(/\$([^$]*)\$/g, (all, inner) => `$${inner.replace(/(?<![<>=!:])=(?!=)/g, '==')}$`);
     }
     return text;
   };
@@ -669,9 +762,21 @@ PS.serializeLatex = function serializeLatex(model) {
     return i;
   }
 
-  function normalizeMath(source) {
-    return String(source)
+  function normalizeMath(source, prose) {
+    const tex = (String(source)
       .replace(/\\gets\b/g, '=')
+      .replace(/:=/g, '=')
+      .replace(/<-|←/g, '=')
+      .replace(/<>/g, '\\ne ')
+      .replace(/&&/g, '\\land ')
+      .replace(/\|\|/g, '\\lor ')
+      .replace(/!=/g, '\\ne ')
+      .replace(/<=/g, '\\le ')
+      .replace(/>=/g, '\\ge ')
+      .replace(/->/g, '\\to ')
+      .replace(/(?<!\\)\b(and|or|not)\b/g, (all, word) => (
+        word === 'and' ? '\\land ' : word === 'or' ? '\\lor ' : '\\lnot '
+      ))
       .replace(/\\And\b/g, '\\land')
       .replace(/\\Or\b/g, '\\lor')
       .replace(/\\Not\b/g, '\\lnot')
@@ -679,14 +784,16 @@ PS.serializeLatex = function serializeLatex(model) {
       .replace(/\\DownTo\b/g, '\\downarrow')
       .replace(/\\textbf\{([^{}]*)\}/g, '\\mathbf{$1}')
       .replace(/\\textit\{([^{}]*)\}/g, '\\mathit{$1}')
-      .replace(/\\text\{([^{}]*)\}/g, '\\text{$1}');
+      .replace(/\\text\{([^{}]*)\}/g, '\\text{$1}'));
+    // Comments are prose: `$ab$` there is a product, not an identifier.
+    return prose ? tex : upright(tex);
   }
 
   /**
    * Split a line into tokens that can be rendered: plain text, math, styled
    * text, calls and keyword/function markers.
    */
-  function parseInline(source) {
+  function parseInline(source, prose) {
     const text = String(source == null ? '' : source);
     const tokens = [];
     let buffer = '';
@@ -710,7 +817,7 @@ PS.serializeLatex = function serializeLatex(model) {
         }
         if (closed) {
           flush();
-          tokens.push({ type: 'math', value: normalizeMath(text.slice(i + 1, j)) });
+          tokens.push({ type: 'math', value: normalizeMath(text.slice(i + 1, j), prose) });
           i = j + 1;
           continue;
         }
@@ -786,8 +893,8 @@ PS.serializeLatex = function serializeLatex(model) {
     return tokens;
   }
 
-  async function renderInline(app, container, source, sourcePath, component) {
-    const tokens = parseInline(source);
+  async function renderInline(app, container, source, sourcePath, component, prose) {
+    const tokens = parseInline(source, prose);
     for (const token of tokens) {
       if (token.type === 'text') {
         container.appendChild(document.createTextNode(token.value));
@@ -797,12 +904,12 @@ PS.serializeLatex = function serializeLatex(model) {
         container.appendChild(el('span', 'ps-fn', token.value));
       } else if (token.type === 'styled') {
         const wrapper = el(token.tag, token.tag === 'span' ? 'ps-styled' : null);
-        await renderInline(app, wrapper, token.value, sourcePath, component);
+        await renderInline(app, wrapper, token.value, sourcePath, component, prose);
         container.appendChild(wrapper);
       } else if (token.type === 'call') {
         container.appendChild(el('span', 'ps-fn', token.name));
         container.appendChild(document.createTextNode('('));
-        await renderInline(app, container, token.args, sourcePath, component);
+        await renderInline(app, container, token.args, sourcePath, component, prose);
         container.appendChild(document.createTextNode(')'));
       } else if (token.type === 'math') {
         const wrapper = el('span', 'ps-math');
@@ -860,14 +967,14 @@ PS.serializeLatex = function serializeLatex(model) {
             rows.push({
               number: ++counter.value,
               depth,
-              text: `\\kw{${index === 0 ? 'if' : 'else if'}} ${expr(branch.cond, branch.condMath)}`,
-              comment: branch.comment || null,
+              text: `\\kw{${index === 0 ? 'if' : 'else if'}} ${expr(branch.cond, branch.condMath, true)}`,
+              comment: (index === 0 ? node.comment || branch.comment : branch.comment) || null,
             });
             buildRows(branch.body || [], depth + 1, counter, rows);
           });
           if (node.elseBody) {
             const only = node.elseBody.length === 1 ? node.elseBody[0] : null;
-            if (only && SIMPLE.has(only.type) && !only.comment) {
+            if (only && SIMPLE.has(only.type) && !only.comment && !node.elseComment) {
               rows.push({
                 number: ++counter.value,
                 depth,
@@ -875,7 +982,7 @@ PS.serializeLatex = function serializeLatex(model) {
                 comment: null,
               });
             } else {
-              rows.push({ number: ++counter.value, depth, text: '\\kw{else}', comment: node.comment || null });
+              rows.push({ number: ++counter.value, depth, text: '\\kw{else}', comment: node.elseComment || null });
               buildRows(node.elseBody, depth + 1, counter, rows);
             }
           }
@@ -883,16 +990,26 @@ PS.serializeLatex = function serializeLatex(model) {
         }
 
         case 'while':
-          rows.push({ number: ++counter.value, depth, text: `\\kw{while} ${expr(node.cond, node.condMath)}`, comment: node.comment || null });
+          rows.push({ number: ++counter.value, depth, text: `\\kw{while} ${expr(node.cond, node.condMath, true)}`, comment: node.comment || null });
           buildRows(node.body || [], depth + 1, counter, rows);
           break;
 
         case 'for': {
+          if (node.all) {
+            const parts = String(node.init || '').split(/\s+in\s+/);
+            // A head already written with text commands (\texttt{child} of
+            // \texttt{u}) is prose; math mode would swallow its spaces.
+            const head = parts.length === 2
+              ? `${expr(parts[0], true)} \\kw{in} ${expr(parts[1], true)}`
+              : expr(node.init, !/\\text(?:tt|rm|sf|up)?\{/.test(node.init || ''));
+            rows.push({ number: ++counter.value, depth, text: `\\kw{for all} ${head}`, comment: node.comment || null });
+            buildRows(node.body || [], depth + 1, counter, rows);
+            break;
+          }
           const head = node.bound
             ? `${expr(node.init, node.initMath)} \\kw{${node.downto ? 'downto' : 'to'}} ${expr(node.bound, node.boundMath)}`
             : expr(node.init, node.initMath);
-          const keyword = node.all ? 'for all' : 'for';
-          rows.push({ number: ++counter.value, depth, text: `\\kw{${keyword}} ${head}`, comment: node.comment || null });
+          rows.push({ number: ++counter.value, depth, text: `\\kw{for} ${head}`, comment: node.comment || null });
           buildRows(node.body || [], depth + 1, counter, rows);
           break;
         }
@@ -900,7 +1017,7 @@ PS.serializeLatex = function serializeLatex(model) {
         case 'repeat':
           rows.push({ number: ++counter.value, depth, text: '\\kw{repeat}', comment: node.comment || null });
           buildRows(node.body || [], depth + 1, counter, rows);
-          rows.push({ number: ++counter.value, depth, text: `\\kw{until} ${expr(node.until, node.untilMath)}`, comment: null });
+          rows.push({ number: ++counter.value, depth, text: `\\kw{until} ${expr(node.until, node.untilMath, true)}`, comment: null });
           break;
 
         case 'state':
@@ -996,6 +1113,7 @@ PS.serializeLatex = function serializeLatex(model) {
 
     for (const row of rows) {
       const rowEl = el('div', 'ps-row');
+      rowEl.style.setProperty('--ps-depth', String(row.depth));
       const numberEl = el('span', 'ps-num', settings.lineNumbers && row.number != null ? String(row.number) : '');
       const codeEl = el('span', 'ps-code');
       codeEl.style.paddingLeft = `calc(var(--ps-indent) * ${row.depth})`;
@@ -1003,7 +1121,7 @@ PS.serializeLatex = function serializeLatex(model) {
       const commentEl = el('span', 'ps-comment');
       if (row.comment) {
         commentEl.appendChild(document.createTextNode(`${settings.commentDelimiter || '//'} `));
-        await renderInline(app, commentEl, row.comment, sourcePath, component);
+        await renderInline(app, commentEl, row.comment, sourcePath, component, true);
       }
       rowEl.appendChild(numberEl);
       rowEl.appendChild(codeEl);
@@ -1023,6 +1141,9 @@ PS.serializeLatex = function serializeLatex(model) {
 ((PS) => {
   const CONTAINERS = new Set(['if', 'while', 'for', 'repeat', 'function']);
   const bodyOf = (node) => PS.bodyOf(node);
+  const isMathValue = (value) => String(value == null ? '' : value).trim() !== ''
+    && !/[\u4e00-\u9fff]/.test(String(value));
+  const mathText = (value) => PS.normalizeOperators(value);
 
   function cloneNode(node) {
     const copy = JSON.parse(JSON.stringify(node, (key, value) => (key === 'id' ? undefined : value)));
@@ -1372,8 +1493,10 @@ class BuilderModal extends Modal {
     button('✕', 'Delete', () => this.remove(node));
   }
 
-  maybeComment(parent, node) {
-    if (node.comment == null && !node.__showComment) return;
+  // get/set pick which comment a row edits: if and else-if rows keep theirs
+  // on the branch, the else row on node.elseComment.
+  maybeComment(parent, node, get = () => node.comment, set = (value) => { node.comment = value; }) {
+    if (get() == null && !node.__showComment) return;
     const anchor = parent.querySelector(':scope > .pb-actions');
     const mount = (element) => {
       if (anchor) parent.insertBefore(element, anchor);
@@ -1386,9 +1509,9 @@ class BuilderModal extends Modal {
       attr: { type: 'text', placeholder: 'trailing comment' },
     }));
     input.dataset.id = node.id;
-    input.value = node.comment || '';
+    input.value = get() || '';
     input.addEventListener('input', () => {
-      node.comment = input.value;
+      set(input.value);
       this.schedulePreview();
     });
   }
@@ -1410,7 +1533,10 @@ class BuilderModal extends Modal {
         node.branches.forEach((branch, branchIndex) => {
           if (node.__collapsed && branchIndex > 0) return;
           const element = this.row(node, depth, branchIndex === 0 ? 'if' : 'else if');
-          this.field(element, node, branch.cond, (value) => { branch.cond = value; }, 'condition, e.g. i == 0');
+          this.field(element, node, branch.cond, (value) => {
+            branch.cond = mathText(value);
+            branch.condMath = isMathValue(value);
+          }, 'condition, e.g. i == 0');
           this.actions(element, node, node.elseBody ? [] : [
             ['+else if', 'Add else-if branch', () => {
               this.pushHistory();
@@ -1431,6 +1557,8 @@ class BuilderModal extends Modal {
               this.schedulePreview();
             }]] : []),
           ]);
+          if (branchIndex === 0) this.maybeComment(element, node);
+          else this.maybeComment(element, node, () => branch.comment, (value) => { branch.comment = value; });
           if (!node.__collapsed) this.renderNodes(branch.body, depth + 1);
         });
         if (node.elseBody && !node.__collapsed) {
@@ -1441,22 +1569,39 @@ class BuilderModal extends Modal {
             this.renderTree();
             this.schedulePreview();
           }]]);
-        this.maybeComment(element, node);
+          this.maybeComment(element, node, () => node.elseComment, (value) => { node.elseComment = value; });
           this.renderNodes(node.elseBody, depth + 1);
         }
         return;
       }
       case 'while': {
         const element = this.row(node, depth, 'while');
-        this.field(element, node, node.cond, (value) => { node.cond = value; }, 'condition, e.g. k > 0');
+        this.field(element, node, node.cond, (value) => {
+          node.cond = mathText(value);
+          node.condMath = isMathValue(value);
+        }, 'condition, e.g. k > 0');
         this.actions(element, node);
         this.maybeComment(element, node);
         if (!node.__collapsed) this.renderNodes(node.body, depth + 1);
         return;
       }
       case 'for': {
+        if (node.all) {
+          const element = this.row(node, depth, 'for all');
+          this.field(element, node, node.init, (value) => {
+            node.init = mathText(value);
+            node.initMath = isMathValue(value);
+          }, 'variable in set, e.g. x in S');
+          this.actions(element, node);
+          this.maybeComment(element, node);
+          if (!node.__collapsed) this.renderNodes(node.body, depth + 1);
+          return;
+        }
         const element = this.row(node, depth, 'for');
-        this.field(element, node, node.init, (value) => { node.init = value; }, 'start, e.g. j = 2');
+        this.field(element, node, node.init, (value) => {
+          node.init = mathText(value);
+          node.initMath = isMathValue(value);
+        }, 'start, e.g. j = 2');
         const direction = element.createEl('select', { cls: 'pb-select' });
         [['to', 'to'], ['downto', 'downto']].forEach(([value, label]) => {
           const option = direction.createEl('option', { text: label, value });
@@ -1466,7 +1611,10 @@ class BuilderModal extends Modal {
           node.downto = direction.value === 'downto';
           this.schedulePreview();
         });
-        this.field(element, node, node.bound, (value) => { node.bound = value; }, 'end, e.g. n');
+        this.field(element, node, node.bound, (value) => {
+          node.bound = mathText(value);
+          node.boundMath = isMathValue(value);
+        }, 'end, e.g. n');
         this.actions(element, node);
         this.maybeComment(element, node);
         if (!node.__collapsed) this.renderNodes(node.body, depth + 1);
@@ -1477,7 +1625,10 @@ class BuilderModal extends Modal {
         this.actions(head, node);
         if (!node.__collapsed) this.renderNodes(node.body, depth + 1);
         const tail = this.row(node, depth, 'until');
-        this.field(tail, node, node.until, (value) => { node.until = value; }, 'condition, e.g. m == 9');
+        this.field(tail, node, node.until, (value) => {
+          node.until = mathText(value);
+          node.untilMath = isMathValue(value);
+        }, 'condition, e.g. m == 9');
         return;
       }
       case 'function': {
@@ -1493,7 +1644,10 @@ class BuilderModal extends Modal {
         });
         this.field(element, node, node.name, (value) => { node.name = value; }, 'name, e.g. PushS1');
         element.createSpan({ cls: 'pb-word', text: '(' });
-        this.field(element, node, node.args, (value) => { node.args = value; }, 'args, e.g. A, x');
+        this.field(element, node, node.args, (value) => {
+          node.args = mathText(value);
+          node.argsMath = isMathValue(value);
+        }, 'args, e.g. A, x');
         element.createSpan({ cls: 'pb-word', text: ')' });
         this.actions(element, node);
         this.maybeComment(element, node);
@@ -1504,7 +1658,10 @@ class BuilderModal extends Modal {
         const element = this.row(node, depth, 'call');
         this.field(element, node, node.name, (value) => { node.name = value; }, 'procedure name');
         element.createSpan({ cls: 'pb-word', text: '(' });
-        this.field(element, node, node.args, (value) => { node.args = value; }, 'args, e.g. A, i');
+        this.field(element, node, node.args, (value) => {
+          node.args = mathText(value);
+          node.argsMath = isMathValue(value);
+        }, 'args, e.g. A, i');
         element.createSpan({ cls: 'pb-word', text: ')' });
         this.actions(element, node);
         this.maybeComment(element, node);
@@ -1520,7 +1677,10 @@ class BuilderModal extends Modal {
       case 'require':
       case 'ensure': {
         const element = this.row(node, depth, node.type);
-        this.field(element, node, node.text, (value) => { node.text = value; }, node.type === 'require' ? 'input, e.g. A, n' : 'output, e.g. A is sorted');
+        this.field(element, node, node.text, (value) => {
+          node.text = mathText(value);
+          node.textMath = isMathValue(value);
+        }, node.type === 'require' ? 'input, e.g. A, n' : 'output, e.g. A is sorted');
         this.actions(element, node);
         this.maybeComment(element, node);
         return;
@@ -1528,7 +1688,10 @@ class BuilderModal extends Modal {
       case 'return':
       case 'print': {
         const element = this.row(node, depth, node.type);
-        this.field(element, node, node.text, (value) => { node.text = value; }, 'value (optional)');
+        this.field(element, node, node.text, (value) => {
+          node.text = mathText(value);
+          node.textMath = isMathValue(value);
+        }, 'value (optional)');
         this.actions(element, node);
         this.maybeComment(element, node);
         return;
@@ -1549,7 +1712,10 @@ class BuilderModal extends Modal {
       }
       default: {
         const element = this.row(node, depth, 'statement');
-        this.field(element, node, node.text, (value) => { node.text = value; }, 'e.g. S1.top = 0');
+        this.field(element, node, node.text, (value) => {
+          node.text = mathText(value);
+          node.textMath = isMathValue(value);
+        }, 'e.g. S1.top = 0');
         this.actions(element, node);
         this.maybeComment(element, node);
       }
@@ -1868,7 +2034,7 @@ class PseudocodeSuitePlugin extends Plugin {
     if (index < 0) index = 0;
     const base = section.lineStart - offsets[0].start;
     const chosen = offsets[index];
-    return { start: base + chosen.start, end: base + chosen.end };
+    return { start: base + chosen.start, end: base + chosen.end, source: source };
   }
 
   addEditButton(block, path, fence) {
@@ -1924,13 +2090,37 @@ class PseudocodeSuitePlugin extends Plugin {
       if (start < 0) {
         if (FENCE_OPEN.test(line)) start = i;
       } else if (FENCE_CLOSE.test(line)) {
-        offsets.push({ start, end: i });
+        offsets.push({ start, end: i, content: lines.slice(start + 1, i).join('\n') });
         start = -1;
       }
     }
     if (!offsets.length) return [];
     const base = lineStart - offsets[0].start;
-    return offsets.map((fence) => ({ start: base + fence.start, end: base + fence.end }));
+    return offsets.map((fence) => ({
+      start: base + fence.start,
+      end: base + fence.end,
+      source: fence.content,
+    }));
+  }
+
+  locateFence(lines, source, approximate) {
+    const normalize = (value) => String(value || '').replace(/\s+/g, ' ').trim();
+    const wanted = normalize(source);
+    const found = [];
+    let start = -1;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (start < 0) {
+        if (FENCE_OPEN.test(line)) start = i;
+      } else if (FENCE_CLOSE.test(line)) {
+        found.push({ start, end: i, content: lines.slice(start + 1, i).join('\n') });
+        start = -1;
+      }
+    }
+    const matches = found.filter((item) => normalize(item.content) === wanted);
+    if (!matches.length) return null;
+    return matches.reduce((best, item) =>
+      Math.abs(item.start - approximate) < Math.abs(best.start - approximate) ? item : best);
   }
 
   async openAtFence(path, fence) {
@@ -1940,24 +2130,33 @@ class PseudocodeSuitePlugin extends Plugin {
       return;
     }
     const data = await this.app.vault.read(file);
-    const lines = data.split('\n');
-    if (!FENCE_OPEN.test((lines[fence.start] || '').trim())) {
+    const eol = data.includes('\r\n') ? '\r\n' : '\n';
+    const lines = data.split(/\r?\n/);
+    let located = fence.source ? this.locateFence(lines, fence.source, fence.start) : null;
+    if (!located && Number.isInteger(fence.start) && Number.isInteger(fence.end)
+      && FENCE_OPEN.test((lines[fence.start] || '').trim())
+      && FENCE_CLOSE.test((lines[fence.end] || '').trim())) {
+      located = { start: fence.start, end: fence.end };
+    }
+    if (!located) {
       new Notice('The block moved. Reopen the note and try again.');
       return;
     }
-    const source = lines.slice(fence.start + 1, fence.end).join('\n');
-    const model = PS.parseLatex(source);
+    const blockSource = lines.slice(located.start + 1, located.end).join(eol);
+    const model = PS.parseLatex(blockSource);
     new PS.BuilderModal(this.app, {
       model,
       settings: this.settings,
       sourcePath: path,
       onSave: async (latex) => {
         await this.app.vault.process(file, (content) => {
-          const current = content.split('\n');
-          if (!FENCE_OPEN.test((current[fence.start] || '').trim())) return content;
-          return current.slice(0, fence.start + 1)
-            .concat(latex.split('\n'), current.slice(fence.end))
-            .join('\n');
+          const fileEol = content.includes('\r\n') ? '\r\n' : '\n';
+          const current = content.split(/\r?\n/);
+          const target = this.locateFence(current, blockSource, located.start);
+          if (!target) return content;
+          return current.slice(0, target.start + 1)
+            .concat(latex.split('\n'), current.slice(target.end))
+            .join(fileEol);
         });
         new Notice('Pseudocode updated');
       },

@@ -2,6 +2,9 @@
 ((PS) => {
   const CONTAINERS = new Set(['if', 'while', 'for', 'repeat', 'function']);
   const bodyOf = (node) => PS.bodyOf(node);
+  const isMathValue = (value) => String(value == null ? '' : value).trim() !== ''
+    && !/[\u4e00-\u9fff]/.test(String(value));
+  const mathText = (value) => PS.normalizeOperators(value);
 
   function cloneNode(node) {
     const copy = JSON.parse(JSON.stringify(node, (key, value) => (key === 'id' ? undefined : value)));
@@ -351,8 +354,10 @@ class BuilderModal extends Modal {
     button('✕', 'Delete', () => this.remove(node));
   }
 
-  maybeComment(parent, node) {
-    if (node.comment == null && !node.__showComment) return;
+  // get/set pick which comment a row edits: if and else-if rows keep theirs
+  // on the branch, the else row on node.elseComment.
+  maybeComment(parent, node, get = () => node.comment, set = (value) => { node.comment = value; }) {
+    if (get() == null && !node.__showComment) return;
     const anchor = parent.querySelector(':scope > .pb-actions');
     const mount = (element) => {
       if (anchor) parent.insertBefore(element, anchor);
@@ -365,9 +370,9 @@ class BuilderModal extends Modal {
       attr: { type: 'text', placeholder: 'trailing comment' },
     }));
     input.dataset.id = node.id;
-    input.value = node.comment || '';
+    input.value = get() || '';
     input.addEventListener('input', () => {
-      node.comment = input.value;
+      set(input.value);
       this.schedulePreview();
     });
   }
@@ -389,7 +394,10 @@ class BuilderModal extends Modal {
         node.branches.forEach((branch, branchIndex) => {
           if (node.__collapsed && branchIndex > 0) return;
           const element = this.row(node, depth, branchIndex === 0 ? 'if' : 'else if');
-          this.field(element, node, branch.cond, (value) => { branch.cond = value; }, 'condition, e.g. i == 0');
+          this.field(element, node, branch.cond, (value) => {
+            branch.cond = mathText(value);
+            branch.condMath = isMathValue(value);
+          }, 'condition, e.g. i == 0');
           this.actions(element, node, node.elseBody ? [] : [
             ['+else if', 'Add else-if branch', () => {
               this.pushHistory();
@@ -410,6 +418,8 @@ class BuilderModal extends Modal {
               this.schedulePreview();
             }]] : []),
           ]);
+          if (branchIndex === 0) this.maybeComment(element, node);
+          else this.maybeComment(element, node, () => branch.comment, (value) => { branch.comment = value; });
           if (!node.__collapsed) this.renderNodes(branch.body, depth + 1);
         });
         if (node.elseBody && !node.__collapsed) {
@@ -420,22 +430,39 @@ class BuilderModal extends Modal {
             this.renderTree();
             this.schedulePreview();
           }]]);
-        this.maybeComment(element, node);
+          this.maybeComment(element, node, () => node.elseComment, (value) => { node.elseComment = value; });
           this.renderNodes(node.elseBody, depth + 1);
         }
         return;
       }
       case 'while': {
         const element = this.row(node, depth, 'while');
-        this.field(element, node, node.cond, (value) => { node.cond = value; }, 'condition, e.g. k > 0');
+        this.field(element, node, node.cond, (value) => {
+          node.cond = mathText(value);
+          node.condMath = isMathValue(value);
+        }, 'condition, e.g. k > 0');
         this.actions(element, node);
         this.maybeComment(element, node);
         if (!node.__collapsed) this.renderNodes(node.body, depth + 1);
         return;
       }
       case 'for': {
+        if (node.all) {
+          const element = this.row(node, depth, 'for all');
+          this.field(element, node, node.init, (value) => {
+            node.init = mathText(value);
+            node.initMath = isMathValue(value);
+          }, 'variable in set, e.g. x in S');
+          this.actions(element, node);
+          this.maybeComment(element, node);
+          if (!node.__collapsed) this.renderNodes(node.body, depth + 1);
+          return;
+        }
         const element = this.row(node, depth, 'for');
-        this.field(element, node, node.init, (value) => { node.init = value; }, 'start, e.g. j = 2');
+        this.field(element, node, node.init, (value) => {
+          node.init = mathText(value);
+          node.initMath = isMathValue(value);
+        }, 'start, e.g. j = 2');
         const direction = element.createEl('select', { cls: 'pb-select' });
         [['to', 'to'], ['downto', 'downto']].forEach(([value, label]) => {
           const option = direction.createEl('option', { text: label, value });
@@ -445,7 +472,10 @@ class BuilderModal extends Modal {
           node.downto = direction.value === 'downto';
           this.schedulePreview();
         });
-        this.field(element, node, node.bound, (value) => { node.bound = value; }, 'end, e.g. n');
+        this.field(element, node, node.bound, (value) => {
+          node.bound = mathText(value);
+          node.boundMath = isMathValue(value);
+        }, 'end, e.g. n');
         this.actions(element, node);
         this.maybeComment(element, node);
         if (!node.__collapsed) this.renderNodes(node.body, depth + 1);
@@ -456,7 +486,10 @@ class BuilderModal extends Modal {
         this.actions(head, node);
         if (!node.__collapsed) this.renderNodes(node.body, depth + 1);
         const tail = this.row(node, depth, 'until');
-        this.field(tail, node, node.until, (value) => { node.until = value; }, 'condition, e.g. m == 9');
+        this.field(tail, node, node.until, (value) => {
+          node.until = mathText(value);
+          node.untilMath = isMathValue(value);
+        }, 'condition, e.g. m == 9');
         return;
       }
       case 'function': {
@@ -472,7 +505,10 @@ class BuilderModal extends Modal {
         });
         this.field(element, node, node.name, (value) => { node.name = value; }, 'name, e.g. PushS1');
         element.createSpan({ cls: 'pb-word', text: '(' });
-        this.field(element, node, node.args, (value) => { node.args = value; }, 'args, e.g. A, x');
+        this.field(element, node, node.args, (value) => {
+          node.args = mathText(value);
+          node.argsMath = isMathValue(value);
+        }, 'args, e.g. A, x');
         element.createSpan({ cls: 'pb-word', text: ')' });
         this.actions(element, node);
         this.maybeComment(element, node);
@@ -483,7 +519,10 @@ class BuilderModal extends Modal {
         const element = this.row(node, depth, 'call');
         this.field(element, node, node.name, (value) => { node.name = value; }, 'procedure name');
         element.createSpan({ cls: 'pb-word', text: '(' });
-        this.field(element, node, node.args, (value) => { node.args = value; }, 'args, e.g. A, i');
+        this.field(element, node, node.args, (value) => {
+          node.args = mathText(value);
+          node.argsMath = isMathValue(value);
+        }, 'args, e.g. A, i');
         element.createSpan({ cls: 'pb-word', text: ')' });
         this.actions(element, node);
         this.maybeComment(element, node);
@@ -499,7 +538,10 @@ class BuilderModal extends Modal {
       case 'require':
       case 'ensure': {
         const element = this.row(node, depth, node.type);
-        this.field(element, node, node.text, (value) => { node.text = value; }, node.type === 'require' ? 'input, e.g. A, n' : 'output, e.g. A is sorted');
+        this.field(element, node, node.text, (value) => {
+          node.text = mathText(value);
+          node.textMath = isMathValue(value);
+        }, node.type === 'require' ? 'input, e.g. A, n' : 'output, e.g. A is sorted');
         this.actions(element, node);
         this.maybeComment(element, node);
         return;
@@ -507,7 +549,10 @@ class BuilderModal extends Modal {
       case 'return':
       case 'print': {
         const element = this.row(node, depth, node.type);
-        this.field(element, node, node.text, (value) => { node.text = value; }, 'value (optional)');
+        this.field(element, node, node.text, (value) => {
+          node.text = mathText(value);
+          node.textMath = isMathValue(value);
+        }, 'value (optional)');
         this.actions(element, node);
         this.maybeComment(element, node);
         return;
@@ -528,7 +573,10 @@ class BuilderModal extends Modal {
       }
       default: {
         const element = this.row(node, depth, 'statement');
-        this.field(element, node, node.text, (value) => { node.text = value; }, 'e.g. S1.top = 0');
+        this.field(element, node, node.text, (value) => {
+          node.text = mathText(value);
+          node.textMath = isMathValue(value);
+        }, 'e.g. S1.top = 0');
         this.actions(element, node);
         this.maybeComment(element, node);
       }

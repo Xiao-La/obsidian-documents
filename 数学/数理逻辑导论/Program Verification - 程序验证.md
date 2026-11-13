@@ -42,14 +42,27 @@ $$
 ### Axioms and Rules
 
 要验证一个程序，需要构造一个证明序列：
-![[Program Verification - 程序验证-1.png|416]]
+$$
+\begin{array}{ll}
+(\!\lvert \phi_0\rvert\!) &  \\
+C_1; &  \\
+\quad (\!\lvert \phi_1\rvert\!) & \texttt{justification} \\
+C_2; &  \\
+\quad\vdots &  \\
+\quad (\!\lvert \phi_{n-1}\rvert\!) & \texttt{justification} \\
+C_n; &  \\
+\quad (\!\lvert \phi_n\rvert\!) & \texttt{justification}
+\end{array}
+$$
 （Axiom）
 - Assignment： $$
 \dfrac{}{(\!\lvert   Q[E/x] \rvert \!) \; x=E \; (\!\lvert  Q(x) \rvert \!)}
 $$
 也就是，若要再执行赋值 `x=E` 后 $Q(x)$ 成立，则原来把 $Q$ 中的 $x$ 替换为 $E$ 一定成立。
 例如，在图中 $\phi$ 应该是 $x+1>0\land y>0$。
-![[Program Verification - 程序验证-2.png]]
+$$
+(\!\lvert \phi\rvert\!)\ x=x+1\ (\!\lvert x>0\land y>0\rvert\!)
+$$
 
 （Implied Rule）
 - Precondition Strengthening
@@ -73,7 +86,21 @@ $$
     (\!\lvert  P \rvert \!) \text{ if } B \; \{C_1\} \text{ else } \{C_2\} \; (\!\lvert  Q \rvert \!)
 }
 $$
-![[Program Verification - 程序验证-3.png|559]]
+$$
+\begin{array}{ll}
+(\!\lvert P\rvert\!) &  \\
+\texttt{if ( }B\texttt{ ) \{} &  \\
+\quad (\!\lvert (P\land B)\rvert\!) & \text{if-then-else} \\
+\quad C_1 &  \\
+\quad (\!\lvert Q\rvert\!) & \textit{(justify depending on }C_1\textit{—a “subproof”)} \\
+\texttt{\} else \{} &  \\
+\quad (\!\lvert (P\land(\neg B))\rvert\!) & \text{if-then-else} \\
+\quad C_2 &  \\
+\quad (\!\lvert Q\rvert\!) & \textit{(justify depending on }C_2\textit{—a “subproof”)} \\
+\texttt{\}} &  \\
+(\!\lvert Q\rvert\!) & \text{if-then-else }\textit{[justifies this }Q\textit{, given previous two]}
+\end{array}
+$$
 
 **Loop Invariant（循环不变式）**：在循环中始终成立。
 - Partial-While：
@@ -85,6 +112,25 @@ $$
 }
 $$
 这里 $I$ 就是一个 Loop Invariant。需要合适地选取一个循环不变式，用来完成我们的证明。
-![[Program Verification - 程序验证-4.png|487]]
+$$
+\begin{array}{ll}
+(\!\lvert x\ge 0\rvert\!) &  \\
+(\!\lvert 1=0!\rvert\!) & \text{implied (a)} \\
+\texttt{y = 1 ;} &  \\
+(\!\lvert y=0!\rvert\!) & \text{assignment} \\
+\texttt{z = 0 ;} &  \\
+(\!\lvert y=z!\rvert\!) & \text{assignment} \\
+\texttt{while (z != x) \{} &  \\
+\quad (\!\lvert (y=z!)\land\neg(z=x)\rvert\!) & \text{partial-while} \\
+\quad (\!\lvert y(z+1)=(z+1)!\rvert\!) & \text{implied (b)} \\
+\quad \texttt{z = z + 1 ;} &  \\
+\quad (\!\lvert yz=z!\rvert\!) & \text{assignment} \\
+\quad \texttt{y = y * z ;} &  \\
+\quad (\!\lvert y=z!\rvert\!) & \text{assignment} \\
+\texttt{\}} &  \\
+(\!\lvert y=z!\land(z=x)\rvert\!) & \text{partial-while} \\
+(\!\lvert y=x!\rvert\!) & \text{implied (c)}
+\end{array}
+$$
 
 

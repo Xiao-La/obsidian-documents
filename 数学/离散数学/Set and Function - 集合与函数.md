@@ -68,9 +68,20 @@ $$
 
 定义 **Disjoint**：两个集合无交。
 集合恒等式：
-![[Set Theory - 集合论.png|298]]
-![[Set Theory - 集合论-1.png|299]]
-![[Set Theory - 集合论-2.png|302]]
+
+| 名称 | 恒等式 |
+| --- | --- |
+| Identity laws | $A\cup\emptyset=A$<br>$A\cap U=A$ |
+| Domination laws | $A\cup U=U$<br>$A\cap\emptyset=\emptyset$ |
+| Idempotent laws | $A\cup A=A$<br>$A\cap A=A$ |
+| Complementation laws | $\overline{\overline{A}}=A$ |
+| Commutative laws | $A\cup B=B\cup A$<br>$A\cap B=B\cap A$ |
+| Associative laws | $A\cup(B\cup C)=(A\cup B)\cup C$<br>$A\cap(B\cap C)=(A\cap B)\cap C$ |
+| Distributive laws | $A\cup(B\cap C)=(A\cup B)\cap(A\cup C)$<br>$A\cap(B\cup C)=(A\cap B)\cup(A\cap C)$ |
+| De Morgan's laws | $\overline{A\cap B}=\overline{A}\cup\overline{B}$<br>$\overline{A\cup B}=\overline{A}\cap\overline{B}$ |
+| Absorption laws | $A\cup(A\cap B)=A$<br>$A\cap(A\cup B)=A$ |
+| Complement laws | $A\cup\overline{A}=U$<br>$A\cap\overline{A}=\emptyset$ |
+
 要证明这些恒等式：
 - 与真值表相对的，使用成员表（其中 0 表示不在集合中，1 表示在集合中）：
 
@@ -130,7 +141,21 @@ $$
 ### 一些重要函数
 
 上/下取整函数 $\lceil x \rceil,\lfloor x \rfloor$
-![[Set Theory - 集合论-4.png|353]]
+
+**TABLE 1** Useful Properties of the Floor and Ceiling Functions. ($n$ is an integer, $x$ is a real number)
+
+| | Property |
+| --- | --- |
+| (1a) | $\lfloor x\rfloor=n \text{ if and only if } n\le x<n+1$ |
+| (1b) | $\lceil x\rceil=n \text{ if and only if } n-1<x\le n$ |
+| (1c) | $\lfloor x\rfloor=n \text{ if and only if } x-1<n\le x$ |
+| (1d) | $\lceil x\rceil=n \text{ if and only if } x\le n<x+1$ |
+| (2) | $x-1<\lfloor x\rfloor\le x\le\lceil x\rceil<x+1$ |
+| (3a) | $\lfloor -x\rfloor=-\lceil x\rceil$ |
+| (3b) | $\lceil -x\rceil=-\lfloor x\rfloor$ |
+| (4a) | $\lfloor x+n\rfloor=\lfloor x\rfloor+n$ |
+| (4b) | $\lceil x+n\rceil=\lceil x\rceil+n$ |
+
 证明取整函数相关的式子考虑拆 $x=\widetilde{x}+a$ 其中 $\widetilde{x}$ 为整数部分。
 
 ## 序列 (Sequence)

@@ -72,6 +72,28 @@ PS.reorder = function reorder(nodes, dragId, targetId, mode) {
   return true;
 };
 
+/** Normalize LaTeX operators typed in the builder, without touching fonts. */
+PS.normalizeOperators = function normalizeOperators(text) {
+  return String(text == null ? '' : text)
+    .replace(/\\neq\b/g, '!=')
+    .replace(/\\ne\b/g, '!=')
+    .replace(/\\le\b/g, '<=')
+    .replace(/\\ge\b/g, '>=')
+    .replace(/\\gets\b/g, '=')
+    .replace(/:=/g, '=')
+    .replace(/<-|←/g, '=')
+    .replace(/<>/g, '!=')
+    .replace(/&&/g, 'and')
+    .replace(/\|\|/g, 'or')
+    .replace(/\\to\b/g, 'to')
+    .replace(/\\land\b/g, 'and')
+    .replace(/\\lor\b/g, 'or')
+    .replace(/\\lnot\b/g, 'not')
+    .replace(/\\And\b/g, 'and')
+    .replace(/\\Or\b/g, 'or')
+    .replace(/\\Not\b/g, 'not');
+};
+
 /* ------------------------------------------------------------------ */
 /* LaTeX helpers                                                       */
 /* ------------------------------------------------------------------ */
@@ -135,8 +157,14 @@ function fromMath(text) {
   }
   value = value
     .replace(/\\gets\b/g, '=')
+    .replace(/:=/g, '=')
+    .replace(/<-|←/g, '=')
+    .replace(/<>/g, '!=')
+    .replace(/&&/g, 'and')
+    .replace(/\|\|/g, 'or')
     .replace(/\\le\b/g, '<=')
     .replace(/\\ge\b/g, '>=')
+    .replace(/\\neq\b/g, '!=')
     .replace(/\\ne\b/g, '!=')
     .replace(/\\land\b/g, 'and')
     .replace(/\\lor\b/g, 'or')
@@ -147,7 +175,8 @@ function fromMath(text) {
     .replace(/\\To\b/g, 'to')
     .replace(/\\DownTo\b/g, 'downto')
     // innermost font commands first; repeat so nested \mathrm{..\text{..}..} unwraps
-    .replace(/\\text(?:bf|it|tt|rm|sf|up)\{([^{}]*)\}/g, '$1')
+    // \texttt marks code identifiers (CS50 notes); keep it.
+    .replace(/\\text(?:bf|it|rm|sf|up)\{([^{}]*)\}/g, '$1')
     .replace(/\\text\{([^{}]*)\}/g, '$1')
     .replace(/\\mathrm\{([^{}]*)\}/g, '$1')
     .replace(/\\mathrm\{([^{}]*)\}/g, '$1')
@@ -175,6 +204,8 @@ PS.fromMath = fromMath;
 /* ------------------------------------------------------------------ */
 /* Parser                                                              */
 /* ------------------------------------------------------------------ */
+
+const BLOCK_LINES = new Set(['Function', 'Procedure', 'If', 'Elif', 'ElsIf', 'ElseIf', 'Else', 'While', 'For', 'ForAll', 'Repeat']);
 
 const OPENERS = {
   If: (node) => [node.branches[0].body],
@@ -212,7 +243,7 @@ PS.parseLatex = function parseLatex(source) {
   for (const rawLine of lines) {
     const line = rawLine.trim();
     if (!line) continue;
-    if (/^\\(?:begin|end)\{algorithm(?:ic)?\}/.test(line)) continue;
+    if (/^\\(?:[Bb]egin|[Ee]nd)\{algorithm(?:ic)?\}/.test(line)) continue;
     if (/^\\label\{/.test(line)) continue;
 
     const match = line.match(/^\\([A-Za-z]+)([\s\S]*)$/);
@@ -221,7 +252,17 @@ PS.parseLatex = function parseLatex(source) {
       continue;
     }
     const name = match[1];
-    const rest = (match[2] || '').trim();
+    let rest = (match[2] || '').trim();
+    // A trailing \Comment on a block line (\If{...} \Comment{...}) belongs to
+    // that line; split it off before reading the line's own groups.
+    let lineComment = null;
+    if (BLOCK_LINES.has(name)) {
+      const split = splitComment(rest);
+      if (split.comment !== null) {
+        rest = split.body.trim();
+        lineComment = split.comment;
+      }
+    }
     const group = firstGroup(rest);
 
     switch (name) {
@@ -241,6 +282,7 @@ PS.parseLatex = function parseLatex(source) {
           argsMath: args ? isSingleMath(args.value) : false,
           body: [],
         };
+        if (lineComment !== null) node.comment = lineComment;
         push(node);
         stack.push({ target: node.body, node });
         break;
@@ -257,6 +299,7 @@ PS.parseLatex = function parseLatex(source) {
           branches: [{ cond: group ? fromMath(group.value) : '', condMath: group ? isSingleMath(group.value) : false, body: [] }],
           elseBody: null,
         };
+        if (lineComment !== null) node.comment = lineComment;
         push(node);
         stack.push({ target: node.branches[0].body, node });
         break;
@@ -267,6 +310,7 @@ PS.parseLatex = function parseLatex(source) {
         const top = stack[stack.length - 1];
         if (!top.node || top.node.type !== 'if') break;
         const branch = { cond: group ? fromMath(group.value) : '', condMath: group ? isSingleMath(group.value) : false, body: [] };
+        if (lineComment !== null) branch.comment = lineComment;
         top.node.branches.push(branch);
         stack[stack.length - 1] = { target: branch.body, node: top.node };
         break;
@@ -275,6 +319,7 @@ PS.parseLatex = function parseLatex(source) {
         const top = stack[stack.length - 1];
         if (!top.node || top.node.type !== 'if') break;
         top.node.elseBody = [];
+        if (lineComment !== null) top.node.elseComment = lineComment;
         stack[stack.length - 1] = { target: top.node.elseBody, node: top.node };
         break;
       }
@@ -289,6 +334,7 @@ PS.parseLatex = function parseLatex(source) {
           condMath: group ? isSingleMath(group.value) : false,
           body: [],
         };
+        if (lineComment !== null) node.comment = lineComment;
         push(node);
         stack.push({ target: node.body, node });
         break;
@@ -299,22 +345,24 @@ PS.parseLatex = function parseLatex(source) {
 
       case 'ForAll': {
         const content = group ? group.value : '';
+        const clean = fromMath(content).replace(/\$/g, '').trim();
         const node = {
           id: PS.nextId(),
           type: 'for',
           all: true,
-          init: fromMath(content),
-          initMath: isSingleMath(content),
+          init: clean,
+          initMath: false,
           bound: '',
           body: [],
         };
+        if (lineComment !== null) node.comment = lineComment;
         push(node);
         stack.push({ target: node.body, node });
         break;
       }
       case 'For': {
         const content = group ? group.value : '';
-        const parts = content.split(/\\(?:To|DownTo)\b/i);
+        const parts = content.split(/\s*(?:\\To|\\DownTo|\bto\b|\bdownto\b)\s*/i);
         const node = {
           id: PS.nextId(),
           type: 'for',
@@ -325,6 +373,7 @@ PS.parseLatex = function parseLatex(source) {
           downto: /\bDownTo\b/i.test(content),
           body: [],
         };
+        if (lineComment !== null) node.comment = lineComment;
         push(node);
         stack.push({ target: node.body, node });
         break;
@@ -335,6 +384,7 @@ PS.parseLatex = function parseLatex(source) {
 
       case 'Repeat': {
         const node = { id: PS.nextId(), type: 'repeat', body: [], until: '' };
+        if (lineComment !== null) node.comment = lineComment;
         push(node);
         stack.push({ target: node.body, node });
         break;
@@ -456,8 +506,12 @@ function normalizeExpr(expr) {
     .replace(/([A-Za-z])_?(\d+)/g, (all, letter, digits) => digits.length === 1 ? `${letter}_${digits}` : `${letter}_{${digits}}`)
     .replace(/([A-Za-z])-([A-Za-z])/g, '$1\\text{-}$2');
 
-  value = value.replace(/(?<!\\)\b[A-Za-z]{2,}\b/g, (word) =>
-    KEYWORD_WORDS.has(word.toLowerCase()) ? word : `\\mathrm{${word}}`);
+  value = value.replace(/(?<!\\)\b[A-Za-z]{2,}\b/g, (word) => {
+    // Constants (NIL, OVERFLOW) and booleans read as text inside expressions too.
+    if (/^[A-Z]{2,}$/.test(word)) return `\\text{${word}}`;
+    if (/^(true|false)$/i.test(word)) return `\\textbf{${word.toLowerCase()}}`;
+    return KEYWORD_WORDS.has(word.toLowerCase()) ? word : `\\mathrm{${word}}`;
+  });
 
   value = value
     .replace(/\band\b/g, '\\land ')
@@ -528,12 +582,12 @@ function emitNodes(nodes, depth, out) {
         break;
       case 'if':
         node.branches.forEach((branch, index) => {
-          const suffix = index === 0 ? commentSuffix(node) : '';
+          const suffix = commentSuffix(index === 0 ? node : branch);
           out.push(`${pad}${index === 0 ? '\\If{' : '\\Elif{'}${mathOrRaw(branch.cond)}}${suffix}`);
           emitNodes(branch.body, depth + 1, out);
         });
         if (node.elseBody) {
-          out.push(`${pad}\\Else`);
+          out.push(`${pad}\\Else${node.elseComment ? ` \\Comment{${node.elseComment}}` : ''}`);
           emitNodes(node.elseBody, depth + 1, out);
         }
         out.push(`${pad}\\EndIf`);
@@ -544,10 +598,16 @@ function emitNodes(nodes, depth, out) {
         out.push(`${pad}\\EndWhile`);
         break;
       case 'for': {
+        if (node.all) {
+          out.push(`${pad}\\ForAll{${node.init || ''}}${commentSuffix(node)}`);
+          emitNodes(node.body, depth + 1, out);
+          out.push(`${pad}\\EndFor`);
+          break;
+        }
         const head = node.bound
           ? `${mathOrRaw(node.init)} ${node.downto ? '\\DownTo' : '\\To'} ${mathOrRaw(node.bound)}`
           : mathOrRaw(node.init);
-        out.push(`${pad}\\${node.all ? 'ForAll' : 'For'}{${head}}${commentSuffix(node)}`);
+        out.push(`${pad}\\For{${head}}${commentSuffix(node)}`);
         emitNodes(node.body, depth + 1, out);
         out.push(`${pad}\\EndFor`);
         break;

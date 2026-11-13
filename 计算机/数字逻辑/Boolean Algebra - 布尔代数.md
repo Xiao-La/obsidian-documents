@@ -89,7 +89,18 @@ Standard Form（不唯一）
 - 例：![[Boolean Algebra - 布尔代数-4.png|499]]
 
 在所有 16 种二元布尔函数中，有 8 种是标准的逻辑门：
-![[Boolean Algebra - 布尔代数-5.png|345]]
+
+| 名称 | 函数 |
+| --- | --- |
+| complement (inverter) | $F_{12}=x'$ |
+| transfer (buffer) | $F_3=x$ |
+| AND | $F_1=xy$ |
+| OR | $F_7=x+y$ |
+| NAND | $F_{14}=(xy)'$ |
+| NOR | $F_8=(x+y)'$ |
+| XOR | $F_6=x\oplus y$ |
+| equivalence (XNOR) | $F_9=(x\oplus y)'$ |
+
 
 ## 卡诺图（Karnaugh Map, K-map）
 
