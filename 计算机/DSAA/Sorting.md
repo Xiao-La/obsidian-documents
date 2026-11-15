@@ -22,22 +22,22 @@ $\text{Max-Heapify}(A,i)$：考虑以 $i$ 为根的子树。假设 $\text{Left}(
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{Max-Heapify}{$A, i$}
-\State $l =$ \Call{Left}{$i$}
-\State $r =$ \Call{Right}{$i$}
-\If{$l \le A.\mathit{heap}\text{-}\mathit{size}$ and $A[l] > A[i]$}
-\State $\mathit{largest} = l$
-\Else
-\State $\mathit{largest} = i$
-\EndIf
-\If{$r \le A.\mathit{heap}\text{-}\mathit{size}$ and $A[r] > A[\mathit{largest}]$}
-\State $\mathit{largest} = r$
-\EndIf
-\If{$\mathit{largest} \neq i$}
-\State exchange $A[i]$ with $A[\mathit{largest}]$
-\State \Call{Max-Heapify}{$A, \mathit{largest}$}
-\EndIf
-\EndProcedure
+  \Procedure{Max-Heapify}{$A, i$}
+    \State $l =$ \Call{Left}{$i$}
+    \State $r =$ \Call{Right}{$i$}
+    \If{$l \le A.\mathit{heap}\text{-}\mathit{size}$ and $A[l] > A[i]$}
+      \State $\mathit{largest} = l$
+    \Else
+      \State $\mathit{largest} = i$
+    \EndIf
+    \If{$r \le A.\mathit{heap}\text{-}\mathit{size}$ and $A[r] > A[\mathit{largest}]$}
+      \State $\mathit{largest} = r$
+    \EndIf
+    \If{$\mathit{largest} \ne i$}
+      \State exchange $A[i]$ with $A[\mathit{largest}]$
+      \State \Call{Max-Heapify}{$A, \mathit{largest}$}
+    \EndIf
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
@@ -48,12 +48,12 @@ $\text{Build-Max-Heap}(A,n)$：从叶子节点开始，从下至上不断执行 
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{Build-Max-Heap}{$A, n$}
-\State $A.\mathit{heap}\text{-}\mathit{size} = n$
-\For{$i = \lfloor n/2 \rfloor$ downto $1$}
-\State \Call{Max-Heapify}{$A, i$}
-\EndFor
-\EndProcedure
+  \Procedure{Build-Max-Heap}{$A, n$}
+    \State $A.\mathit{heap}\text{-}\mathit{size} = n$
+    \For{$i = \lfloor n/2 \rfloor$ \DownTo $1$}
+      \State \Call{Max-Heapify}{$A, i$}
+    \EndFor
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
@@ -72,14 +72,14 @@ $$
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{Heap-Sort}{$A$}
-\State \Call{Build-Max-Heap}{$A$}
-\For{$i = A.\mathit{length}$ downto $2$}
-\State exchange $A[1]$ with $A[i]$
-\State $A.\mathit{heap}\text{-}\mathit{size} = A.\mathit{heap}\text{-}\mathit{size} - 1$
-\State \Call{Max-Heapify}{$A, 1$}
-\EndFor
-\EndProcedure
+  \Procedure{Heap-Sort}{$A$}
+    \State \Call{Build-Max-Heap}{$A$}
+    \For{$i = A.\mathit{length}$ \DownTo $2$}
+      \State exchange $A[1]$ with $A[i]$
+      \State $A.\mathit{heap}\text{-}\mathit{size} = A.\mathit{heap}\text{-}\mathit{size} - 1$
+      \State \Call{Max-Heapify}{$A, 1$}
+    \EndFor
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
@@ -98,13 +98,13 @@ $$
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{Quick-Sort}{$A, p, r$}
-\If{$p < r$}
-\State $q =$ \Call{Partition}{$A, p, r$}
-\State \Call{Quick-Sort}{$A, p, q - 1$}
-\State \Call{Quick-Sort}{$A, q + 1, r$}
-\EndIf
-\EndProcedure
+  \Procedure{Quick-Sort}{$A, p, r$}
+    \If{$p < r$}
+      \State $q =$ \Call{Partition}{$A, p, r$}
+      \State \Call{Quick-Sort}{$A, p, q - 1$}
+      \State \Call{Quick-Sort}{$A, q + 1, r$}
+    \EndIf
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
@@ -159,11 +159,11 @@ $$
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{Randomized-Partition}{$A, p, r$}
-\State $i =$ \Call{Random}{$p, r$}
-\State exchange $A[r]$ with $A[i]$
-\Return \Call{Partition}{$A, p, r$}
-\EndProcedure
+  \Procedure{Randomized-Partition}{$A, p, r$}
+    \State $i =$ \Call{Random}{$p, r$}
+    \State exchange $A[r]$ with $A[i]$
+    \Return \Call{Partition}{$A, p, r$}
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
@@ -228,22 +228,22 @@ $$
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{Counting-Sort}{$A, B, k$}
-\State let $C[0 \ldots k]$ be a new array
-\For{$i = 0$ to $k$}
-\State $C[i] = 0$
-\EndFor
-\For{$j = 1$ to $A.\mathit{length}$}
-\State $C[A[j]] = C[A[j]] + 1$
-\EndFor
-\For{$i = 1$ to $k$}
-\State $C[i] = C[i] + C[i-1]$
-\EndFor
-\For{$j = A.\mathit{length}$ downto $1$}
-\State $B[C[A[j]]] = A[j]$
-\State $C[A[j]] = C[A[j]] - 1$
-\EndFor
-\EndProcedure
+  \Procedure{Counting-Sort}{$A, B, k$}
+    \State let $C[0 \twodots k]$ be a new array
+    \For{$i = 0$ \To $k$}
+      \State $C[i] = 0$
+    \EndFor
+    \For{$j = 1$ \To $A.\mathit{length}$}
+      \State $C[A[j]] = C[A[j]] + 1$
+    \EndFor
+    \For{$i = 1$ \To $k$}
+      \State $C[i] = C[i] + C[i-1]$
+    \EndFor
+    \For{$j = A.\mathit{length}$ \DownTo $1$}
+      \State $B[C[A[j]]] = A[j]$
+      \State $C[A[j]] = C[A[j]] - 1$
+    \EndFor
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
@@ -259,11 +259,11 @@ $$
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{Radix-Sort}{$A, d$}
-\For{$i = 1$ to $d$}
-\State use a stable sort to sort array $A$ on digit $i$
-\EndFor
-\EndProcedure
+  \Procedure{Radix-Sort}{$A, d$}
+    \For{$i = 1$ \To $d$}
+      \State use a stable sort to sort array $A$ on digit $i$
+    \EndFor
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```

@@ -101,9 +101,11 @@ const OPERATOR_ALIASES = [
   [/<>/g, '!='],
   [/&&/g, 'and'],
   [/\|\|/g, 'or'],
-  [/\\(?:land|And)\b/g, 'and'],
-  [/\\(?:lor|Or)\b/g, 'or'],
-  [/\\(?:lnot|Not)\b/g, 'not'],
+  [/\\(?:And|AND)\b/g, 'and'],
+  [/\\(?:Or|OR)\b/g, 'or'],
+  [/\\(?:Not|NOT)\b/g, 'not'],
+  // CLRS subarray ranges A[1 . . n] (clrscode \twodots) are typed as `..`.
+  [/\s*\\twodots\b\s*/g, '..'],
 ];
 
 /** Canonical ASCII operators → TeX. */
@@ -112,11 +114,11 @@ const SYMBOL_TEX = [
   [/>=/g, '\\ge '],
   [/!=/g, '\\ne '],
   [/->/g, '\\to '],
+  [/\s*(?<![.\\])\.\.(?!\.)\s*/g, ' \\twodots '],
 ];
 const WORD_TEX = [
-  [/(?<!\\)\band\b/g, '\\land '],
-  [/(?<!\\)\bor\b/g, '\\lor '],
-  [/(?<!\\)\bnot\b/g, '\\lnot '],
+  // Inside math (a field written with backslashes): roman words, as in CLRS.
+  [/(?<![\\{])\b(and|or|not)\b/g, '\\text{ $1 }'],
 ];
 
 const applyAll = (text, table) => table.reduce((value, [pattern, replacement]) => value.replace(pattern, replacement), text);
@@ -133,7 +135,7 @@ PS.texOperators = function texOperators(text, words = true) {
 };
 
 // Font commands keep their argument as written; mask them while rewriting.
-const FONT_GROUP = /\\(?:text|textbf|textit|texttt|textrm|textsf|textup|mathrm|mathit|mathbf|mathsf|mathtt|operatorname)\{[^{}]*\}/g;
+const FONT_GROUP = /\\(?:text|textbf|textit|texttt|textrm|textsf|textup|textsc|mathrm|mathit|mathbf|mathsf|mathtt|operatorname|Call)\{[^{}]*\}/g;
 
 PS.maskFontGroups = function maskFontGroups(tex, transform) {
   const kept = [];
@@ -185,7 +187,9 @@ function isSingleMath(text) {
 }
 
 const subscript = (all, letter, digits) => (digits.length === 1 ? `${letter}_${digits}` : `${letter}_{${digits}}`);
-const UNWRAP_FONT = /\\(?:text(?:bf|it|rm|sf|up)?|mathrm|mathit|mathbf)\{([^{}]*)\}/g;
+// Not before "(": an explicit \mathrm{Parent}(i) is a function name the
+// author chose to set upright, not a procedure call (see PS.splitCalls).
+const UNWRAP_FONT = /\\(?:text(?:bf|it|rm|sf|up)?|mathrm|mathit|mathbf)\{([^{}]*)\}(?!\()/g;
 
 /**
  * Normalize a LaTeX fragment into something better for the visual editor:
@@ -194,21 +198,37 @@ const UNWRAP_FONT = /\\(?:text(?:bf|it|rm|sf|up)?|mathrm|mathit|mathbf)\{([^{}]*
  */
 function fromMath(text) {
   let value = String(text == null ? '' : text).trim();
-  if (isSingleMath(value)) value = value.slice(1, -1).trim();
+  const single = isSingleMath(value);
+  if (single) value = value.slice(1, -1).trim();
   value = PS.normalizeOperators(value)
     .replace(/\\To\b/g, 'to')
     .replace(/\\DownTo\b/g, 'downto');
-  // Innermost first; repeat so nested \mathrm{..\text{..}..} unwraps.
-  for (let previous = null; previous !== value;) {
-    previous = value;
-    value = value.replace(UNWRAP_FONT, '$1');
-  }
+  // Innermost first; repeat so nested \mathrm{..\text{..}..} unwraps. In mixed text
+  // (`\textbf{not} $S.\mathrm{empty}()$`) only inside the math runs: outside them the
+  // font is the author's (bold keywords) and must survive a save.
+  const unwrap = (text) => {
+    // An explicit italic all-caps name (\mathit{KB}) is a variable, not the constant KB.
+    const kept = [];
+    let chunk = text.replace(/\\mathit\{[A-Z][A-Z0-9]+\}/g, (group) => `\u0002${kept.push(group) - 1}\u0003`);
+    for (let previous = null; previous !== chunk;) {
+      previous = chunk;
+      chunk = chunk.replace(UNWRAP_FONT, '$1');
+    }
+    return chunk
+      .replace(/\\textsc\{([a-z]+)\}/g, (all, word) => word.toUpperCase())
+      .replace(/\u0002(\d+)\u0003/g, (all, index) => kept[Number(index)]);
+  };
+  value = value.includes('$')
+    ? value.split(/(\$[^$]*\$)/).map((chunk, index) => (index % 2 ? unwrap(chunk) : chunk)).join('')
+    // Prose without any math (`\Return \textbf{true}`) keeps its fonts as written.
+    : single ? unwrap(value) : value;
   value = value
     .replace(/([A-Za-z])_\{(\d+)\}/g, subscript)
     .replace(/\\textbackslash\b/g, '\\')
     .replace(/\\_/g, '_')
     .replace(/\\[,;: ]/g, ' ');
-  return value.replace(/[ \t]+/g, ' ').trim();
+  // `\State \text{}` is the empty placeholder of a comment-only line.
+  return value.replace(/\\text\{\}/g, '').replace(/[ \t]+/g, ' ').trim();
 }
 
 PS.readGroup = readGroup;
@@ -216,6 +236,175 @@ PS.firstGroup = firstGroup;
 PS.splitComment = splitComment;
 PS.fromMath = fromMath;
 PS.isSingleMath = isSingleMath;
+
+/* ------------------------------------------------------------------ */
+/* Procedure calls inside expressions                                  */
+/* ------------------------------------------------------------------ */
+
+/*
+ * In builder fields a capitalized name directly followed by "(" is a
+ * procedure call, typeset like \Call (small caps): `return Merge-Sort(A, p, r)`,
+ * `x = Extract-Min(Q)`. Single letters stay math (T(n), O(n)); so does any
+ * field containing a backslash, which is the escape hatch (\mathrm{Pr}(A)).
+ *
+ * The words and / or / not are written as words, never as ∧ ∨ ¬. CLRS sets them in
+ * roman between the math (clrscode: `\While $i > 0$ and $A[i] > \id{key}$`), so
+ * they are saved as plain text between math runs; only `error` is bold.
+ */
+const CALL_AT = /(?<![A-Za-z0-9_.'])([A-Z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*)\(/g;
+const isCallName = (name) => /^[A-Z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*$/.test(name) && (name.match(/[A-Za-z]/g) || []).length >= 2;
+const LOGIC_WORD = /(?<![A-Za-z0-9_.])(and|or|not)(?![A-Za-z0-9_])/g;
+// `\textbf{and}` is how older notes wrote them; read, and saved back as plain words.
+const LOGIC_TEX = /^\\textbf\{(and|or|not|error)\}/;
+const LOGIC_PLAIN = /^(and|or|not)(?![A-Za-z0-9_])/;
+// Quoted strings stay text, with typographic quotes: error “heap underflow”.
+const STRING = /(“[^”]*”|"[^"]*")/;
+
+/** Split text into text and keyword parts. */
+function splitLogic(value) {
+  const parts = [];
+  let last = 0;
+  LOGIC_WORD.lastIndex = 0;
+  for (let match; (match = LOGIC_WORD.exec(value));) {
+    if (match.index > last) parts.push({ type: 'text', value: value.slice(last, match.index) });
+    parts.push({ type: 'keyword', value: match[1] });
+    last = match.index + match[0].length;
+  }
+  if (last < value.length) parts.push({ type: 'text', value: value.slice(last) });
+  return parts;
+}
+
+/** Split plain text into text, call and keyword parts, or null if it has none of the latter. */
+function splitCalls(text) {
+  const value = String(text == null ? '' : text);
+  if (value.includes('\\') || value.includes('$')) return null;
+  const parts = [];
+  let last = 0;
+  const pushText = (chunk) => {
+    chunk.split(STRING).forEach((piece, index) => {
+      if (!piece) return;
+      if (index % 2) parts.push({ type: 'string', value: piece.slice(1, -1) });
+      else parts.push(...splitLogic(piece));
+    });
+  };
+  const lead = value.match(/^\s*error(?=\s|$)/);
+  if (lead) {
+    parts.push({ type: 'keyword', value: 'error' });
+    last = lead[0].length;
+  }
+  CALL_AT.lastIndex = last;
+  for (let match; (match = CALL_AT.exec(value));) {
+    if (!isCallName(match[1])) continue;
+    const open = match.index + match[0].length - 1;
+    let depth = 0;
+    let close = -1;
+    for (let i = open; i < value.length && close < 0; i++) {
+      if (value[i] === '(') depth += 1;
+      else if (value[i] === ')' && --depth === 0) close = i;
+    }
+    if (close < 0) continue;
+    pushText(value.slice(last, match.index));
+    parts.push({ type: 'call', name: match[1], args: value.slice(open + 1, close) });
+    last = close + 1;
+    CALL_AT.lastIndex = last;
+  }
+  pushText(value.slice(last));
+  return parts.some((part) => part.type !== 'text') ? parts : null;
+}
+
+/**
+ * Plain text with calls or logic words → inline LaTeX: math runs as `$...$`
+ * (through `mathFn`), calls as \Call{Name}{args}, and / or / not as plain words,
+ * error as \textbf{error}.
+ * Null when there is neither.
+ */
+function inlineWithCalls(text, mathFn) {
+  const parts = splitCalls(text);
+  if (!parts) return null;
+  const math = (segment) => {
+    const [, before, body, after] = segment.match(/^(\s*)([\s\S]*?)(\s*)$/);
+    if (!body) return segment ? ' ' : '';
+    return `${before ? ' ' : ''}$${mathFn(body)}$${after ? ' ' : ''}`;
+  };
+  return parts.map((part) => {
+    if (part.type === 'call') return `\\Call{${part.name}}{${inlineWithCalls(part.args, mathFn) || math(part.args).trim()}}`;
+    if (part.type === 'keyword') return part.value === 'error' ? '\\textbf{error}' : part.value;
+    if (part.type === 'string') return `“${part.value}”`;
+    return math(part.value);
+  }).join('').trim();
+}
+
+/**
+ * The reverse, for the builder: `$x =$ \Call{Left}{$i$}` → `x = Left(i)`,
+ * `$i > 0$ and $A[i] > \mathit{key}$` → `i > 0 and A[i] > key`.
+ * Only for text made of nothing but math runs, calls and keywords; null otherwise.
+ */
+function callsToPlain(raw) {
+  const text = String(raw == null ? '' : raw).trim();
+  let out = '';
+  let found = 0;
+  let constants = 0;
+  let i = 0;
+  while (i < text.length) {
+    if (text[i] === '“') {
+      const end = text.indexOf('”', i + 1);
+      if (end < 0) return null;
+      out += text.slice(i, end + 1);
+      i = end + 1;
+      continue;
+    }
+    const constant = text.slice(i).match(/^\\textsc\{([a-z]+)\}/);
+    if (constant) {
+      out += constant[1].toUpperCase();
+      constants += 1;
+      i += constant[0].length;
+      continue;
+    }
+    if (/\s/.test(text[i])) {
+      while (i < text.length && /\s/.test(text[i])) i++;
+      out += ' ';
+      continue;
+    }
+    if (text[i] === '$') {
+      const end = text.indexOf('$', i + 1);
+      if (end < 0) return null;
+      out += fromMath(text.slice(i, end + 1));
+      i = end + 1;
+      continue;
+    }
+    // Bare punctuation between calls (`\Call{A}{$i$}, \Call{B}{$j$}`); words would change font.
+    if (/[,;:()[\]+\-*/=<>]/.test(text[i])) {
+      out += text[i++];
+      continue;
+    }
+    const keyword = text.slice(i).match(LOGIC_TEX) || text.slice(i).match(LOGIC_PLAIN);
+    if (keyword) {
+      out += ` ${keyword[1]} `;
+      found += 1;
+      i += keyword[0].length;
+      continue;
+    }
+    const call = text.slice(i).match(/^\\Call\{([^{}]*)\}/);
+    if (!call || !isCallName(call[1])) return null;
+    const args = readGroup(text, i + call[0].length);
+    if (!args) return null;
+    const inner = !args.value.trim() ? ''
+      : callsToPlain(args.value) ?? (isSingleMath(args.value) ? fromMath(args.value) : null);
+    if (inner == null) return null;
+    out += `${call[1]}(${inner})`;
+    found += 1;
+    i = args.end;
+  }
+  const plain = out.replace(/\s+/g, ' ').replace(/\(\s+/g, '(').replace(/\s+\)/g, ')').trim();
+  // Anything still carrying LaTeX would not survive the trip back.
+  if (/[\\$]/.test(plain)) return null;
+  if (found) return inlineWithCalls(plain, (s) => s) ? plain : null;
+  return constants ? plain : null;
+}
+
+PS.splitCalls = splitCalls;
+PS.inlineWithCalls = inlineWithCalls;
+PS.callsToPlain = callsToPlain;
 
 /* ------------------------------------------------------------------ */
 /* Parser                                                              */
@@ -227,10 +416,26 @@ const COMMENTABLE = new Set([
   'Call', 'Break', 'Continue',
 ]);
 
+// Fields that may be calls, constants or math joined by logic words.
+const LOGIC_SOURCE = /\\Call\b|\\textbf\{(?:and|or|not|error)\}|\\textsc\{|(?:^|\$)\s*(?:and|or|not)\s+\$/;
+
 /** `{ field: value, fieldMath: wasSingleMath }` for a math-carrying field. */
 function mathField(name, raw) {
-  const source = raw == null ? '' : raw;
+  // Older notes set the logic words bold; CLRS has them roman, as plain words.
+  const source = (raw == null ? '' : raw).replace(/\\textbf\{(and|or|not)\}/g, '$1');
+  const plain = LOGIC_SOURCE.test(source) ? callsToPlain(source) : null;
+  if (plain != null) return { [name]: plain, [`${name}Math`]: true };
   return { [name]: fromMath(source), [`${name}Math`]: isSingleMath(source) };
+}
+
+/** A condition field: a single `=` there is a test, read (and saved) as `==`. */
+function conditionField(name, raw) {
+  const out = mathField(name, raw);
+  const value = out[name];
+  out[name] = out[`${name}Math`]
+    ? PS.asComparison(value)
+    : value.replace(/\$([^$]*)\$/g, (all, inner) => `$${PS.asComparison(inner)}$`);
+  return out;
 }
 
 /** Join physical lines: an odd number of `$` continues on the next line. */
@@ -301,7 +506,7 @@ PS.parseLatex = function parseLatex(source) {
       }
 
       case 'If': {
-        const branch = Object.assign(mathField('cond', group ? group.value : ''), { body: [] });
+        const branch = Object.assign(conditionField('cond', group ? group.value : ''), { body: [] });
         const node = PS.node('if', { branches: [branch], elseBody: null });
         open(withComment(node, lineComment), branch.body);
         break;
@@ -311,7 +516,7 @@ PS.parseLatex = function parseLatex(source) {
       case 'ElseIf': {
         const { node } = top();
         if (!node || node.type !== 'if') break;
-        const branch = withComment(Object.assign(mathField('cond', group ? group.value : ''), { body: [] }), lineComment);
+        const branch = withComment(Object.assign(conditionField('cond', group ? group.value : ''), { body: [] }), lineComment);
         node.branches.push(branch);
         stack[stack.length - 1] = { target: branch.body, node };
         break;
@@ -326,7 +531,7 @@ PS.parseLatex = function parseLatex(source) {
       }
 
       case 'While': {
-        const node = PS.node('while', Object.assign(mathField('cond', group ? group.value : ''), { body: [] }));
+        const node = PS.node('while', Object.assign(conditionField('cond', group ? group.value : ''), { body: [] }));
         open(withComment(node, lineComment), node.body);
         break;
       }
@@ -339,7 +544,7 @@ PS.parseLatex = function parseLatex(source) {
       }
       case 'For': {
         const content = group ? group.value : '';
-        const parts = content.split(/\s*(?:\\To|\\DownTo|\bto\b|\bdownto\b)\s*/i);
+        const parts = content.split(/\s*(?:\\textbf\{(?:to|downto)\}|\\To\b|\\DownTo\b|\bto\b|\bdownto\b)\s*/i);
         const bound = parts.length > 1 ? parts.slice(1).join('') : '';
         const node = PS.node('for', Object.assign(
           mathField('init', parts[0] || ''),
@@ -358,7 +563,7 @@ PS.parseLatex = function parseLatex(source) {
       case 'Until': {
         const { node } = top();
         if (!node || node.type !== 'repeat') break;
-        Object.assign(node, mathField('until', group ? group.value : ''));
+        Object.assign(node, conditionField('until', group ? group.value : ''));
         if (lineComment !== null) node.untilComment = lineComment;
         pop();
         break;
@@ -457,29 +662,45 @@ function withComment(target, comment) {
 const KEYWORD_WORDS = new Set(['and', 'or', 'not']);
 
 // A word rendered upright in math; spaces next to one are real word gaps.
-const WORDISH = String.raw`\\(?:mathrm|text|textbf)\{[^{}]*\}`;
+const WORDISH = String.raw`\\(?:mathrm|text|textbf|textsc)\{[^{}]*\}`;
 const SPACE_AFTER_WORD = new RegExp(`(${WORDISH})\\s+(?=[A-Za-z0-9(\\[“‘"']|${WORDISH})`, 'g');
-const SPACE_BEFORE_WORD = new RegExp(`([A-Za-z0-9\\])”’"'])\\s+(?=${WORDISH})`, 'g');
+const SPACE_BEFORE_WORD = new RegExp(`((?<!\\\\[A-Za-z]*)[A-Za-z0-9\\])”’"'])\\s+(?=${WORDISH})`, 'g');
+
+// Upright math operators, as in CLRS: max(a, b), lg n, x mod y. Only when used as one
+// (`max = A[1]` is the variable *max*).
+const MATH_FUNCTIONS = new Set(['max', 'min', 'gcd', 'lcm', 'exp', 'sin', 'cos', 'lg', 'log', 'ln']);
+const PREFIX_OPERATORS = new Set(['lg', 'log', 'ln']);
+
+/** CLRS constants (NIL, TRUE, FALSE, OVERFLOW) are small caps: `\textsc{nil}`. */
+const constantTex = (word) => `\\textsc{${word.toLowerCase()}}`;
 
 /**
- * Builder typesetting rules for a math fragment: multi-letter identifiers
- * upright, all-caps constants and booleans as text, digits after a letter as
- * subscripts, ASCII operators as TeX. Font groups already present are kept.
+ * Builder typesetting rules for a math fragment, following CLRS: multi-letter
+ * identifiers italic (*key*, *heap-size*), words of a phrase upright
+ * ("exchange A[i] with A[j]"), constants and booleans in small caps, digits
+ * after a letter as subscripts, ASCII operators as TeX. Font groups already
+ * present are kept.
  */
 function normalizeExpr(expr) {
   const out = PS.maskFontGroups(expr, (masked) => {
-    const value = masked.replace(/([A-Za-z])_\{(\d+)\}/g, subscript);
-    const whole = value.trim();
-    if (/^[A-Z]{2,}[A-Z0-9_-]*$/.test(whole)) return `\\text{${whole}}`;
-    if (/^(true|false)$/i.test(whole)) return `\\textbf{${whole.toLowerCase()}}`;
-
-    const words = value
+    const words = masked
+      .replace(/([A-Za-z])_\{(\d+)\}/g, subscript)
       .replace(/([A-Za-z])_?(\d+)/g, subscript)
       .replace(/([A-Za-z])-([A-Za-z])/g, '$1\\text{-}$2')
-      .replace(/(?<!\\)\b[A-Za-z]{2,}\b/g, (word) => {
-        if (/^[A-Z]{2,}$/.test(word)) return `\\text{${word}}`;
-        if (/^(true|false)$/i.test(word)) return `\\textbf{${word.toLowerCase()}}`;
-        return KEYWORD_WORDS.has(word) ? word : `\\mathrm{${word}}`;
+      .replace(/(?<!\\)\b[A-Za-z]{2,}\b/g, (word, offset, text) => {
+        const before = text.slice(0, offset);
+        const after = text.slice(offset + word.length);
+        if (/^[A-Z]{2,}$/.test(word) || /^(true|false)$/i.test(word)) return constantTex(word);
+        if (KEYWORD_WORDS.has(word)) return word;
+        if (word === 'mod') return '\\bmod';
+        if (MATH_FUNCTIONS.has(word)
+          && (/^\s*\(/.test(after) || (PREFIX_OPERATORS.has(word) && /^\s+[A-Za-z0-9\\]/.test(after)))) {
+          return `\\${word}`;
+        }
+        // A word spaced off from a neighbouring word or variable is part of a phrase.
+        const phrase = /^\s+(?:[A-Za-z0-9(“"']|\u0000)/.test(after)
+          || /(?:(?<!\\[A-Za-z]*)[A-Za-z0-9]|[)\]”"']|\u0001)\s+$/.test(before);
+        return phrase ? `\\mathrm{${word}}` : `\\mathit{${word}}`;
       });
     return PS.texOperators(words);
   });
@@ -498,8 +719,8 @@ function toMath(raw) {
   if (!expr) return '';
   // CJK prose must stay outside math mode.
   if (/[一-鿿]/.test(expr)) return expr;
-  if (expr.includes('\\')) return `$${PS.texOperators(expr, false)}$`;
-  return `$${normalizeExpr(expr)}$`;
+  if (expr.includes('\\')) return `$${normalizeExpr(expr)}$`;
+  return inlineWithCalls(expr, normalizeExpr) || `$${normalizeExpr(expr)}$`;
 }
 
 /**
@@ -516,7 +737,7 @@ function mathOrRaw(text, isMath) {
   }
   return value
     .replace(/\$([^$]+)\$/g, (all, inner) =>
-      `$${inner.includes('\\') ? PS.texOperators(inner, false) : normalizeExpr(inner)}$`)
+      `$${normalizeExpr(inner)}$`)
     .replace(/[ \t]{2,}/g, ' ');
 }
 
@@ -527,6 +748,19 @@ PS.mathOrRaw = mathOrRaw;
 const commentSuffix = (comment) => (comment ? ` \\Comment{${comment}}` : '');
 const field = (node, key) => mathOrRaw(node[key], node[`${key}Math`]);
 
+// CLRS: `=` assigns, `==` tests. A single `=` in a condition is written as `==`.
+const asComparison = (tex) => tex.replace(/(?<![<>=!:\\])=(?!=)/g, '==');
+PS.asComparison = asComparison;
+const condition = (node, key) => field(node, key).replace(/\$([^$]*)\$/g, (all, inner) => `$${asComparison(inner)}$`);
+
+/** `v in S` → `$v \\in S$`; a head written with text commands stays as written. */
+function forAllHead(init) {
+  if (!init || /\\text(?:tt|rm|sf|up)?\{|\$/.test(init)) return init;
+  const parts = init.split(/\s+(?:in|\\in)\s+/);
+  if (parts.length === 2) return `$${normalizeExpr(parts[0])} \\in ${normalizeExpr(parts[1])}$`;
+  return toMath(init);
+}
+
 function emitNodes(nodes, depth, out) {
   const pad = '  '.repeat(depth);
   const line = (text, comment) => out.push(`${pad}${text}${commentSuffix(comment)}`);
@@ -535,7 +769,11 @@ function emitNodes(nodes, depth, out) {
   for (const node of nodes) {
     switch (node.type) {
       case 'state':
-        line(`\\State ${field(node, 'text') || '\\text{}'}`, node.comment);
+      {
+        // A comment-only line is `\State \Comment{...}`; `\text{}` only keeps an empty one alive.
+        const text = field(node, 'text');
+        line(text ? `\\State ${text}` : node.comment ? '\\State' : '\\State \\text{}', node.comment);
+      }
         break;
       case 'call':
         line(`\\State \\Call{${node.name || ''}}{${field(node, 'args')}}`, node.comment);
@@ -561,7 +799,7 @@ function emitNodes(nodes, depth, out) {
         break;
       case 'if':
         node.branches.forEach((branch, index) => {
-          line(`${index === 0 ? '\\If' : '\\Elif'}{${field(branch, 'cond')}}`, index === 0 ? node.comment : branch.comment);
+          line(`${index === 0 ? '\\If' : '\\Elif'}{${condition(branch, 'cond')}}`, index === 0 ? node.comment : branch.comment);
           body(branch.body);
         });
         if (node.elseBody) {
@@ -571,13 +809,13 @@ function emitNodes(nodes, depth, out) {
         line('\\EndIf');
         break;
       case 'while':
-        line(`\\While{${field(node, 'cond')}}`, node.comment);
+        line(`\\While{${condition(node, 'cond')}}`, node.comment);
         body(node.body);
         line('\\EndWhile');
         break;
       case 'for': {
         const head = node.all
-          ? node.init || ''
+          ? forAllHead(node.init || '')
           : node.bound
             ? `${field(node, 'init')} ${node.downto ? '\\DownTo' : '\\To'} ${field(node, 'bound')}`
             : field(node, 'init');
@@ -589,7 +827,7 @@ function emitNodes(nodes, depth, out) {
       case 'repeat':
         line('\\Repeat', node.comment);
         body(node.body);
-        line(`\\Until{${field(node, 'until')}}`, node.untilComment);
+        line(`\\Until{${condition(node, 'until')}}`, node.untilComment);
         break;
       case 'function': {
         const kind = node.kind === 'Procedure' ? 'Procedure' : 'Function';

@@ -20,25 +20,25 @@
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{Stack-Empty}{$S$}
-\If{$S.\mathit{top} == 0$}
-\Return TRUE
-\Else
-\Return FALSE
-\EndIf
-\EndProcedure
-\Procedure{Push}{$S, x$}
-\State $S.\mathit{top} = S.\mathit{top} + 1$
-\State $S[S.\mathit{top}] = x$
-\EndProcedure
-\Procedure{Pop}{$S$}
-\If{\Call{Stack-Empty}{$S$}}
-\State \textbf{error} “underflow”
-\Else
-\State $S.\mathit{top} = S.\mathit{top} - 1$
-\Return $S[S.\mathit{top} + 1]$
-\EndIf
-\EndProcedure
+  \Procedure{Stack-Empty}{$S$}
+    \If{$S.\mathit{top} == 0$}
+      \Return $\textsc{true}$
+    \Else
+      \Return $\textsc{false}$
+    \EndIf
+  \EndProcedure
+  \Procedure{Push}{$S, x$}
+    \State $S.\mathit{top} = S.\mathit{top} + 1$
+    \State $S[S.\mathit{top}] = x$
+  \EndProcedure
+  \Procedure{Pop}{$S$}
+    \If{\Call{Stack-Empty}{$S$}}
+      \State \textbf{error} “underflow”
+    \Else
+      \State $S.\mathit{top} = S.\mathit{top} - 1$
+      \Return $S[S.\mathit{top} + 1]$
+    \EndIf
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
@@ -50,23 +50,23 @@
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{Enqueue}{$Q, x$}
-\State $Q[Q.\mathit{tail}] = x$
-\If{$Q.\mathit{tail} == Q.\mathit{length}$}
-\State $Q.\mathit{tail} = 1$
-\Else
-\State $Q.\mathit{tail} = Q.\mathit{tail} + 1$
-\EndIf
-\EndProcedure
-\Procedure{Dequeue}{$Q$}
-\State $x = Q[Q.\mathit{head}]$
-\If{$Q.\mathit{head} == Q.\mathit{length}$}
-\State $Q.\mathit{head} = 1$
-\Else
-\State $Q.\mathit{head} = Q.\mathit{head} + 1$
-\EndIf
-\Return $x$
-\EndProcedure
+  \Procedure{Enqueue}{$Q, x$}
+    \State $Q[Q.\mathit{tail}] = x$
+    \If{$Q.\mathit{tail} == Q.\mathit{length}$}
+      \State $Q.\mathit{tail} = 1$
+    \Else
+      \State $Q.\mathit{tail} = Q.\mathit{tail} + 1$
+    \EndIf
+  \EndProcedure
+  \Procedure{Dequeue}{$Q$}
+    \State $x = Q[Q.\mathit{head}]$
+    \If{$Q.\mathit{head} == Q.\mathit{length}$}
+      \State $Q.\mathit{head} = 1$
+    \Else
+      \State $Q.\mathit{head} = Q.\mathit{head} + 1$
+    \EndIf
+    \Return $x$
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
@@ -80,53 +80,53 @@
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{Max-Heap-Maximum}{$A$}
-\If{$A.\mathit{heap}\text{-}\mathit{size} < 1$}
-\State \textbf{error} “heap underflow”
-\EndIf
-\Return $A[1]$
-\EndProcedure
-\Procedure{Max-Heap-Extract-Max}{$A$}
-\State $\mathit{max} =$ \Call{Max-Heap-Maximum}{$A$}
-\State $A[1] = A[A.\mathit{heap}\text{-}\mathit{size}]$
-\State $A.\mathit{heap}\text{-}\mathit{size} = A.\mathit{heap}\text{-}\mathit{size} - 1$
-\State \Call{Max-Heapify}{$A, 1$}
-\Return $\mathit{max}$
-\EndProcedure
+  \Procedure{Max-Heap-Maximum}{$A$}
+    \If{$A.\mathit{heap}\text{-}\mathit{size} < 1$}
+      \State \textbf{error} “heap underflow”
+    \EndIf
+    \Return $A[1]$
+  \EndProcedure
+  \Procedure{Max-Heap-Extract-Max}{$A$}
+    \State $\mathit{max} =$ \Call{Max-Heap-Maximum}{$A$}
+    \State $A[1] = A[A.\mathit{heap}\text{-}\mathit{size}]$
+    \State $A.\mathit{heap}\text{-}\mathit{size} = A.\mathit{heap}\text{-}\mathit{size} - 1$
+    \State \Call{Max-Heapify}{$A, 1$}
+    \Return $\mathit{max}$
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{Max-Heap-Increase-Key}{$A, x, k$}
-\If{$k < x.\mathit{key}$}
-\State \textbf{error} “new key is smaller than current key”
-\EndIf
-\State $x.\mathit{key} = k$
-\State find the index $i$ in array $A$ where object $x$ occurs
-\While{$i > 1$ and $A[$\Call{Parent}{$i$}$].\mathit{key} < A[i].\mathit{key}$}
-\State exchange $A[i]$ with $A[$\Call{Parent}{$i$}$]$, updating the information that maps priority queue objects to array indices
-\State $i =$ \Call{Parent}{$i$}
-\EndWhile
-\EndProcedure
+  \Procedure{Max-Heap-Increase-Key}{$A, x, k$}
+    \If{$k < x.\mathit{key}$}
+      \State \textbf{error} “new key is smaller than current key”
+    \EndIf
+    \State $x.\mathit{key} = k$
+    \State find the index $i$ in array $A$ where object $x$ occurs
+    \While{$i > 1$ and $A[$\Call{Parent}{$i$}$].\mathit{key} < A[i].\mathit{key}$}
+      \State exchange $A[i]$ with $A[$\Call{Parent}{$i$}$]$, updating the information that maps priority queue objects to array indices
+      \State $i =$ \Call{Parent}{$i$}
+    \EndWhile
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{Max-Heap-Insert}{$A, x, n$}
-\If{$A.\mathit{heap}\text{-}\mathit{size} == n$}
-\State \textbf{error} “heap overflow”
-\EndIf
-\State $A.\mathit{heap}\text{-}\mathit{size} = A.\mathit{heap}\text{-}\mathit{size} + 1$
-\State $k = x.\mathit{key}$
-\State $x.\mathit{key} = -\infty$
-\State $A[A.\mathit{heap}\text{-}\mathit{size}] = x$
-\State map $x$ to index $\mathit{heap}\text{-}\mathit{size}$ in the array
-\State \Call{Max-Heap-Increase-Key}{$A, x, k$}
-\EndProcedure
+  \Procedure{Max-Heap-Insert}{$A, x, n$}
+    \If{$A.\mathit{heap}\text{-}\mathit{size} == n$}
+      \State \textbf{error} “heap overflow”
+    \EndIf
+    \State $A.\mathit{heap}\text{-}\mathit{size} = A.\mathit{heap}\text{-}\mathit{size} + 1$
+    \State $k = x.\mathit{key}$
+    \State $x.\mathit{key} = -\infty$
+    \State $A[A.\mathit{heap}\text{-}\mathit{size}] = x$
+    \State map $x$ to index $\mathit{heap}\text{-}\mathit{size}$ in the array
+    \State \Call{Max-Heap-Increase-Key}{$A, x, k$}
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
@@ -142,43 +142,43 @@
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{List-Search}{$L, k$}
-\State $x = L.\mathit{head}$
-\While{$x \neq \text{NIL}$ and $x.\mathit{key} \neq k$}
-\State $x = x.\mathit{next}$
-\EndWhile
-\Return $x$
-\EndProcedure
+  \Procedure{List-Search}{$L, k$}
+    \State $x = L.\mathit{head}$
+    \While{$x \ne \textsc{nil}$ and $x.\mathit{key} \ne k$}
+      \State $x = x.\mathit{next}$
+    \EndWhile
+    \Return $x$
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{List-Insert}{$L, x$}
-\State $x.\mathit{next} = L.\mathit{head}$
-\If{$L.\mathit{head} \neq \text{NIL}$}
-\State $L.\mathit{head}.\mathit{prev} = x$
-\EndIf
-\State $L.\mathit{head} = x$
-\State $x.\mathit{prev} = \text{NIL}$
-\EndProcedure
+  \Procedure{List-Insert}{$L, x$}
+    \State $x.\mathit{next} = L.\mathit{head}$
+    \If{$L.\mathit{head} \ne \textsc{nil}$}
+      \State $L.\mathit{head}.\mathit{prev} = x$
+    \EndIf
+    \State $L.\mathit{head} = x$
+    \State $x.\mathit{prev} = \textsc{nil}$
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{List-Delete}{$L, x$}
-\If{$x.\mathit{prev} \neq \text{NIL}$}
-\State $x.\mathit{prev}.\mathit{next} = x.\mathit{next}$
-\Else
-\State $L.\mathit{head} = x.\mathit{next}$
-\EndIf
-\If{$x.\mathit{next} \neq \text{NIL}$}
-\State $x.\mathit{next}.\mathit{prev} = x.\mathit{prev}$
-\EndIf
-\EndProcedure
+  \Procedure{List-Delete}{$L, x$}
+    \If{$x.\mathit{prev} \ne \textsc{nil}$}
+      \State $x.\mathit{prev}.\mathit{next} = x.\mathit{next}$
+    \Else
+      \State $L.\mathit{head} = x.\mathit{next}$
+    \EndIf
+    \If{$x.\mathit{next} \ne \textsc{nil}$}
+      \State $x.\mathit{next}.\mathit{prev} = x.\mathit{prev}$
+    \EndIf
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
@@ -225,62 +225,62 @@ Induction step:  更大的树由根节点，左子树，右子树（可能为空
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{Tree-Search}{$x, k$}
-\If{$x == \text{NIL}$ or $k == x.\mathit{key}$}
-\Return $x$
-\EndIf
-\If{$k < x.\mathit{key}$}
-\Return \Call{Tree-Search}{$x.\mathit{left}, k$}
-\Else
-\Return \Call{Tree-Search}{$x.\mathit{right}, k$}
-\EndIf
-\EndProcedure
-\Procedure{Iterative-Tree-Search}{$x, k$}
-\While{$x \neq \text{NIL}$ and $k \neq x.\mathit{key}$}
-\If{$k < x.\mathit{key}$}
-\State $x = x.\mathit{left}$
-\Else
-\State $x = x.\mathit{right}$
-\EndIf
-\EndWhile
-\Return $x$
-\EndProcedure
+  \Procedure{Tree-Search}{$x, k$}
+    \If{$x == \textsc{nil}$ or $k == x.\mathit{key}$}
+      \Return $x$
+    \EndIf
+    \If{$k < x.\mathit{key}$}
+      \Return \Call{Tree-Search}{$x.\mathit{left}, k$}
+    \Else
+      \Return \Call{Tree-Search}{$x.\mathit{right}, k$}
+    \EndIf
+  \EndProcedure
+  \Procedure{Iterative-Tree-Search}{$x, k$}
+    \While{$x \ne \textsc{nil}$ and $k \ne x.\mathit{key}$}
+      \If{$k < x.\mathit{key}$}
+        \State $x = x.\mathit{left}$
+      \Else
+        \State $x = x.\mathit{right}$
+      \EndIf
+    \EndWhile
+    \Return $x$
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{Tree-Minimum}{$x$}
-\While{$x.\mathit{left} \neq \text{NIL}$}
-\State $x = x.\mathit{left}$
-\EndWhile
-\Return $x$
-\EndProcedure
-\Procedure{Tree-Maximum}{$x$}
-\While{$x.\mathit{right} \neq \text{NIL}$}
-\State $x = x.\mathit{right}$
-\EndWhile
-\Return $x$
-\EndProcedure
+  \Procedure{Tree-Minimum}{$x$}
+    \While{$x.\mathit{left} \ne \textsc{nil}$}
+      \State $x = x.\mathit{left}$
+    \EndWhile
+    \Return $x$
+  \EndProcedure
+  \Procedure{Tree-Maximum}{$x$}
+    \While{$x.\mathit{right} \ne \textsc{nil}$}
+      \State $x = x.\mathit{right}$
+    \EndWhile
+    \Return $x$
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{Tree-Successor}{$x$}
-\If{$x.\mathit{right} \neq \text{NIL}$}
-\Return \Call{Tree-Minimum}{$x.\mathit{right}$} \Comment{leftmost node in right subtree}
-\Else \Comment{find the lowest ancestor of $x$ whose left child is an ancestor of $x$}
-\State $y = x.p$
-\While{$y \neq \text{NIL}$ and $x == y.\mathit{right}$}
-\State $x = y$
-\State $y = y.p$
-\EndWhile
-\Return $y$
-\EndIf
-\EndProcedure
+  \Procedure{Tree-Successor}{$x$}
+    \If{$x.\mathit{right} \ne \textsc{nil}$}
+      \Return \Call{Tree-Minimum}{$x.\mathit{right}$} \Comment{leftmost node in right subtree}
+    \Else \Comment{find the lowest ancestor of $x$ whose left child is an ancestor of $x$}
+      \State $y = x.p$
+      \While{$y \ne \textsc{nil}$ and $x == y.\mathit{right}$}
+        \State $x = y$
+        \State $y = y.p$
+      \EndWhile
+      \Return $y$
+    \EndIf
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
@@ -293,26 +293,26 @@ Induction step:  更大的树由根节点，左子树，右子树（可能为空
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{Tree-Insert}{$T, z$}
-\State $x = T.\mathit{root}$
-\State $y = \text{NIL}$
-\While{$x \neq \text{NIL}$}
-\State $y = x$
-\If{$z.\mathit{key} < x.\mathit{key}$}
-\State $x = x.\mathit{left}$
-\Else
-\State $x = x.\mathit{right}$
-\EndIf
-\EndWhile
-\State $z.p = y$
-\If{$y == \text{NIL}$}
-\State $T.\mathit{root} = z$
-\ElsIf{$z.\mathit{key} < y.\mathit{key}$}
-\State $y.\mathit{left} = z$
-\Else
-\State $y.\mathit{right} = z$
-\EndIf
-\EndProcedure
+  \Procedure{Tree-Insert}{$T, z$}
+    \State $x = T.\mathit{root}$
+    \State $y = \textsc{nil}$
+    \While{$x \ne \textsc{nil}$}
+      \State $y = x$
+      \If{$z.\mathit{key} < x.\mathit{key}$}
+        \State $x = x.\mathit{left}$
+      \Else
+        \State $x = x.\mathit{right}$
+      \EndIf
+    \EndWhile
+    \State $z.p = y$
+    \If{$y == \textsc{nil}$}
+      \State $T.\mathit{root} = z$
+    \Elif{$z.\mathit{key} < y.\mathit{key}$}
+      \State $y.\mathit{left} = z$
+    \Else
+      \State $y.\mathit{right} = z$
+    \EndIf
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
@@ -324,18 +324,18 @@ Induction step:  更大的树由根节点，左子树，右子树（可能为空
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{Transplant}{$T, u, v$}
-\If{$u.p == \text{NIL}$}
-\State $T.\mathit{root} = v$
-\ElsIf{$u == u.p.\mathit{left}$}
-\State $u.p.\mathit{left} = v$
-\Else
-\State $u.p.\mathit{right} = v$
-\EndIf
-\If{$v \neq \text{NIL}$}
-\State $v.p = u.p$
-\EndIf
-\EndProcedure
+  \Procedure{Transplant}{$T, u, v$}
+    \If{$u.p == \textsc{nil}$}
+      \State $T.\mathit{root} = v$
+    \Elif{$u == u.p.\mathit{left}$}
+      \State $u.p.\mathit{left} = v$
+    \Else
+      \State $u.p.\mathit{right} = v$
+    \EndIf
+    \If{$v \ne \textsc{nil}$}
+      \State $v.p = u.p$
+    \EndIf
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
@@ -343,23 +343,23 @@ Induction step:  更大的树由根节点，左子树，右子树（可能为空
 ```pseudo
 \begin{algorithm}
 \begin{algorithmic}
-\Procedure{Tree-Delete}{$T, z$}
-\If{$z.\mathit{left} == \text{NIL}$}
-\State \Call{Transplant}{$T, z, z.\mathit{right}$} \Comment{replace $z$ by its right child}
-\ElsIf{$z.\mathit{right} == \text{NIL}$}
-\State \Call{Transplant}{$T, z, z.\mathit{left}$} \Comment{replace $z$ by its left child}
-\Else
-\State $y =$ \Call{Tree-Minimum}{$z.\mathit{right}$} \Comment{$y$ is $z$'s successor}
-\If{$y \neq z.\mathit{right}$} \Comment{is $y$ farther down the tree?}
-\State \Call{Transplant}{$T, y, y.\mathit{right}$} \Comment{replace $y$ by its right child}
-\State $y.\mathit{right} = z.\mathit{right}$ \Comment{$z$'s right child becomes $y$'s right child}
-\State $y.\mathit{right}.p = y$
-\EndIf
-\State \Call{Transplant}{$T, z, y$} \Comment{replace $z$ by its successor $y$}
-\State $y.\mathit{left} = z.\mathit{left}$ \Comment{and give $z$'s left child to $y$, which had no left child}
-\State $y.\mathit{left}.p = y$
-\EndIf
-\EndProcedure
+  \Procedure{Tree-Delete}{$T, z$}
+    \If{$z.\mathit{left} == \textsc{nil}$}
+      \State \Call{Transplant}{$T, z, z.\mathit{right}$} \Comment{replace $z$ by its right child}
+    \Elif{$z.\mathit{right} == \textsc{nil}$}
+      \State \Call{Transplant}{$T, z, z.\mathit{left}$} \Comment{replace $z$ by its left child}
+    \Else
+      \State $y =$ \Call{Tree-Minimum}{$z.\mathit{right}$} \Comment{$y$ is $z$'s successor}
+      \If{$y \ne z.\mathit{right}$} \Comment{is $y$ farther down the tree?}
+        \State \Call{Transplant}{$T, y, y.\mathit{right}$} \Comment{replace $y$ by its right child}
+        \State $y.\mathit{right} = z.\mathit{right}$ \Comment{$z$'s right child becomes $y$'s right child}
+        \State $y.\mathit{right}.p = y$
+      \EndIf
+      \State \Call{Transplant}{$T, z, y$} \Comment{replace $z$ by its successor $y$}
+      \State $y.\mathit{left} = z.\mathit{left}$ \Comment{and give $z$'s left child to $y$, which had no left child}
+      \State $y.\mathit{left}.p = y$
+    \EndIf
+  \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 ```
@@ -370,4 +370,56 @@ Induction step:  更大的树由根节点，左子树，右子树（可能为空
 - 中序（Inorder）：左，根，右。
 - 后序（Postorder）：左，右，根。
 
+平衡树（self-balancing trees）通过一些操作让二叉查找树的树高变成 $O(\log n)$ 的。
+### AVL Trees
 
+名字来源于发明者：Adelson-Velskii & Landis。
+不变量：所有节点都是局部平衡的。
+- 对于每个节点，左子树的树高和右子树的树高最多差 1。
+- 也就是说，对于每个节点 $v$，左右子树分别为 $T_{l},T_{r}$，定义平衡因子（Balance Factor）：
+$$
+bal(v)=h(T_{l})-h(T_{r})
+$$
+- 那么 AVL 树需要保证 $bal(v)\in \{ -1,0,1 \}$ 对任意节点 $v$。
+
+**定理：** 令 $\varphi= \frac{\sqrt{5}+1}{2}$，那么 $n$ 个节点的 AVL 树的树高满足
+$$
+h\leq \frac{\log n}{\log \varphi} 
+$$
+证明：
+- 设 $A(h)$ 表示，高度为 $h$ 的 AVL 树中，最少有多少个节点。那么，对于任意的有 $n$ 个节点且高度为 $h$ 的 AVL 树，都有 $n\geq A(h)$。
+- 显然 $A(0)=1$，$A(1)=2$。
+- 对于 $h\geq 2$，则必须由一个根节点，一个高度为 $h-1$ 的子树，和一个高度至少为 $h-2$ 的子树组成，于是
+$$
+A(h)=1+A(h-1)+A(h-2)
+$$
+- 这里有 $A(h)=Fib(h+2)-1$，其中 $Fib(k)$ 为下标从零开始的斐波那契数列（$Fib(0)=Fib(1)=1$）。这可以用归纳证明。
+-  根据斐波那契数列的闭式公式，有不等式
+$$
+Fib(k)\geq \frac{1}{\sqrt{5} }\left[ \varphi^{k+1}-1 \right]
+$$
+- 因此，有
+$$
+n\geq A(h)= Fib(h+2)-1\geq \frac{1}{\sqrt{5} }\left[ \varphi^{h+3}-1 \right]-1
+$$
+- 化简得到
+$$
+\sqrt{5}n+\sqrt{5}+1 \geq \varphi ^{h+3}
+$$
+- 因此
+$$
+h \leq  \frac{\log(\sqrt{5}n+\sqrt{5}+1)}{\log \varphi}-3\leq \frac{\log n}{\log \varphi}
+$$
+
+**插入操作。** 插入 $z$，先按正常的 BST 去做；考虑搜索路径，我们从下至上回溯搜索路径，同时做 **重新平衡**。考虑做到了节点 $v$ ，假设它的**右孩子** $x$ **在搜索路径上**（左孩子的情况是对称的）。那么有三种情况：
+- $bal(v)=1$。那么，只需要设 $bal(v)=0$ 即可。并且，$v$ 这个子树的高度没变，所以不需要再向上回溯了。![[Data Structures.png|529]]
+- $bal(v)=0$。那么，只需要设 $bal(v)=-1$ 即可。这时候 $v$ 这个子树的高度增加了，所以还需要向上回溯，除非 $v$ 已经是根节点了。
+- $bal(v)=-1$，那么插入之后，这个子树变得不平衡了！考虑搜索路径上向下连着的三个节点 $v,x,w$。分两种情况：
+  - $w$ 是 $x$ 的右孩子。那么我们需要向左旋转（rotate）这个树：令 $x$ 为 $v$ 的 parent，令 $x$ 的左子树变成 $v$ 的右子树，那么操作之后 $bal(x)=bal(v)=0$。旋转后也不需要再向上回溯。![[Data Structures-9.png|544]]
+  - $w$ 是 $x$ 的左孩子。可以先在 $x$ 处右旋一次，再在 $v$ 处左旋一次。这里，最后的结果会是 $w$ 成为了根节点，且 $bal(w)=0$。若初始 $bal(w)=-1$，那么结果（如下图）为 $bal(v)=1,bal(x)=0$。若初始 $bal(w)=1$，那么结果为 $bal(v)=0,bal(x)=-1$。若初始 $bal(w)=0(w=z)$，那么 $bal(v)=bal(x)=0$。![[Data Structures-10.png|540]]
+**删除操作。** 类似地，我们正常按 BST 删完之后，我们回溯搜索路径。这里不妨假设删除减少了 **左子树** 的树高（右子树是对称的）。分三种情况：
+- $bal(v)=1$，那么只需要设 $bal(v)=0$ 即可。这里 $v$ 子树的高度减少了，所以需要继续向上回溯。
+- $bal(v)=0$，那么只需要设 $bal(v)=-1$ 即可。这里 $v$ 子树的高度没变，所以不需要再向上回溯。
+- $bal(v)=-1$。那么左子树会变得比右子树的树高少 $2$！考虑右子树向下的搜索路径三个节点 $v,x,w$。 有两种情况：
+  - $bal(x)\in \{ -1,0 \}$。那么在 $v$ 处向左旋转就好了。这里若 $bal(x)=0$，那么最后 $bal(v)=-1,bal(x)=1$，树高没变，就不用向上回溯了。若 $bal(x)=-1$，那么最后 $bal(v)=bal(x)=0$，还需要向上回溯，因为树高变了。![[Data Structures-11.png|568]]
+  - $bal(x)=1$。需要两次旋转，旋转完也还要向上回溯。![[Data Structures-12.png|560]]

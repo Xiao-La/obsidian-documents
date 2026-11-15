@@ -10,11 +10,15 @@ const DEFAULT_SETTINGS = {
 
 const CSS_LENGTH = /^\d*\.?\d+(?:em|rem|px|ch|pt)$/;
 
+// [file, family, style, weight, format]. The small caps are Latin Modern Roman Caps
+// (cmcsc10's design, GUST Font License): real small-cap glyphs for NIL and procedure
+// names instead of the browser's thin, shrunken imitation.
 const FONT_FACES = [
-  ['cm-regular.ttf', 'normal', 'normal'],
-  ['cm-italic.ttf', 'italic', 'normal'],
-  ['cm-bold.ttf', 'normal', 'bold'],
-  ['cm-bolditalic.ttf', 'italic', 'bold'],
+  ['cm-regular.ttf', 'CM Pseudocode', 'normal', 'normal', 'truetype'],
+  ['cm-italic.ttf', 'CM Pseudocode', 'italic', 'normal', 'truetype'],
+  ['cm-bold.ttf', 'CM Pseudocode', 'normal', 'bold', 'truetype'],
+  ['cm-bolditalic.ttf', 'CM Pseudocode', 'italic', 'bold', 'truetype'],
+  ['cm-smallcaps.otf', 'CM Pseudocode SC', 'normal', 'normal', 'opentype'],
 ];
 
 /* ---------------- fences ---------------- */
@@ -187,10 +191,10 @@ class PseudocodeSuitePlugin extends Plugin {
    * resource URLs instead (also in popout windows).
    */
   installFonts() {
-    const css = FONT_FACES.map(([file, style, weight]) => {
+    const css = FONT_FACES.map(([file, family, style, weight, format]) => {
       const url = this.app.vault.adapter.getResourcePath(`${this.manifest.dir}/fonts/${file}`);
-      return `@font-face { font-family: 'CM Pseudocode'; font-style: ${style}; font-weight: ${weight}; `
-        + `font-display: swap; src: url("${url}") format('truetype'); }`;
+      return `@font-face { font-family: '${family}'; font-style: ${style}; font-weight: ${weight}; `
+        + `font-display: swap; src: url("${url}") format('${format}'); }`;
     }).join('\n');
     const inject = (doc) => {
       if (!doc || doc.getElementById('pseudocode-suite-fonts')) return;

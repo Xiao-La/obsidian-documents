@@ -4,21 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "057b8590005efd40",
+        "id": "544f4fd45b123378",
         "type": "tabs",
         "children": [
           {
-            "id": "75a1cdb088e1fb6d",
+            "id": "bc7a5a3f7aad389a",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "计算机/Harvard CS50 - AI/0 - Search.md",
+                "file": "计算机/DSAA/Data Structures.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "0 - Search"
+              "title": "Data Structures"
             }
           }
         ]
@@ -172,6 +172,7 @@
   },
   "left-ribbon": {
     "hiddenItems": {
+      "figure-suite:New figure": false,
       "pseudocode-suite:Insert pseudocode block": false,
       "bases:新建数据库": false,
       "switcher:打开快速切换": false,
@@ -183,11 +184,19 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "75a1cdb088e1fb6d",
+  "active": "bc7a5a3f7aad389a",
   "lastOpenFiles": [
-    "计算机/Harvard CS50 - AI/1 - Knowledge.md",
-    "计算机/DSAA/Introduction.md",
+    "笔记依赖/图片/Data Structures-12.png",
+    "笔记依赖/图片/Data Structures-11.png",
+    "笔记依赖/图片/Data Structures-10.png",
+    "笔记依赖/图片/Data Structures-9.png",
+    "笔记依赖/图片/Data Structures.png",
+    "数学/离散数学/Recurrence - 递归.md",
     "计算机/DSAA/Data Structures.md",
+    "数学/离散数学/Number Theory - 数论.md",
+    "计算机/DSAA/Introduction.md",
+    "计算机/Harvard CS50 - AI/0 - Search.md",
+    "计算机/Harvard CS50 - AI/1 - Knowledge.md",
     "计算机/DSAA/Sorting.md",
     "__ps_suite_test.md",
     "笔记依赖/图片/Number Theory - 数论-11.png",
@@ -196,18 +205,12 @@
     "笔记依赖/图片/Sequential Logic - 时序逻辑-9.png",
     "笔记依赖/图片/Sequential Logic - 时序逻辑-12.png",
     "笔记依赖/图片/Sequential Logic - 时序逻辑-14.png",
-    "笔记依赖/图片/Sequential Logic - 时序逻辑-15.png",
-    "笔记依赖/图片/Sequential Logic - 时序逻辑-20.png",
-    "笔记依赖/图片/Sequential Logic - 时序逻辑-22.png",
-    "笔记依赖/图片/Sequential Logic - 时序逻辑-26.png",
     "计算机/Harvard CS50 - AI/6 - Language.md",
     "数学/离散数学/Set and Function - 集合与函数.md",
-    "数学/离散数学/Recurrence - 递归.md",
     "数学/离散数学/Counting - 计数.md",
     "数学/线性代数/Eigenvalues and Eigenvectors - 特征值和特征向量.md",
     "数学/离散数学/Logic and Proofs - 逻辑与证明.md",
     "数学/离散数学/Algorithm - 算法.md",
-    "数学/离散数学/Number Theory - 数论.md",
     "数学/线性代数/Orthogonal - 正交.md",
     "数学/线性代数/Vector Space - 向量空间.md",
     "数学/概率与统计/Probability Distributions - 概率分布.md",
@@ -217,10 +220,8 @@
     "计算机/数字逻辑/Sequential Logic - 时序逻辑.md",
     "数学/微分几何/Coordinate Systems and Vectors - 坐标系与向量.md",
     "计算机/SUSTech CS109 - Java.md",
-    "计算机/Harvard CS50 - AI/0 - Search.md",
     "计算机/Harvard CS50 - AI/4 - Learning.md",
     "数学/概率与统计/Random Variables - 随机变量.md",
-    "数学/线性代数/Positive Definite Matrices - 正定矩阵.md",
     "数学/未命名",
     "数学/微分几何",
     "其他通识课/生命科学概论/总复习.pdf",

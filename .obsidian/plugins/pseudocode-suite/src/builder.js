@@ -33,18 +33,18 @@
   /* Row layouts. A part is a literal word, an input ({ key }) or a select. */
   const field = (key, placeholder, math = true) => ({ key, placeholder, math });
   const ROWS = {
-    state: { chip: 'statement', parts: [field('text', 'e.g. S1.top = 0')] },
+    state: { chip: 'statement', parts: [field('text', 'e.g. x = Extract-Min(Q)')] },
     require: { chip: 'require', parts: [field('text', 'input, e.g. A, n')] },
     ensure: { chip: 'ensure', parts: [field('text', 'output, e.g. A is sorted')] },
-    return: { chip: 'return', parts: [field('text', 'value (optional)')] },
+    return: { chip: 'return', parts: [field('text', 'value, e.g. Merge-Sort(A, p, r)')] },
     print: { chip: 'print', parts: [field('text', 'value')] },
     break: { chip: 'break', parts: [] },
     continue: { chip: 'continue', parts: [] },
     call: { chip: 'call', parts: [field('name', 'procedure name', false), '(', field('args', 'args, e.g. A, i'), ')'] },
     raw: { chip: 'raw', parts: [field('text', 'unrecognized raw line', false)] },
     comment: { chip: '//', parts: [field('text', 'comment text', false)], noComment: true },
-    while: { chip: 'while', parts: [field('cond', 'condition, e.g. k > 0')] },
-    forall: { chip: 'for all', parts: [field('init', 'variable in set, e.g. x in S')] },
+    while: { chip: 'while', parts: [field('cond', 'condition, e.g. i > 0 and A[i] > key')] },
+    forall: { chip: 'for each', parts: [field('init', 'element in set, e.g. v in G.V')] },
     for: {
       chip: 'for',
       parts: [
@@ -57,7 +57,7 @@
       chip: 'procedure',
       parts: [
         { select: 'kind', options: [['Procedure', 'Procedure'], ['Function', 'Function']] },
-        field('name', 'name, e.g. PushS1', false),
+        field('name', 'name, e.g. Max-Heapify', false),
         '(', field('args', 'args, e.g. A, x'), ')',
       ],
     },
@@ -68,7 +68,7 @@
     ['Return', 'return'], ['Call', 'call'], ['Procedure', 'function'],
   ];
   const MORE_INSERTS = [
-    ['For all', 'forall'], ['Repeat … until', 'repeat'], ['Require', 'require'], ['Ensure', 'ensure'],
+    ['For each', 'forall'], ['Repeat … until', 'repeat'], ['Require', 'require'], ['Ensure', 'ensure'],
     ['Break', 'break'], ['Continue', 'continue'], ['Print', 'print'], ['Comment line', 'comment'],
   ];
 
@@ -99,6 +99,20 @@
     }
   }
 
+  /*
+   * A field that was plain text in the source (`\State Initialize the array`) stays plain text
+   * while edited. Marked as `<key>Prose` so it survives undo snapshots (JSON) and duplication;
+   * the serializer ignores it.
+   */
+  function markSourceProse(value) {
+    if (Array.isArray(value)) { value.forEach(markSourceProse); return; }
+    if (!value || typeof value !== 'object') return;
+    for (const [key, child] of Object.entries(value)) {
+      if (key.endsWith('Math') && child === false) value[`${key.slice(0, -4)}Prose`] = true;
+      else if (child && typeof child === 'object') markSourceProse(child);
+    }
+  }
+
   class BuilderModal extends Modal {
     constructor(app, options) {
       super(app);
@@ -106,6 +120,7 @@
       this.settings = options.settings || {};
       this.sourcePath = options.sourcePath || '';
       this.onSave = options.onSave;
+      markSourceProse(this.model.nodes);
       this.initialLatex = PS.serializeLatex(this.model);
       this.index = new Map();
       this.undoStack = [];
@@ -399,7 +414,7 @@
               node, depth, slot: index, kind: index === 0 ? 'node' : 'branch',
               chip: index === 0 ? 'if' : 'else if',
               target: branch,
-              parts: [field('cond', 'condition, e.g. i == 0')],
+              parts: [field('cond', 'condition, e.g. x == NIL')],
               comment: index === 0 ? { target: node, key: 'comment' } : { target: branch, key: 'comment' },
             });
             if (!collapsed) this.renderNodes(branch.body, depth + 1);
@@ -526,9 +541,9 @@
         const value = input.value;
         if (part.math) {
           target[part.key] = PS.normalizeOperators(value);
-          // Prose read from the source (\State Initialize ...) stays prose.
-          const flag = `${part.key}Math`;
-          if (target[flag] !== false) target[flag] = value.trim() !== '' && !hasCjk(value);
+          // Decided from the current text each time, so clearing the field or a stray CJK
+          // character does not lock it into plain text; only source prose stays prose.
+          if (!target[`${part.key}Prose`]) target[`${part.key}Math`] = !hasCjk(value);
         } else {
           target[part.key] = value;
         }
@@ -837,7 +852,7 @@
 
     schedulePreview() {
       clearTimeout(this.previewTimer);
-      this.previewTimer = setTimeout(() => this.renderPreview(), 180);
+      this.previewTimer = setTimeout(() => this.renderPreview(), 120);
     }
 
     async renderPreview() {

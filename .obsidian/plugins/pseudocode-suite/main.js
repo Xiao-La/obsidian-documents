@@ -15,6 +15,9 @@ const {
   PluginSettingTab,
   Setting,
   setIcon,
+  renderMath,
+  finishRenderMath,
+  loadMathJax,
 } = require('obsidian');
 
 /*
@@ -120,9 +123,11 @@ const OPERATOR_ALIASES = [
   [/<>/g, '!='],
   [/&&/g, 'and'],
   [/\|\|/g, 'or'],
-  [/\\(?:land|And)\b/g, 'and'],
-  [/\\(?:lor|Or)\b/g, 'or'],
-  [/\\(?:lnot|Not)\b/g, 'not'],
+  [/\\(?:And|AND)\b/g, 'and'],
+  [/\\(?:Or|OR)\b/g, 'or'],
+  [/\\(?:Not|NOT)\b/g, 'not'],
+  // CLRS subarray ranges A[1 . . n] (clrscode \twodots) are typed as `..`.
+  [/\s*\\twodots\b\s*/g, '..'],
 ];
 
 /** Canonical ASCII operators → TeX. */
@@ -131,11 +136,11 @@ const SYMBOL_TEX = [
   [/>=/g, '\\ge '],
   [/!=/g, '\\ne '],
   [/->/g, '\\to '],
+  [/\s*(?<![.\\])\.\.(?!\.)\s*/g, ' \\twodots '],
 ];
 const WORD_TEX = [
-  [/(?<!\\)\band\b/g, '\\land '],
-  [/(?<!\\)\bor\b/g, '\\lor '],
-  [/(?<!\\)\bnot\b/g, '\\lnot '],
+  // Inside math (a field written with backslashes): roman words, as in CLRS.
+  [/(?<![\\{])\b(and|or|not)\b/g, '\\text{ $1 }'],
 ];
 
 const applyAll = (text, table) => table.reduce((value, [pattern, replacement]) => value.replace(pattern, replacement), text);
@@ -152,7 +157,7 @@ PS.texOperators = function texOperators(text, words = true) {
 };
 
 // Font commands keep their argument as written; mask them while rewriting.
-const FONT_GROUP = /\\(?:text|textbf|textit|texttt|textrm|textsf|textup|mathrm|mathit|mathbf|mathsf|mathtt|operatorname)\{[^{}]*\}/g;
+const FONT_GROUP = /\\(?:text|textbf|textit|texttt|textrm|textsf|textup|textsc|mathrm|mathit|mathbf|mathsf|mathtt|operatorname|Call)\{[^{}]*\}/g;
 
 PS.maskFontGroups = function maskFontGroups(tex, transform) {
   const kept = [];
@@ -204,7 +209,9 @@ function isSingleMath(text) {
 }
 
 const subscript = (all, letter, digits) => (digits.length === 1 ? `${letter}_${digits}` : `${letter}_{${digits}}`);
-const UNWRAP_FONT = /\\(?:text(?:bf|it|rm|sf|up)?|mathrm|mathit|mathbf)\{([^{}]*)\}/g;
+// Not before "(": an explicit \mathrm{Parent}(i) is a function name the
+// author chose to set upright, not a procedure call (see PS.splitCalls).
+const UNWRAP_FONT = /\\(?:text(?:bf|it|rm|sf|up)?|mathrm|mathit|mathbf)\{([^{}]*)\}(?!\()/g;
 
 /**
  * Normalize a LaTeX fragment into something better for the visual editor:
@@ -213,21 +220,37 @@ const UNWRAP_FONT = /\\(?:text(?:bf|it|rm|sf|up)?|mathrm|mathit|mathbf)\{([^{}]*
  */
 function fromMath(text) {
   let value = String(text == null ? '' : text).trim();
-  if (isSingleMath(value)) value = value.slice(1, -1).trim();
+  const single = isSingleMath(value);
+  if (single) value = value.slice(1, -1).trim();
   value = PS.normalizeOperators(value)
     .replace(/\\To\b/g, 'to')
     .replace(/\\DownTo\b/g, 'downto');
-  // Innermost first; repeat so nested \mathrm{..\text{..}..} unwraps.
-  for (let previous = null; previous !== value;) {
-    previous = value;
-    value = value.replace(UNWRAP_FONT, '$1');
-  }
+  // Innermost first; repeat so nested \mathrm{..\text{..}..} unwraps. In mixed text
+  // (`\textbf{not} $S.\mathrm{empty}()$`) only inside the math runs: outside them the
+  // font is the author's (bold keywords) and must survive a save.
+  const unwrap = (text) => {
+    // An explicit italic all-caps name (\mathit{KB}) is a variable, not the constant KB.
+    const kept = [];
+    let chunk = text.replace(/\\mathit\{[A-Z][A-Z0-9]+\}/g, (group) => `\u0002${kept.push(group) - 1}\u0003`);
+    for (let previous = null; previous !== chunk;) {
+      previous = chunk;
+      chunk = chunk.replace(UNWRAP_FONT, '$1');
+    }
+    return chunk
+      .replace(/\\textsc\{([a-z]+)\}/g, (all, word) => word.toUpperCase())
+      .replace(/\u0002(\d+)\u0003/g, (all, index) => kept[Number(index)]);
+  };
+  value = value.includes('$')
+    ? value.split(/(\$[^$]*\$)/).map((chunk, index) => (index % 2 ? unwrap(chunk) : chunk)).join('')
+    // Prose without any math (`\Return \textbf{true}`) keeps its fonts as written.
+    : single ? unwrap(value) : value;
   value = value
     .replace(/([A-Za-z])_\{(\d+)\}/g, subscript)
     .replace(/\\textbackslash\b/g, '\\')
     .replace(/\\_/g, '_')
     .replace(/\\[,;: ]/g, ' ');
-  return value.replace(/[ \t]+/g, ' ').trim();
+  // `\State \text{}` is the empty placeholder of a comment-only line.
+  return value.replace(/\\text\{\}/g, '').replace(/[ \t]+/g, ' ').trim();
 }
 
 PS.readGroup = readGroup;
@@ -235,6 +258,175 @@ PS.firstGroup = firstGroup;
 PS.splitComment = splitComment;
 PS.fromMath = fromMath;
 PS.isSingleMath = isSingleMath;
+
+/* ------------------------------------------------------------------ */
+/* Procedure calls inside expressions                                  */
+/* ------------------------------------------------------------------ */
+
+/*
+ * In builder fields a capitalized name directly followed by "(" is a
+ * procedure call, typeset like \Call (small caps): `return Merge-Sort(A, p, r)`,
+ * `x = Extract-Min(Q)`. Single letters stay math (T(n), O(n)); so does any
+ * field containing a backslash, which is the escape hatch (\mathrm{Pr}(A)).
+ *
+ * The words and / or / not are written as words, never as ∧ ∨ ¬. CLRS sets them in
+ * roman between the math (clrscode: `\While $i > 0$ and $A[i] > \id{key}$`), so
+ * they are saved as plain text between math runs; only `error` is bold.
+ */
+const CALL_AT = /(?<![A-Za-z0-9_.'])([A-Z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*)\(/g;
+const isCallName = (name) => /^[A-Z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*$/.test(name) && (name.match(/[A-Za-z]/g) || []).length >= 2;
+const LOGIC_WORD = /(?<![A-Za-z0-9_.])(and|or|not)(?![A-Za-z0-9_])/g;
+// `\textbf{and}` is how older notes wrote them; read, and saved back as plain words.
+const LOGIC_TEX = /^\\textbf\{(and|or|not|error)\}/;
+const LOGIC_PLAIN = /^(and|or|not)(?![A-Za-z0-9_])/;
+// Quoted strings stay text, with typographic quotes: error “heap underflow”.
+const STRING = /(“[^”]*”|"[^"]*")/;
+
+/** Split text into text and keyword parts. */
+function splitLogic(value) {
+  const parts = [];
+  let last = 0;
+  LOGIC_WORD.lastIndex = 0;
+  for (let match; (match = LOGIC_WORD.exec(value));) {
+    if (match.index > last) parts.push({ type: 'text', value: value.slice(last, match.index) });
+    parts.push({ type: 'keyword', value: match[1] });
+    last = match.index + match[0].length;
+  }
+  if (last < value.length) parts.push({ type: 'text', value: value.slice(last) });
+  return parts;
+}
+
+/** Split plain text into text, call and keyword parts, or null if it has none of the latter. */
+function splitCalls(text) {
+  const value = String(text == null ? '' : text);
+  if (value.includes('\\') || value.includes('$')) return null;
+  const parts = [];
+  let last = 0;
+  const pushText = (chunk) => {
+    chunk.split(STRING).forEach((piece, index) => {
+      if (!piece) return;
+      if (index % 2) parts.push({ type: 'string', value: piece.slice(1, -1) });
+      else parts.push(...splitLogic(piece));
+    });
+  };
+  const lead = value.match(/^\s*error(?=\s|$)/);
+  if (lead) {
+    parts.push({ type: 'keyword', value: 'error' });
+    last = lead[0].length;
+  }
+  CALL_AT.lastIndex = last;
+  for (let match; (match = CALL_AT.exec(value));) {
+    if (!isCallName(match[1])) continue;
+    const open = match.index + match[0].length - 1;
+    let depth = 0;
+    let close = -1;
+    for (let i = open; i < value.length && close < 0; i++) {
+      if (value[i] === '(') depth += 1;
+      else if (value[i] === ')' && --depth === 0) close = i;
+    }
+    if (close < 0) continue;
+    pushText(value.slice(last, match.index));
+    parts.push({ type: 'call', name: match[1], args: value.slice(open + 1, close) });
+    last = close + 1;
+    CALL_AT.lastIndex = last;
+  }
+  pushText(value.slice(last));
+  return parts.some((part) => part.type !== 'text') ? parts : null;
+}
+
+/**
+ * Plain text with calls or logic words → inline LaTeX: math runs as `$...$`
+ * (through `mathFn`), calls as \Call{Name}{args}, and / or / not as plain words,
+ * error as \textbf{error}.
+ * Null when there is neither.
+ */
+function inlineWithCalls(text, mathFn) {
+  const parts = splitCalls(text);
+  if (!parts) return null;
+  const math = (segment) => {
+    const [, before, body, after] = segment.match(/^(\s*)([\s\S]*?)(\s*)$/);
+    if (!body) return segment ? ' ' : '';
+    return `${before ? ' ' : ''}$${mathFn(body)}$${after ? ' ' : ''}`;
+  };
+  return parts.map((part) => {
+    if (part.type === 'call') return `\\Call{${part.name}}{${inlineWithCalls(part.args, mathFn) || math(part.args).trim()}}`;
+    if (part.type === 'keyword') return part.value === 'error' ? '\\textbf{error}' : part.value;
+    if (part.type === 'string') return `“${part.value}”`;
+    return math(part.value);
+  }).join('').trim();
+}
+
+/**
+ * The reverse, for the builder: `$x =$ \Call{Left}{$i$}` → `x = Left(i)`,
+ * `$i > 0$ and $A[i] > \mathit{key}$` → `i > 0 and A[i] > key`.
+ * Only for text made of nothing but math runs, calls and keywords; null otherwise.
+ */
+function callsToPlain(raw) {
+  const text = String(raw == null ? '' : raw).trim();
+  let out = '';
+  let found = 0;
+  let constants = 0;
+  let i = 0;
+  while (i < text.length) {
+    if (text[i] === '“') {
+      const end = text.indexOf('”', i + 1);
+      if (end < 0) return null;
+      out += text.slice(i, end + 1);
+      i = end + 1;
+      continue;
+    }
+    const constant = text.slice(i).match(/^\\textsc\{([a-z]+)\}/);
+    if (constant) {
+      out += constant[1].toUpperCase();
+      constants += 1;
+      i += constant[0].length;
+      continue;
+    }
+    if (/\s/.test(text[i])) {
+      while (i < text.length && /\s/.test(text[i])) i++;
+      out += ' ';
+      continue;
+    }
+    if (text[i] === '$') {
+      const end = text.indexOf('$', i + 1);
+      if (end < 0) return null;
+      out += fromMath(text.slice(i, end + 1));
+      i = end + 1;
+      continue;
+    }
+    // Bare punctuation between calls (`\Call{A}{$i$}, \Call{B}{$j$}`); words would change font.
+    if (/[,;:()[\]+\-*/=<>]/.test(text[i])) {
+      out += text[i++];
+      continue;
+    }
+    const keyword = text.slice(i).match(LOGIC_TEX) || text.slice(i).match(LOGIC_PLAIN);
+    if (keyword) {
+      out += ` ${keyword[1]} `;
+      found += 1;
+      i += keyword[0].length;
+      continue;
+    }
+    const call = text.slice(i).match(/^\\Call\{([^{}]*)\}/);
+    if (!call || !isCallName(call[1])) return null;
+    const args = readGroup(text, i + call[0].length);
+    if (!args) return null;
+    const inner = !args.value.trim() ? ''
+      : callsToPlain(args.value) ?? (isSingleMath(args.value) ? fromMath(args.value) : null);
+    if (inner == null) return null;
+    out += `${call[1]}(${inner})`;
+    found += 1;
+    i = args.end;
+  }
+  const plain = out.replace(/\s+/g, ' ').replace(/\(\s+/g, '(').replace(/\s+\)/g, ')').trim();
+  // Anything still carrying LaTeX would not survive the trip back.
+  if (/[\\$]/.test(plain)) return null;
+  if (found) return inlineWithCalls(plain, (s) => s) ? plain : null;
+  return constants ? plain : null;
+}
+
+PS.splitCalls = splitCalls;
+PS.inlineWithCalls = inlineWithCalls;
+PS.callsToPlain = callsToPlain;
 
 /* ------------------------------------------------------------------ */
 /* Parser                                                              */
@@ -246,10 +438,26 @@ const COMMENTABLE = new Set([
   'Call', 'Break', 'Continue',
 ]);
 
+// Fields that may be calls, constants or math joined by logic words.
+const LOGIC_SOURCE = /\\Call\b|\\textbf\{(?:and|or|not|error)\}|\\textsc\{|(?:^|\$)\s*(?:and|or|not)\s+\$/;
+
 /** `{ field: value, fieldMath: wasSingleMath }` for a math-carrying field. */
 function mathField(name, raw) {
-  const source = raw == null ? '' : raw;
+  // Older notes set the logic words bold; CLRS has them roman, as plain words.
+  const source = (raw == null ? '' : raw).replace(/\\textbf\{(and|or|not)\}/g, '$1');
+  const plain = LOGIC_SOURCE.test(source) ? callsToPlain(source) : null;
+  if (plain != null) return { [name]: plain, [`${name}Math`]: true };
   return { [name]: fromMath(source), [`${name}Math`]: isSingleMath(source) };
+}
+
+/** A condition field: a single `=` there is a test, read (and saved) as `==`. */
+function conditionField(name, raw) {
+  const out = mathField(name, raw);
+  const value = out[name];
+  out[name] = out[`${name}Math`]
+    ? PS.asComparison(value)
+    : value.replace(/\$([^$]*)\$/g, (all, inner) => `$${PS.asComparison(inner)}$`);
+  return out;
 }
 
 /** Join physical lines: an odd number of `$` continues on the next line. */
@@ -320,7 +528,7 @@ PS.parseLatex = function parseLatex(source) {
       }
 
       case 'If': {
-        const branch = Object.assign(mathField('cond', group ? group.value : ''), { body: [] });
+        const branch = Object.assign(conditionField('cond', group ? group.value : ''), { body: [] });
         const node = PS.node('if', { branches: [branch], elseBody: null });
         open(withComment(node, lineComment), branch.body);
         break;
@@ -330,7 +538,7 @@ PS.parseLatex = function parseLatex(source) {
       case 'ElseIf': {
         const { node } = top();
         if (!node || node.type !== 'if') break;
-        const branch = withComment(Object.assign(mathField('cond', group ? group.value : ''), { body: [] }), lineComment);
+        const branch = withComment(Object.assign(conditionField('cond', group ? group.value : ''), { body: [] }), lineComment);
         node.branches.push(branch);
         stack[stack.length - 1] = { target: branch.body, node };
         break;
@@ -345,7 +553,7 @@ PS.parseLatex = function parseLatex(source) {
       }
 
       case 'While': {
-        const node = PS.node('while', Object.assign(mathField('cond', group ? group.value : ''), { body: [] }));
+        const node = PS.node('while', Object.assign(conditionField('cond', group ? group.value : ''), { body: [] }));
         open(withComment(node, lineComment), node.body);
         break;
       }
@@ -358,7 +566,7 @@ PS.parseLatex = function parseLatex(source) {
       }
       case 'For': {
         const content = group ? group.value : '';
-        const parts = content.split(/\s*(?:\\To|\\DownTo|\bto\b|\bdownto\b)\s*/i);
+        const parts = content.split(/\s*(?:\\textbf\{(?:to|downto)\}|\\To\b|\\DownTo\b|\bto\b|\bdownto\b)\s*/i);
         const bound = parts.length > 1 ? parts.slice(1).join('') : '';
         const node = PS.node('for', Object.assign(
           mathField('init', parts[0] || ''),
@@ -377,7 +585,7 @@ PS.parseLatex = function parseLatex(source) {
       case 'Until': {
         const { node } = top();
         if (!node || node.type !== 'repeat') break;
-        Object.assign(node, mathField('until', group ? group.value : ''));
+        Object.assign(node, conditionField('until', group ? group.value : ''));
         if (lineComment !== null) node.untilComment = lineComment;
         pop();
         break;
@@ -476,29 +684,45 @@ function withComment(target, comment) {
 const KEYWORD_WORDS = new Set(['and', 'or', 'not']);
 
 // A word rendered upright in math; spaces next to one are real word gaps.
-const WORDISH = String.raw`\\(?:mathrm|text|textbf)\{[^{}]*\}`;
+const WORDISH = String.raw`\\(?:mathrm|text|textbf|textsc)\{[^{}]*\}`;
 const SPACE_AFTER_WORD = new RegExp(`(${WORDISH})\\s+(?=[A-Za-z0-9(\\[“‘"']|${WORDISH})`, 'g');
-const SPACE_BEFORE_WORD = new RegExp(`([A-Za-z0-9\\])”’"'])\\s+(?=${WORDISH})`, 'g');
+const SPACE_BEFORE_WORD = new RegExp(`((?<!\\\\[A-Za-z]*)[A-Za-z0-9\\])”’"'])\\s+(?=${WORDISH})`, 'g');
+
+// Upright math operators, as in CLRS: max(a, b), lg n, x mod y. Only when used as one
+// (`max = A[1]` is the variable *max*).
+const MATH_FUNCTIONS = new Set(['max', 'min', 'gcd', 'lcm', 'exp', 'sin', 'cos', 'lg', 'log', 'ln']);
+const PREFIX_OPERATORS = new Set(['lg', 'log', 'ln']);
+
+/** CLRS constants (NIL, TRUE, FALSE, OVERFLOW) are small caps: `\textsc{nil}`. */
+const constantTex = (word) => `\\textsc{${word.toLowerCase()}}`;
 
 /**
- * Builder typesetting rules for a math fragment: multi-letter identifiers
- * upright, all-caps constants and booleans as text, digits after a letter as
- * subscripts, ASCII operators as TeX. Font groups already present are kept.
+ * Builder typesetting rules for a math fragment, following CLRS: multi-letter
+ * identifiers italic (*key*, *heap-size*), words of a phrase upright
+ * ("exchange A[i] with A[j]"), constants and booleans in small caps, digits
+ * after a letter as subscripts, ASCII operators as TeX. Font groups already
+ * present are kept.
  */
 function normalizeExpr(expr) {
   const out = PS.maskFontGroups(expr, (masked) => {
-    const value = masked.replace(/([A-Za-z])_\{(\d+)\}/g, subscript);
-    const whole = value.trim();
-    if (/^[A-Z]{2,}[A-Z0-9_-]*$/.test(whole)) return `\\text{${whole}}`;
-    if (/^(true|false)$/i.test(whole)) return `\\textbf{${whole.toLowerCase()}}`;
-
-    const words = value
+    const words = masked
+      .replace(/([A-Za-z])_\{(\d+)\}/g, subscript)
       .replace(/([A-Za-z])_?(\d+)/g, subscript)
       .replace(/([A-Za-z])-([A-Za-z])/g, '$1\\text{-}$2')
-      .replace(/(?<!\\)\b[A-Za-z]{2,}\b/g, (word) => {
-        if (/^[A-Z]{2,}$/.test(word)) return `\\text{${word}}`;
-        if (/^(true|false)$/i.test(word)) return `\\textbf{${word.toLowerCase()}}`;
-        return KEYWORD_WORDS.has(word) ? word : `\\mathrm{${word}}`;
+      .replace(/(?<!\\)\b[A-Za-z]{2,}\b/g, (word, offset, text) => {
+        const before = text.slice(0, offset);
+        const after = text.slice(offset + word.length);
+        if (/^[A-Z]{2,}$/.test(word) || /^(true|false)$/i.test(word)) return constantTex(word);
+        if (KEYWORD_WORDS.has(word)) return word;
+        if (word === 'mod') return '\\bmod';
+        if (MATH_FUNCTIONS.has(word)
+          && (/^\s*\(/.test(after) || (PREFIX_OPERATORS.has(word) && /^\s+[A-Za-z0-9\\]/.test(after)))) {
+          return `\\${word}`;
+        }
+        // A word spaced off from a neighbouring word or variable is part of a phrase.
+        const phrase = /^\s+(?:[A-Za-z0-9(“"']|\u0000)/.test(after)
+          || /(?:(?<!\\[A-Za-z]*)[A-Za-z0-9]|[)\]”"']|\u0001)\s+$/.test(before);
+        return phrase ? `\\mathrm{${word}}` : `\\mathit{${word}}`;
       });
     return PS.texOperators(words);
   });
@@ -517,8 +741,8 @@ function toMath(raw) {
   if (!expr) return '';
   // CJK prose must stay outside math mode.
   if (/[一-鿿]/.test(expr)) return expr;
-  if (expr.includes('\\')) return `$${PS.texOperators(expr, false)}$`;
-  return `$${normalizeExpr(expr)}$`;
+  if (expr.includes('\\')) return `$${normalizeExpr(expr)}$`;
+  return inlineWithCalls(expr, normalizeExpr) || `$${normalizeExpr(expr)}$`;
 }
 
 /**
@@ -535,7 +759,7 @@ function mathOrRaw(text, isMath) {
   }
   return value
     .replace(/\$([^$]+)\$/g, (all, inner) =>
-      `$${inner.includes('\\') ? PS.texOperators(inner, false) : normalizeExpr(inner)}$`)
+      `$${normalizeExpr(inner)}$`)
     .replace(/[ \t]{2,}/g, ' ');
 }
 
@@ -546,6 +770,19 @@ PS.mathOrRaw = mathOrRaw;
 const commentSuffix = (comment) => (comment ? ` \\Comment{${comment}}` : '');
 const field = (node, key) => mathOrRaw(node[key], node[`${key}Math`]);
 
+// CLRS: `=` assigns, `==` tests. A single `=` in a condition is written as `==`.
+const asComparison = (tex) => tex.replace(/(?<![<>=!:\\])=(?!=)/g, '==');
+PS.asComparison = asComparison;
+const condition = (node, key) => field(node, key).replace(/\$([^$]*)\$/g, (all, inner) => `$${asComparison(inner)}$`);
+
+/** `v in S` → `$v \\in S$`; a head written with text commands stays as written. */
+function forAllHead(init) {
+  if (!init || /\\text(?:tt|rm|sf|up)?\{|\$/.test(init)) return init;
+  const parts = init.split(/\s+(?:in|\\in)\s+/);
+  if (parts.length === 2) return `$${normalizeExpr(parts[0])} \\in ${normalizeExpr(parts[1])}$`;
+  return toMath(init);
+}
+
 function emitNodes(nodes, depth, out) {
   const pad = '  '.repeat(depth);
   const line = (text, comment) => out.push(`${pad}${text}${commentSuffix(comment)}`);
@@ -554,7 +791,11 @@ function emitNodes(nodes, depth, out) {
   for (const node of nodes) {
     switch (node.type) {
       case 'state':
-        line(`\\State ${field(node, 'text') || '\\text{}'}`, node.comment);
+      {
+        // A comment-only line is `\State \Comment{...}`; `\text{}` only keeps an empty one alive.
+        const text = field(node, 'text');
+        line(text ? `\\State ${text}` : node.comment ? '\\State' : '\\State \\text{}', node.comment);
+      }
         break;
       case 'call':
         line(`\\State \\Call{${node.name || ''}}{${field(node, 'args')}}`, node.comment);
@@ -580,7 +821,7 @@ function emitNodes(nodes, depth, out) {
         break;
       case 'if':
         node.branches.forEach((branch, index) => {
-          line(`${index === 0 ? '\\If' : '\\Elif'}{${field(branch, 'cond')}}`, index === 0 ? node.comment : branch.comment);
+          line(`${index === 0 ? '\\If' : '\\Elif'}{${condition(branch, 'cond')}}`, index === 0 ? node.comment : branch.comment);
           body(branch.body);
         });
         if (node.elseBody) {
@@ -590,13 +831,13 @@ function emitNodes(nodes, depth, out) {
         line('\\EndIf');
         break;
       case 'while':
-        line(`\\While{${field(node, 'cond')}}`, node.comment);
+        line(`\\While{${condition(node, 'cond')}}`, node.comment);
         body(node.body);
         line('\\EndWhile');
         break;
       case 'for': {
         const head = node.all
-          ? node.init || ''
+          ? forAllHead(node.init || '')
           : node.bound
             ? `${field(node, 'init')} ${node.downto ? '\\DownTo' : '\\To'} ${field(node, 'bound')}`
             : field(node, 'init');
@@ -608,7 +849,7 @@ function emitNodes(nodes, depth, out) {
       case 'repeat':
         line('\\Repeat', node.comment);
         body(node.body);
-        line(`\\Until{${field(node, 'until')}}`, node.untilComment);
+        line(`\\Until{${condition(node, 'until')}}`, node.untilComment);
         break;
       case 'function': {
         const kind = node.kind === 'Procedure' ? 'Procedure' : 'Function';
@@ -685,7 +926,7 @@ PS.serializeLatex = function serializeLatex(model) {
   }
 
   // In a condition a single `=` is a comparison and shows as `==`.
-  const asComparison = (tex) => tex.replace(/(?<![<>=!:\\])=(?!=)/g, '==');
+  const asComparison = (tex) => PS.asComparison(tex);
 
   /** A field value → inline source for parseInline (math wrapped in $...$). */
   const expr = (value, isMath, comparison) => {
@@ -693,15 +934,58 @@ PS.serializeLatex = function serializeLatex(model) {
     if (!text) return '';
     if (isMath && !text.includes('$')) {
       // Constants and booleans are text, not a product of variables.
-      if (/^[A-Z]{2,}[A-Z0-9_-]*$/.test(text)) return text;
-      if (/^(true|false)$/i.test(text)) return `\\textbf{${text.toLowerCase()}}`;
-      const tex = PS.normalizeExpr(PS.normalizeOperators(text));
-      return `$${comparison ? asComparison(tex) : tex}$`;
+      if (/^[A-Z]{2,}[A-Z0-9_-]*$/.test(text) || /^(true|false)$/i.test(text)) return `\\textsc{${text.toLowerCase()}}`;
+      const math = (segment) => {
+        const tex = PS.normalizeExpr(segment);
+        return comparison ? asComparison(tex) : tex;
+      };
+      const plain = PS.normalizeOperators(text);
+      // Merge-Sort(A, p, r) inside an expression renders like \Call.
+      return PS.inlineWithCalls(plain, math) || `$${math(plain)}$`;
     }
     // Conditions mixing text and math ($a = b$ and $c$): `=` still means `==`.
     if (comparison) return text.replace(/\$([^$]*)\$/g, (all, inner) => `$${asComparison(inner)}$`);
     return text;
   };
+
+  /*
+   * CLRS sets constants (NIL, TRUE, FALSE) in small caps. MathJax has no \textsc,
+   * so they leave the formula and render like procedure names. An operator left
+   * at the cut gets an empty group so TeX still spaces it as an operator.
+   */
+  const CONSTANT_TEX = /\\textsc\{([A-Za-z]+)\}|\\(?:text|textrm|textup|textsf|mathrm|mathsf)\{([A-Z][A-Z0-9]+)\}/g;
+  const EDGE_OP = String.raw`(?:[=<>+\-*,;:]|\\(?:ne|neq|le|leq|ge|geq|to|in|notin|gets|subset|subseteq|supset|supseteq|approx|equiv|sim|mapsto|pm|mp|cdot|times|div|land|lor|wedge|vee|cup|cap|setminus|circ|oplus|otimes)(?![A-Za-z]))`;
+  const ENDS_WITH_OP = new RegExp(`${EDGE_OP}\\s*$`);
+  // CLRS's narrow test-for-equality sign (clrscode3e \isequal); styled by .ps-eq.
+  const IS_EQUAL = String.raw`\mathrel{\class{ps-eq}{=}\mkern1.8mu\class{ps-eq}{=}}`;
+  // CLRS assignment (clrscode \gets): `=` with 1pt more room on each side. Code only;
+  // in comments `=` is equality.
+  const GETS = String.raw`\mathrel{\mkern1.8mu{=}\mkern1.8mu}`;
+  const STARTS_WITH_OP = new RegExp(`^\\s*${EDGE_OP}`);
+
+  function splitConstants(tex, prose) {
+    const tokens = [];
+    let last = 0;
+    let previousConstant = false;
+    const pushMath = (piece, nextConstant) => {
+      let value = piece.trim();
+      if (!value) return;
+      if (previousConstant && STARTS_WITH_OP.test(value)) value = `{}${value}`;
+      if (nextConstant && ENDS_WITH_OP.test(value)) value = `${value}{}`;
+      if (!prose) value = value.replace(/(?<![=<>!:{])=(?![=}])/g, GETS);
+      tokens.push({ type: 'math', value: value.replace(/(?<![=<>!])==(?!=)/g, IS_EQUAL) });
+    };
+    CONSTANT_TEX.lastIndex = 0;
+    for (let match; (match = CONSTANT_TEX.exec(tex));) {
+      pushMath(tex.slice(last, match.index), true);
+      // \textsc{...} as written (\textsc{Evaluate} keeps its capital); legacy \text{NIL} → nil.
+      tokens.push({ type: 'constant', value: match[1] || match[2].toLowerCase() });
+      previousConstant = true;
+      last = match.index + match[0].length;
+    }
+    pushMath(tex.slice(last), false);
+    return tokens;
+  }
 
   function skipSpace(text, index) {
     let i = index;
@@ -717,7 +1001,13 @@ PS.serializeLatex = function serializeLatex(model) {
       .replace(/\\textbf\{([^{}]*)\}/g, '\\mathbf{$1}')
       .replace(/\\textit\{([^{}]*)\}/g, '\\mathit{$1}');
     // Comments are prose: `$ab$` there is a product, not an identifier.
-    return (prose ? tex : PS.normalizeExpr(tex)).trim();
+    // MathJax spaces a bare `.` as punctuation (`x. key`); in TeX and CLRS the attribute
+    // dot is ordinary, so it goes in a group: `x{.}\mathit{key}`. Decimals are left alone.
+    return (prose ? tex : PS.normalizeExpr(tex))
+      .replace(/(?<=[A-Za-z0-9}\])])\.(?=\s*(?:[A-Za-z]|\\(?:math|text)))/g, '{.}')
+      // clrscode's \twodots: the range dots of A[1 . . n].
+      .replace(/\\twodots\b\s*/g, '\\mathinner{\\ldotp\\ldotp}')
+      .trim();
   }
 
   /**
@@ -744,7 +1034,7 @@ PS.serializeLatex = function serializeLatex(model) {
         while (j < text.length && text[j] !== '$') j += text[j] === '\\' ? 2 : 1;
         if (j < text.length) {
           flush();
-          tokens.push({ type: 'math', value: normalizeMath(text.slice(i + 1, j), prose) });
+          tokens.push(...splitConstants(normalizeMath(text.slice(i + 1, j), prose), prose));
           i = j + 1;
           continue;
         }
@@ -785,6 +1075,16 @@ PS.serializeLatex = function serializeLatex(model) {
             }
           }
 
+          if (name === 'textsc') {
+            const value = group(after);
+            if (value) {
+              flush();
+              tokens.push({ type: 'constant', value: value.value });
+              i = value.end;
+              continue;
+            }
+          }
+
           if (FONT_COMMANDS[name]) {
             const value = group(after);
             if (value) {
@@ -811,8 +1111,40 @@ PS.serializeLatex = function serializeLatex(model) {
     return tokens;
   }
 
+  /*
+   * A math run cut off by a call (`\Call{Max}{$i$} $+ T(n)$`) starts or ends with a binary
+   * operator, which TeX would demote to unary and set tight. An empty group on that side keeps
+   * it binary; the space typed between call and math is then dropped so the gap is TeX's own.
+   */
+  const BIN_OP = String.raw`(?:[+\-*]|\\(?:pm|mp|cdot|times|div|land|lor|wedge|vee|cup|cap|setminus|circ|oplus|otimes)(?![A-Za-z]))`;
+  const LEADING_BIN = new RegExp(`^\\s*${BIN_OP}`);
+  const TRAILING_BIN = new RegExp(`${BIN_OP}\\s*$`);
+  const isCallToken = (token) => token && (token.type === 'call' || token.type === 'function' || token.type === 'constant');
+  const isBlank = (token) => token && token.type === 'text' && !token.value.trim();
+
+  function bridgeOperators(tokens) {
+    const out = tokens.slice();
+    for (let i = 0; i < out.length; i++) {
+      const token = out[i];
+      if (token.type !== 'math') continue;
+      let value = token.value;
+      const before = isBlank(out[i - 1]) ? i - 2 : i - 1;
+      if (isCallToken(out[before]) && LEADING_BIN.test(value)) {
+        value = `{}${value}`;
+        if (before === i - 2) { out.splice(i - 1, 1); i -= 1; }
+      }
+      const after = isBlank(out[i + 1]) ? i + 2 : i + 1;
+      if (isCallToken(out[after]) && TRAILING_BIN.test(value)) {
+        value = `${value}{}`;
+        if (after === i + 2) out.splice(i + 1, 1);
+      }
+      if (value !== token.value) out[i] = { ...token, value };
+    }
+    return out;
+  }
+
   function renderInline(container, source, prose) {
-    for (const token of parseInline(source, prose)) {
+    for (const token of bridgeOperators(parseInline(source, prose))) {
       switch (token.type) {
         case 'text':
           container.appendChild(document.createTextNode(token.value));
@@ -834,6 +1166,9 @@ PS.serializeLatex = function serializeLatex(model) {
           container.appendChild(document.createTextNode('('));
           renderInline(container, token.args, prose);
           container.appendChild(document.createTextNode(')'));
+          break;
+        case 'constant':
+          container.appendChild(el('span', 'ps-const', token.value));
           break;
         case 'math': {
           const wrapper = el('span', 'ps-math', token.value);
@@ -889,14 +1224,16 @@ PS.serializeLatex = function serializeLatex(model) {
         case 'if': {
           node.branches.forEach((branch, index) => {
             const comment = index === 0 ? node.comment || branch.comment : branch.comment;
-            row(`\\kw{${index === 0 ? 'if' : 'else if'}} ${expr(branch.cond, branch.condMath, true)}`, comment);
+            row(`\\kw{${index === 0 ? 'if' : 'elseif'}} ${expr(branch.cond, branch.condMath, true)}`, comment);
             body(branch.body);
           });
           if (node.elseBody) {
-            // CLRS style: a single plain statement joins the else line.
-            const only = node.elseBody.length === 1 ? node.elseBody[0] : null;
-            if (only && MERGEABLE.has(only.type) && !only.comment && !node.elseComment) {
-              row(`\\kw{else} ${simpleText(only)}`);
+            // CLRS: a plain first statement goes on the else line ("else x = x.right"),
+            // the rest of the branch below it.
+            const [first, ...rest] = node.elseBody;
+            if (first && MERGEABLE.has(first.type) && !(first.comment && node.elseComment)) {
+              row(`\\kw{else} ${simpleText(first)}`, node.elseComment || first.comment);
+              body(rest);
             } else {
               row('\\kw{else}', node.elseComment);
               body(node.elseBody);
@@ -913,12 +1250,19 @@ PS.serializeLatex = function serializeLatex(model) {
         case 'for': {
           let head;
           if (node.all) {
-            const parts = String(node.init || '').split(/\s+in\s+/);
-            // A head already written with text commands (\texttt{child} of
-            // \texttt{u}) is prose; math mode would swallow its spaces.
-            head = parts.length === 2
-              ? `\\kw{for all} ${expr(parts[0], true)} \\kw{in} ${expr(parts[1], true)}`
-              : `\\kw{for all} ${expr(node.init, !/\\text(?:tt|rm|sf|up)?\{/.test(node.init || ''))}`;
+            // CLRS: "**for** each v ∈ G.V" (only "for" is bold). A head already written with text commands
+            // (\texttt{child} of \texttt{u}) is prose; math mode would swallow its spaces.
+            const parts = String(node.init || '').split(/\s+(?:in|\\in)\s+/);
+            if (parts.length === 2) {
+              const left = expr(parts[0], true);
+              const right = expr(parts[1], true);
+              const single = (value) => /^\$[^$]*\$$/.test(value);
+              head = single(left) && single(right)
+                ? `\\kw{for} each $${left.slice(1, -1)} \\in ${right.slice(1, -1)}$`
+                : `\\kw{for} each ${left} $\\in$ ${right}`;
+            } else {
+              head = `\\kw{for} each ${expr(node.init, !/\\text(?:tt|rm|sf|up)?\{/.test(node.init || ''))}`;
+            }
           } else {
             head = node.bound
               ? `\\kw{for} ${expr(node.init, node.initMath)} \\kw{${node.downto ? 'downto' : 'to'}} ${expr(node.bound, node.boundMath)}`
@@ -936,7 +1280,8 @@ PS.serializeLatex = function serializeLatex(model) {
           break;
 
         case 'state':
-          if (!node.text && node.comment) row('', node.comment, false, { note: true });
+          // CLRS numbers comment lines too.
+          if (!node.text && node.comment) row('', node.comment, true, { note: true });
           else row(simpleText(node), node.comment);
           break;
 
@@ -948,7 +1293,7 @@ PS.serializeLatex = function serializeLatex(model) {
         case 'comment': {
           const last = rows[rows.length - 1];
           if (last && !last.comment) last.comment = node.text || '';
-          else row('', node.text || '', false, { note: true });
+          else row('', node.text || '', true, { note: true });
           break;
         }
 
@@ -960,58 +1305,88 @@ PS.serializeLatex = function serializeLatex(model) {
 
   /* ---------------- public renderer ---------------- */
 
-  function adoptRendered(span, holder) {
-    // MarkdownRenderer wraps inline content in a paragraph; keep its children.
-    const source = holder.childElementCount === 1 && holder.firstElementChild.tagName === 'P'
-      ? holder.firstElementChild
-      : holder;
-    span.replaceChildren(...source.childNodes);
+  /*
+   * Math typesetting. Obsidian's renderMath() is synchronous; the slow part is
+   * finishRenderMath() (~100 ms while MathJax refreshes its stylesheet), and a
+   * block stays hidden until it is done. Rendered formulas are cached by TeX,
+   * so re-renders (editing, mode switches, settings, the builder preview)
+   * clone them instead and never wait.
+   */
+  const MATH_CACHE_LIMIT = 4000;
+  const mathCache = new Map();
+  let mathJaxReady = null;
+
+  function cachedMath(tex) {
+    const hit = mathCache.get(tex);
+    if (!hit) return null;
+    mathCache.delete(tex); // keep recently used entries last
+    mathCache.set(tex, hit);
+    return hit.cloneNode(true);
   }
 
-  async function typesetOne(app, span, tex, sourcePath, component) {
+  function rememberMath(tex, node) {
+    mathCache.set(tex, node.cloneNode(true));
+    if (mathCache.size > MATH_CACHE_LIMIT) mathCache.delete(mathCache.keys().next().value);
+  }
+
+  /** Same markup Obsidian puts around inline math in a note. */
+  function mathElement(tex) {
+    const wrapper = document.createElement('span');
+    wrapper.className = 'math math-inline is-loaded';
+    wrapper.appendChild(renderMath(tex, false));
+    return wrapper;
+  }
+
+  /** Fallback: let a Markdown render do it. */
+  async function typesetViaMarkdown(app, span, tex, sourcePath, component) {
     const holder = document.createElement('div');
     try {
       await MarkdownRenderer.render(app, `$${tex}$`, holder, sourcePath, component);
-      adoptRendered(span, holder);
+      const math = holder.querySelector('.math');
+      if (!math) throw new Error('no math output');
+      span.replaceChildren(math);
+      rememberMath(tex, math);
     } catch (error) {
       span.classList.add('ps-math-error');
       span.textContent = `$${tex}$`;
     }
   }
 
-  /**
-   * Typeset every `.ps-math` span under root. Uses Obsidian's own Markdown
-   * math (so exports behave like normal notes) but in one render call per
-   * block: each formula becomes its own paragraph, mapped back by position.
-   */
+  /** Typeset every `.ps-math` span under root. */
   PS.typesetMath = async function typesetMath(app, root, sourcePath, component) {
-    const spans = Array.from(root.querySelectorAll('.ps-math[data-tex]'));
-    if (!spans.length) return;
-    const texts = spans.map((span) => {
+    const missing = [];
+    root.querySelectorAll('.ps-math[data-tex]').forEach((span) => {
       const tex = span.dataset.tex;
       delete span.dataset.tex;
-      return tex;
+      const hit = cachedMath(tex);
+      if (hit) span.replaceChildren(hit);
+      else missing.push({ span, tex });
     });
+    if (!missing.length) return;
 
-    let pending = spans.map((span, index) => index);
-    try {
-      const holder = document.createElement('div');
-      await MarkdownRenderer.render(app, texts.map((tex) => `$${tex}$`).join('\n\n'), holder, sourcePath, component);
-      const paragraphs = Array.from(holder.children);
-      if (paragraphs.length === spans.length) {
-        pending = pending.filter((index) => {
-          const paragraph = paragraphs[index];
-          const ok = paragraph.tagName === 'P' && paragraph.childElementCount === 1
-            && paragraph.firstElementChild.classList.contains('math')
-            && paragraph.textContent.trim() === paragraph.firstElementChild.textContent.trim();
-          if (ok) spans[index].replaceChildren(paragraph.firstElementChild);
-          return !ok;
+    let failed = missing;
+    if (typeof renderMath === 'function') {
+      try {
+        if (!mathJaxReady) mathJaxReady = typeof loadMathJax === 'function' ? loadMathJax() : Promise.resolve();
+        await mathJaxReady;
+        failed = missing.filter(({ span, tex }) => {
+          try {
+            span.replaceChildren(mathElement(tex));
+            return false;
+          } catch (error) {
+            return true;
+          }
         });
+        await finishRenderMath();
+        missing.forEach((item) => {
+          if (!failed.includes(item)) rememberMath(item.tex, item.span.firstChild);
+        });
+      } catch (error) {
+        mathJaxReady = null;
+        failed = missing.filter(({ span }) => !span.querySelector('mjx-container'));
       }
-    } catch (error) { /* fall back below */ }
-
-    // Anything the batch could not map is rendered on its own.
-    await Promise.all(pending.map((index) => typesetOne(app, spans[index], texts[index], sourcePath, component)));
+    }
+    await Promise.all(failed.map(({ span, tex }) => typesetViaMarkdown(app, span, tex, sourcePath, component)));
   };
 
   PS.buildRows = function buildRowsForModel(model) {
@@ -1043,14 +1418,23 @@ PS.serializeLatex = function serializeLatex(model) {
       rowEl.appendChild(el('span', 'ps-num', settings.lineNumbers && row.number != null ? String(row.number) : ''));
       // A comment-only line has no code cell: its comment starts at the code
       // column, at the line's indent, and runs to the right edge (CLRS).
+      // A procedure header without a comment spans the comment column too, so a long
+      // parameter list does not squeeze the comments of the lines below it.
+      const span = row.kind === 'function' && !row.comment;
       if (!row.note) {
-        const codeEl = el('span', 'ps-code');
+        const codeEl = el('span', span ? 'ps-code ps-span' : 'ps-code');
         renderInline(codeEl, row.text);
         rowEl.appendChild(codeEl);
       }
+      if (span) {
+        grid.appendChild(rowEl);
+        continue;
+      }
       const commentEl = el('span', row.note ? 'ps-comment ps-note' : 'ps-comment');
       if (row.comment) {
-        commentEl.appendChild(document.createTextNode(`${settings.commentDelimiter || '//'} `));
+        // clrscode \CommentSymbol: bold, tightly kerned slashes.
+        commentEl.appendChild(el('span', 'ps-comment-mark', settings.commentDelimiter || '//'));
+        commentEl.appendChild(document.createTextNode(' '));
         renderInline(commentEl, row.comment, true);
       }
       rowEl.appendChild(commentEl);
@@ -1076,6 +1460,7 @@ PS.serializeLatex = function serializeLatex(model) {
 
   PS.renderInline = renderInline;
   PS.parseInline = parseInline;
+  PS.bridgeOperators = bridgeOperators;
 })(PS);
 
 /* Builder modal. */
@@ -1113,18 +1498,18 @@ PS.serializeLatex = function serializeLatex(model) {
   /* Row layouts. A part is a literal word, an input ({ key }) or a select. */
   const field = (key, placeholder, math = true) => ({ key, placeholder, math });
   const ROWS = {
-    state: { chip: 'statement', parts: [field('text', 'e.g. S1.top = 0')] },
+    state: { chip: 'statement', parts: [field('text', 'e.g. x = Extract-Min(Q)')] },
     require: { chip: 'require', parts: [field('text', 'input, e.g. A, n')] },
     ensure: { chip: 'ensure', parts: [field('text', 'output, e.g. A is sorted')] },
-    return: { chip: 'return', parts: [field('text', 'value (optional)')] },
+    return: { chip: 'return', parts: [field('text', 'value, e.g. Merge-Sort(A, p, r)')] },
     print: { chip: 'print', parts: [field('text', 'value')] },
     break: { chip: 'break', parts: [] },
     continue: { chip: 'continue', parts: [] },
     call: { chip: 'call', parts: [field('name', 'procedure name', false), '(', field('args', 'args, e.g. A, i'), ')'] },
     raw: { chip: 'raw', parts: [field('text', 'unrecognized raw line', false)] },
     comment: { chip: '//', parts: [field('text', 'comment text', false)], noComment: true },
-    while: { chip: 'while', parts: [field('cond', 'condition, e.g. k > 0')] },
-    forall: { chip: 'for all', parts: [field('init', 'variable in set, e.g. x in S')] },
+    while: { chip: 'while', parts: [field('cond', 'condition, e.g. i > 0 and A[i] > key')] },
+    forall: { chip: 'for each', parts: [field('init', 'element in set, e.g. v in G.V')] },
     for: {
       chip: 'for',
       parts: [
@@ -1137,7 +1522,7 @@ PS.serializeLatex = function serializeLatex(model) {
       chip: 'procedure',
       parts: [
         { select: 'kind', options: [['Procedure', 'Procedure'], ['Function', 'Function']] },
-        field('name', 'name, e.g. PushS1', false),
+        field('name', 'name, e.g. Max-Heapify', false),
         '(', field('args', 'args, e.g. A, x'), ')',
       ],
     },
@@ -1148,7 +1533,7 @@ PS.serializeLatex = function serializeLatex(model) {
     ['Return', 'return'], ['Call', 'call'], ['Procedure', 'function'],
   ];
   const MORE_INSERTS = [
-    ['For all', 'forall'], ['Repeat … until', 'repeat'], ['Require', 'require'], ['Ensure', 'ensure'],
+    ['For each', 'forall'], ['Repeat … until', 'repeat'], ['Require', 'require'], ['Ensure', 'ensure'],
     ['Break', 'break'], ['Continue', 'continue'], ['Print', 'print'], ['Comment line', 'comment'],
   ];
 
@@ -1179,6 +1564,20 @@ PS.serializeLatex = function serializeLatex(model) {
     }
   }
 
+  /*
+   * A field that was plain text in the source (`\State Initialize the array`) stays plain text
+   * while edited. Marked as `<key>Prose` so it survives undo snapshots (JSON) and duplication;
+   * the serializer ignores it.
+   */
+  function markSourceProse(value) {
+    if (Array.isArray(value)) { value.forEach(markSourceProse); return; }
+    if (!value || typeof value !== 'object') return;
+    for (const [key, child] of Object.entries(value)) {
+      if (key.endsWith('Math') && child === false) value[`${key.slice(0, -4)}Prose`] = true;
+      else if (child && typeof child === 'object') markSourceProse(child);
+    }
+  }
+
   class BuilderModal extends Modal {
     constructor(app, options) {
       super(app);
@@ -1186,6 +1585,7 @@ PS.serializeLatex = function serializeLatex(model) {
       this.settings = options.settings || {};
       this.sourcePath = options.sourcePath || '';
       this.onSave = options.onSave;
+      markSourceProse(this.model.nodes);
       this.initialLatex = PS.serializeLatex(this.model);
       this.index = new Map();
       this.undoStack = [];
@@ -1479,7 +1879,7 @@ PS.serializeLatex = function serializeLatex(model) {
               node, depth, slot: index, kind: index === 0 ? 'node' : 'branch',
               chip: index === 0 ? 'if' : 'else if',
               target: branch,
-              parts: [field('cond', 'condition, e.g. i == 0')],
+              parts: [field('cond', 'condition, e.g. x == NIL')],
               comment: index === 0 ? { target: node, key: 'comment' } : { target: branch, key: 'comment' },
             });
             if (!collapsed) this.renderNodes(branch.body, depth + 1);
@@ -1606,9 +2006,9 @@ PS.serializeLatex = function serializeLatex(model) {
         const value = input.value;
         if (part.math) {
           target[part.key] = PS.normalizeOperators(value);
-          // Prose read from the source (\State Initialize ...) stays prose.
-          const flag = `${part.key}Math`;
-          if (target[flag] !== false) target[flag] = value.trim() !== '' && !hasCjk(value);
+          // Decided from the current text each time, so clearing the field or a stray CJK
+          // character does not lock it into plain text; only source prose stays prose.
+          if (!target[`${part.key}Prose`]) target[`${part.key}Math`] = !hasCjk(value);
         } else {
           target[part.key] = value;
         }
@@ -1917,7 +2317,7 @@ PS.serializeLatex = function serializeLatex(model) {
 
     schedulePreview() {
       clearTimeout(this.previewTimer);
-      this.previewTimer = setTimeout(() => this.renderPreview(), 180);
+      this.previewTimer = setTimeout(() => this.renderPreview(), 120);
     }
 
     async renderPreview() {
@@ -2001,11 +2401,15 @@ const DEFAULT_SETTINGS = {
 
 const CSS_LENGTH = /^\d*\.?\d+(?:em|rem|px|ch|pt)$/;
 
+// [file, family, style, weight, format]. The small caps are Latin Modern Roman Caps
+// (cmcsc10's design, GUST Font License): real small-cap glyphs for NIL and procedure
+// names instead of the browser's thin, shrunken imitation.
 const FONT_FACES = [
-  ['cm-regular.ttf', 'normal', 'normal'],
-  ['cm-italic.ttf', 'italic', 'normal'],
-  ['cm-bold.ttf', 'normal', 'bold'],
-  ['cm-bolditalic.ttf', 'italic', 'bold'],
+  ['cm-regular.ttf', 'CM Pseudocode', 'normal', 'normal', 'truetype'],
+  ['cm-italic.ttf', 'CM Pseudocode', 'italic', 'normal', 'truetype'],
+  ['cm-bold.ttf', 'CM Pseudocode', 'normal', 'bold', 'truetype'],
+  ['cm-bolditalic.ttf', 'CM Pseudocode', 'italic', 'bold', 'truetype'],
+  ['cm-smallcaps.otf', 'CM Pseudocode SC', 'normal', 'normal', 'opentype'],
 ];
 
 /* ---------------- fences ---------------- */
@@ -2178,10 +2582,10 @@ class PseudocodeSuitePlugin extends Plugin {
    * resource URLs instead (also in popout windows).
    */
   installFonts() {
-    const css = FONT_FACES.map(([file, style, weight]) => {
+    const css = FONT_FACES.map(([file, family, style, weight, format]) => {
       const url = this.app.vault.adapter.getResourcePath(`${this.manifest.dir}/fonts/${file}`);
-      return `@font-face { font-family: 'CM Pseudocode'; font-style: ${style}; font-weight: ${weight}; `
-        + `font-display: swap; src: url("${url}") format('truetype'); }`;
+      return `@font-face { font-family: '${family}'; font-style: ${style}; font-weight: ${weight}; `
+        + `font-display: swap; src: url("${url}") format('${format}'); }`;
     }).join('\n');
     const inject = (doc) => {
       if (!doc || doc.getElementById('pseudocode-suite-fonts')) return;

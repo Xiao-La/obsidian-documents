@@ -1,0 +1,9 @@
+{
+  "id": "figure-suite",
+  "name": "Figure Suite",
+  "version": "1.0.0",
+  "minAppVersion": "1.4.0",
+  "description": "Draw CLRS-style figures (arrays, tables, trees, graphs, linked lists) in a panel and export them as PNG/SVG, to the clipboard or into the note.",
+  "author": "joy",
+  "isDesktopOnly": true
+}

@@ -41,61 +41,52 @@ To determine if KB entails $\alpha$, we enumerate all possible models, and check
 
 ```pseudo
 \begin{algorithm}
-  \caption{Model Checking for \texttt{KB} Entailing \texttt{alpha}}
-  \begin{algorithmic}
-    \Require{A set of propositional atoms \texttt{Atoms}, a knowledge base \texttt{KB} (set of formulas), a formula \texttt{alpha}}
-    \Ensure{Return whether \texttt{KB} entails \texttt{alpha}; optionally produce a counterexample valuation}
-    \Function{EntailsByModelChecking}{\texttt{KB}, \texttt{alpha}, \texttt{Atoms}}
-      \ForAll{\texttt{valuation} in \texttt{GenerateAllValuations(Atoms)}}
-        \If{\texttt{SatisfiesKB(valuation, KB)}}
-          \If{\texttt{Evaluate(alpha, valuation)} = \texttt{false}}
-            \State \Return "Not Entailed" with counterexample \texttt{valuation}
-          \EndIf
+\caption{Model Checking for $\mathit{KB}$ Entailing $\alpha$}
+\begin{algorithmic}
+  \Require a set of propositional atoms $\mathit{Atoms}$, a knowledge base $\mathit{KB}$ (a set of formulas), a formula $\alpha$
+  \Ensure whether $\mathit{KB}$ entails $\alpha$; optionally a counterexample valuation
+  \Procedure{Entails-By-Model-Checking}{$\mathit{KB}, \alpha, \mathit{Atoms}$}
+    \State $\mathit{valuations} =$ \Call{Generate-All-Valuations}{$\mathit{Atoms}$}
+    \ForAll{$v \in \mathit{valuations}$}
+      \If{\Call{Satisfies-KB}{$v, \mathit{KB}$}}
+        \If{\Call{Evaluate}{$\alpha, v$} $== \textsc{false}$}
+          \Return “not entailed”, with counterexample $v$
         \EndIf
-      \EndFor
-      \State \Return "Entailed"
-    \EndFunction
-
-    \Function{SatisfiesKB}{\texttt{valuation}, \texttt{KB}}
-      \ForAll{\texttt{phi} in \texttt{KB}}
-        \If{\texttt{Evaluate(phi, valuation)} = \texttt{false}}
-          \State \Return \texttt{false}
-        \EndIf
-      \EndFor
-      \State \Return \texttt{true}
-    \EndFunction
-
-    \Function{GenerateAllValuations}{\texttt{Atoms}}
-      \State \texttt{valuations} $\gets$ an iterator over all mappings \texttt{Atoms} $\to$ \{\texttt{true}, \texttt{false}\}
-      \State \Return \texttt{valuations}
-    \EndFunction
-
-    \Function{Evaluate}{\texttt{formula}, \texttt{valuation}}
-      \If{\texttt{IsAtom(formula)}}
-        \State \Return \texttt{valuation[formula]}
-      \ElsIf{\texttt{IsNegation(formula)}}
-        \State \texttt{sub} $\gets$ \texttt{Subformula(formula)}
-        \State \Return not \texttt{Evaluate(sub, valuation)}
-      \ElsIf{\texttt{IsConjunction(formula)}}
-        \State \texttt{left} $\gets$ \texttt{Left(formula)}; \texttt{right} $\gets$ \texttt{Right(formula)}
-        \State \Return \texttt{Evaluate(left, valuation)} and \texttt{Evaluate(right, valuation)}
-      \ElsIf{\texttt{IsDisjunction(formula)}}
-        \State \texttt{left} $\gets$ \texttt{Left(formula)}; \texttt{right} $\gets$ \texttt{Right(formula)}
-        \State \Return \texttt{Evaluate(left, valuation)} or \texttt{Evaluate(right, valuation)}
-      \ElsIf{\texttt{IsExclusiveOr(formula)}}
-        \State \texttt{left} $\gets$ \texttt{Left(formula)}; \texttt{right} $\gets$ \texttt{Right(formula)}
-        \State \Return \texttt{Evaluate(left, valuation)} $\ne$ \texttt{Evaluate(right, valuation)}
-      \ElsIf{\texttt{IsImplication(formula)}}
-        \State \texttt{left} $\gets$ \texttt{Left(formula)}; \texttt{right} $\gets$ \texttt{Right(formula)}
-        \State \Return (not \texttt{Evaluate(left, valuation)}) or \texttt{Evaluate(right, valuation)}
-      \ElsIf{\texttt{IsBiconditional(formula)}}
-        \State \texttt{left} $\gets$ \texttt{Left(formula)}; \texttt{right} $\gets$ \texttt{Right(formula)}
-        \State \Return \texttt{Evaluate(left, valuation)} = \texttt{Evaluate(right, valuation)}
-      \Else
-        \State \Return "Unsupported Formula"
       \EndIf
-    \EndFunction
-  \end{algorithmic}
+    \EndFor
+    \Return “entailed”
+  \EndProcedure
+  \Procedure{Satisfies-KB}{$v, \mathit{KB}$}
+    \ForAll{$\phi \in \mathit{KB}$}
+      \If{\Call{Evaluate}{$\phi, v$} $== \textsc{false}$}
+        \Return $\textsc{false}$
+      \EndIf
+    \EndFor
+    \Return $\textsc{true}$
+  \EndProcedure
+  \Procedure{Generate-All-Valuations}{$\mathit{Atoms}$}
+    \Return an iterator over all mappings $\mathit{Atoms} \to \{\textsc{true}, \textsc{false}\}$
+  \EndProcedure
+  \Procedure{Evaluate}{$\phi, v$}
+    \If{\Call{Is-Atom}{$\phi$}}
+      \Return $v[\phi]$
+    \Elif{\Call{Is-Negation}{$\phi$}}
+      \Return not \Call{Evaluate}{$\phi.\mathit{sub}, v$}
+    \Elif{\Call{Is-Conjunction}{$\phi$}}
+      \Return \Call{Evaluate}{$\phi.\mathit{left}, v$} and \Call{Evaluate}{$\phi.\mathit{right}, v$}
+    \Elif{\Call{Is-Disjunction}{$\phi$}}
+      \Return \Call{Evaluate}{$\phi.\mathit{left}, v$} or \Call{Evaluate}{$\phi.\mathit{right}, v$}
+    \Elif{\Call{Is-Exclusive-Or}{$\phi$}}
+      \Return \Call{Evaluate}{$\phi.\mathit{left}, v$} $\ne$ \Call{Evaluate}{$\phi.\mathit{right}, v$}
+    \Elif{\Call{Is-Implication}{$\phi$}}
+      \Return not \Call{Evaluate}{$\phi.\mathit{left}, v$} or \Call{Evaluate}{$\phi.\mathit{right}, v$}
+    \Elif{\Call{Is-Biconditional}{$\phi$}}
+      \Return \Call{Evaluate}{$\phi.\mathit{left}, v$} $==$ \Call{Evaluate}{$\phi.\mathit{right}, v$}
+    \Else
+      \State \textbf{error} “unsupported formula”
+    \EndIf
+  \EndProcedure
+\end{algorithmic}
 \end{algorithm}
 ```
 

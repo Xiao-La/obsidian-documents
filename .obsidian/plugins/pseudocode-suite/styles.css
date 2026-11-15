@@ -59,10 +59,9 @@
   display: contents;
 }
 
+/* CLRS: line numbers in the text font, same size and colour as the code. */
 .ps-num {
   text-align: right;
-  color: var(--text-muted);
-  font-size: 0.8em;
   font-variant-numeric: tabular-nums;
   user-select: none;
 }
@@ -73,9 +72,8 @@
   overflow-wrap: anywhere;
 }
 
+/* CLRS comments are ordinary roman text after a bold // . */
 .ps-comment {
-  color: var(--text-muted);
-  font-size: 0.92em;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -88,15 +86,6 @@
 }
 
 /* Procedure header: leads its body, with air before each later procedure. */
-.ps-row-function > .ps-code {
-  font-size: 1.14em;
-  line-height: 1.4;
-}
-
-.ps-row-function > .ps-code .ps-fn {
-  letter-spacing: 0.04em;
-}
-
 .ps-row-function:not(:first-child) > * {
   padding-top: 0.8em;
 }
@@ -124,11 +113,33 @@
   font-weight: 700;
 }
 
-.ps-fn {
-  font-variant: small-caps;
-  font-variant-caps: small-caps;
-  font-feature-settings: "smcp";
-  letter-spacing: 0.02em;
+/* \texttt{\textbf{/\hspace*{-0.3em}/}}: bold typewriter slashes, overlapped. */
+.ps-comment-mark {
+  font-family: var(--font-monospace, monospace), monospace;
+  font-size: 0.95em;
+  font-weight: 700;
+  letter-spacing: -0.3em;
+  margin-right: 0.3em;
+}
+
+.ps-code.ps-span {
+  grid-column: 2 / -1;
+}
+
+/* CLRS \proc / \const: \textnormal{\scshape ...}. The SC face draws lowercase as
+ * real small caps, so no font-variant (that would make the browser fake them again). */
+.ps-fn,
+.ps-const {
+  font-family: 'CM Pseudocode SC', 'CM Pseudocode', serif;
+  font-style: normal;
+  font-weight: normal;
+}
+
+/* CLRS \isequal: two `=` narrowed to 80% with 1pt between them. */
+.ps-block mjx-mo.ps-eq {
+  display: inline-block;
+  transform: scaleX(0.8);
+  margin: 0 -0.078em;
 }
 
 .ps-math-error,

@@ -34,6 +34,9 @@ const {
   PluginSettingTab,
   Setting,
   setIcon,
+  renderMath,
+  finishRenderMath,
+  loadMathJax,
 } = require('obsidian');
 
 """

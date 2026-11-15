@@ -4,11 +4,11 @@ const PS = loadPS();
 const { ok, eq, done } = suite();
 
 // ---- toMath ----
-eq(PS.toMath('S1.top = 0'), '$S_1.\\mathrm{top} = 0$', 'subscript + roman');
+eq(PS.toMath('S1.top = 0'), '$S_1.\\mathit{top} = 0$', 'subscript + roman');
 eq(PS.toMath('i == 0'), '$i == 0$', 'equality');
-eq(PS.toMath('l <= A.heap-size and A[l] > A[largest]'), '$l \\le A.\\mathrm{heap}\\text{-}\\mathrm{size} \\land A[l] > A[\\mathrm{largest}]$', 'operators + hyphen');
-eq(PS.toMath('OVERFLOW'), '$\\text{OVERFLOW}$', 'constant');
-eq(PS.toMath('true'), '$\\textbf{true}$', 'boolean');
+eq(PS.toMath('l <= A.heap-size and A[l] > A[largest]'), '$l \\le A.\\mathit{heap}\\text{-}\\mathit{size}$ and $A[l] > A[\\mathit{largest}]$', 'operators + hyphen');
+eq(PS.toMath('OVERFLOW'), '$\\textsc{overflow}$', 'constant');
+eq(PS.toMath('true'), '$\\textsc{true}$', 'boolean');
 eq(PS.toMath(''), '', 'empty');
 
 // ---- parse/serialize round trip on every pseudo block in the vaults ----
@@ -116,14 +116,88 @@ eq(PS.mathOrRaw('x <= y', true), '$x \\le y$', 'math field becomes math');
 // ---- word spacing inside math ----
 eq(PS.toMath('exchange A[i] with A[j]'), '$\\mathrm{exchange}\\ A[i]\\ \\mathrm{with}\\ A[j]$', 'spaces kept around words');
 eq(PS.toMath('Initialize the array'), '$\\mathrm{Initialize}\\ \\mathrm{the}\\ \\mathrm{array}$', 'prose typed in builder keeps spaces');
-eq(PS.toMath('x = largest'), '$x = \\mathrm{largest}$', 'no extra space around operators');
-eq(PS.toMath('a and b'), '$a \\land b$', 'logic words stay operators');
-eq(PS.toMath('x = NIL'), '$x = \\text{NIL}$', 'constant inside expression');
+eq(PS.toMath('x = largest'), '$x = \\mathit{largest}$', 'no extra space around operators');
+eq(PS.toMath('a and b'), '$a$ and $b$', 'logic words are roman words between math');
+eq(PS.toMath('x = NIL'), '$x = \\textsc{nil}$', 'constant inside expression');
 
 // ---- operators ----
-eq(PS.normalizeOperators('a \\leq b \\land c \\gets d'), 'a <= b and c = d', 'aliases normalized');
-eq(PS.texOperators('a <= b and not c'), 'a \\le  b \\land  \\lnot  c', 'ascii to tex');
+eq(PS.normalizeOperators('a \\leq b \\land c \\gets d'), 'a <= b \\land c = d', 'aliases normalized, explicit \\land kept');
+eq(PS.normalizeOperators('a && b || c'), 'a and b or c', '&& and || are the words');
+eq(PS.texOperators('a <= b and not c'), 'a \\le  b \\text{ and } \\text{ not } c', 'ascii to tex, words stay roman words');
 eq(PS.fromMath('$\\mathrm{\\text{x}}$'), 'x', 'nested font groups unwrapped');
+
+// ---- natural call syntax: Name(args) in math fields ----
+eq(PS.toMath('Merge-Sort(A, p, r)'), '\\Call{Merge-Sort}{$A, p, r$}', 'bare call becomes \\Call');
+eq(PS.toMath('x = Extract-Min(Q)'), '$x =$ \\Call{Extract-Min}{$Q$}', 'call on right of assignment');
+eq(PS.toMath('Max(Left(i), Right(i))'), '\\Call{Max}{\\Call{Left}{$i$}$,$ \\Call{Right}{$i$}}', 'nested calls');
+ok(PS.toMath('A[Parent(i)] < A[i]').includes('\\Call{Parent}{$i$}'), 'call inside brackets');
+eq(PS.toMath('T(n) = O(n)'), '$T(n) = O(n)$', 'single-letter functions stay math');
+eq(PS.toMath('f(x)'), '$f(x)$', 'lowercase stays math');
+eq(PS.toMath('S1.top()'), '$S_1.\\mathit{top}()$', 'methods are not calls');
+eq(PS.toMath('\\mathrm{Pr}(A)'), '$\\mathrm{Pr}(A)$', 'backslash opts out');
+eq(PS.callsToPlain('$x =$ \\Call{Extract-Min}{$Q$}'), 'x = Extract-Min(Q)', 'calls back to plain');
+eq(PS.callsToPlain('\\Call{Max}{\\Call{Left}{$i$}, \\Call{Right}{$i$}}'), 'Max(Left(i), Right(i))', 'nested back to plain');
+eq(PS.callsToPlain('\\Call{Foo}{\\textbf{x}}'), null, 'unusual call kept raw');
+{
+  const ret = PS.parseLatex('\\Return \\Call{Max-Heapify}{$A, i$}').nodes[0];
+  eq([ret.text, ret.textMath], ['Max-Heapify(A, i)', true], 'return call parsed to plain field');
+  eq(PS.serializeLatex({ caption: '', nodes: [ret] }).split('\n')[2], '  \\Return \\Call{Max-Heapify}{$A, i$}', 'return call saved back');
+  const rows = PS.buildRows(PS.parseLatex('\\Return \\Call{Max-Heapify}{$A, i$}'));
+  eq(rows[0].text, '\\kw{return} \\Call{Max-Heapify}{$A, i$}', 'return call renders as call');
+  const cond = PS.parseLatex('\\If{$\\Call{Is-Empty}{$S$}$}\n\\State x\n\\EndIf').nodes[0];
+  ok(PS.serializeLatex({ caption: '', nodes: [cond] }).includes('\\Call{Is-Empty}'), 'call in condition survives');
+}
+
+// ---- source must spell calls as \Call: bare Name(args) in source is prose ----
+{
+  const ret = PS.parseLatex('\\Return Tree-Maximum(x.left)').nodes[0];
+  eq(ret.textMath, false, 'bare call in source is not guessed');
+  eq(PS.serializeLatex({ caption: '', nodes: [ret] }).split('\n')[2], '  \\Return Tree-Maximum(x.left)', 'kept verbatim');
+}
+
+// ---- and / or / not: roman words between math, as in CLRS ----
+eq(PS.toMath('i > 0 and A[i] > key'), '$i > 0$ and $A[i] > \\mathit{key}$', 'and between math runs');
+eq(PS.toMath('not S1.empty()'), 'not $S_1.\\mathit{empty}()$', 'leading not');
+eq(PS.toMath(PS.normalizeOperators('x && y || z')), '$x$ and $y$ or $z$', '&& and || become words');
+eq(PS.toMath('p \\land q'), '$p \\land q$', 'explicit \\land stays a symbol');
+eq(PS.toMath('land and order'), '$\\mathit{land}$ and $\\mathit{order}$', 'only whole words');
+eq(PS.toMath('Max-Heapify(A, i) and done'), '\\Call{Max-Heapify}{$A, i$} and $\\mathit{done}$', 'keywords next to calls');
+{
+  const cond = PS.parseLatex('\\If{$Q.\\mathrm{tail} = 1$ \\textbf{and} $Q.\\mathrm{head} = 1$}\n\\EndIf').nodes[0].branches[0];
+  eq([cond.cond, cond.condMath], ['Q.tail == 1 and Q.head == 1', true], 'older \\textbf{and} shown as the word');
+  eq(PS.serializeLatex({ caption: '', nodes: [PS.parseLatex('\\If{$a = 1$ \\textbf{and} $b = 1$}\n\\EndIf').nodes[0]] }).split('\n')[2],
+    '  \\If{$a == 1$ and $b == 1$}', 'older \\textbf{and} saved as the roman word');
+  const notLoop = PS.parseLatex('\\While{\\textbf{not} $S_1.\\mathrm{empty}()$}\n\\EndWhile');
+  eq(PS.serializeLatex(notLoop).split('\n')[2], '  \\While{not $S_1.\\mathrm{empty}()$}', 'older bold not saved roman, rest kept');
+  ok(!PS.buildRows(notLoop)[0].text.includes('\\textbf'), 'not renders roman');
+  const bare = PS.parseLatex('\\While{$i > 0$ and $A[i] > \\mathit{key}$}\n\\EndWhile').nodes[0];
+  eq([bare.cond, bare.condMath], ['i > 0 and A[i] > key', true], 'canonical: plain and between math runs');
+  const prose = PS.parseLatex('\\State $x$ and $y$ are swapped').nodes[0];
+  eq(prose.textMath, false, 'other words keep a line prose');
+}
+
+// ---- CLRS typography ----
+eq(PS.toMath('A[1..j-1]'), '$A[1 \\twodots j-1]$', 'range dots typed as .. (clrscode \\twodots)');
+eq(PS.parseLatex('\\State $C[0 \\twodots k] = 0$').nodes[0].text, 'C[0..k] = 0', 'twodots shown as .. in the builder');
+eq(PS.toMath('(a, b, ..., z)'), '$(a, b, ..., z)$', 'three dots are not a range');
+eq(PS.toMath('exchange A[i] with A[j]'), '$\\mathrm{exchange}\\ A[i]\\ \\mathrm{with}\\ A[j]$', 'phrase words upright');
+eq(PS.toMath('x.key = k'), '$x.\\mathit{key} = k$', 'identifiers italic');
+eq(PS.toMath('m = max(a, b) + lg n'), '$m = \\max(a, b) + \\lg n$', 'math operators upright');
+eq(PS.toMath('max = A[1]'), '$\\mathit{max} = A[1]$', 'max as a variable stays italic');
+eq(PS.toMath('x mod y'), '$x \\bmod y$', 'mod');
+eq(PS.toMath('x != NIL'), '$x \\ne \\textsc{nil}$', 'no stray space after \\ne');
+eq(PS.toMath('error "heap underflow"'), '\\textbf{error} “heap underflow”', 'error statement');
+{
+  const err = PS.parseLatex('\\State \\textbf{error} “underflow”').nodes[0];
+  eq([err.text, err.textMath], ['error “underflow”', true], 'error read back for the builder');
+  eq(PS.serializeLatex({ caption: '', nodes: [err] }).split('\n')[2], '  \\State \\textbf{error} “underflow”', 'error saved back');
+  const nil = PS.parseLatex('\\If{$x \\ne \\textsc{nil}$}\n\\EndIf').nodes[0].branches[0];
+  eq([nil.cond, nil.condMath], ['x != NIL', true], 'small-caps constant read back as NIL');
+  eq(PS.serializeLatex(PS.parseLatex('\\If{$A[m] = x$}\n\\EndIf')).split('\n')[2], '  \\If{$A[m] == x$}', 'condition = saved as ==');
+  eq(PS.serializeLatex(PS.parseLatex('\\Return \\textbf{true}')).split('\n')[2], '  \\Return \\textbf{true}', 'fonts in math-free prose kept');
+  const loop = PS.parseLatex('\\For{$i \\gets 0$ \\textbf{to} $k$}\n\\EndFor').nodes[0];
+  eq([loop.init, loop.bound, loop.downto], ['i = 0', 'k', false], 'for with \\textbf{to}');
+}
 
 // ---- tree helpers ----
 const tree = PS.parseLatex('\\If{a}\n\\State b\n\\Elif{c}\n\\State d\n\\Else\n\\State e\n\\EndIf');

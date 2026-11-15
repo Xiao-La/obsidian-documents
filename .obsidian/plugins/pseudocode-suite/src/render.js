@@ -50,7 +50,7 @@
   }
 
   // In a condition a single `=` is a comparison and shows as `==`.
-  const asComparison = (tex) => tex.replace(/(?<![<>=!:\\])=(?!=)/g, '==');
+  const asComparison = (tex) => PS.asComparison(tex);
 
   /** A field value → inline source for parseInline (math wrapped in $...$). */
   const expr = (value, isMath, comparison) => {
@@ -58,15 +58,58 @@
     if (!text) return '';
     if (isMath && !text.includes('$')) {
       // Constants and booleans are text, not a product of variables.
-      if (/^[A-Z]{2,}[A-Z0-9_-]*$/.test(text)) return text;
-      if (/^(true|false)$/i.test(text)) return `\\textbf{${text.toLowerCase()}}`;
-      const tex = PS.normalizeExpr(PS.normalizeOperators(text));
-      return `$${comparison ? asComparison(tex) : tex}$`;
+      if (/^[A-Z]{2,}[A-Z0-9_-]*$/.test(text) || /^(true|false)$/i.test(text)) return `\\textsc{${text.toLowerCase()}}`;
+      const math = (segment) => {
+        const tex = PS.normalizeExpr(segment);
+        return comparison ? asComparison(tex) : tex;
+      };
+      const plain = PS.normalizeOperators(text);
+      // Merge-Sort(A, p, r) inside an expression renders like \Call.
+      return PS.inlineWithCalls(plain, math) || `$${math(plain)}$`;
     }
     // Conditions mixing text and math ($a = b$ and $c$): `=` still means `==`.
     if (comparison) return text.replace(/\$([^$]*)\$/g, (all, inner) => `$${asComparison(inner)}$`);
     return text;
   };
+
+  /*
+   * CLRS sets constants (NIL, TRUE, FALSE) in small caps. MathJax has no \textsc,
+   * so they leave the formula and render like procedure names. An operator left
+   * at the cut gets an empty group so TeX still spaces it as an operator.
+   */
+  const CONSTANT_TEX = /\\textsc\{([A-Za-z]+)\}|\\(?:text|textrm|textup|textsf|mathrm|mathsf)\{([A-Z][A-Z0-9]+)\}/g;
+  const EDGE_OP = String.raw`(?:[=<>+\-*,;:]|\\(?:ne|neq|le|leq|ge|geq|to|in|notin|gets|subset|subseteq|supset|supseteq|approx|equiv|sim|mapsto|pm|mp|cdot|times|div|land|lor|wedge|vee|cup|cap|setminus|circ|oplus|otimes)(?![A-Za-z]))`;
+  const ENDS_WITH_OP = new RegExp(`${EDGE_OP}\\s*$`);
+  // CLRS's narrow test-for-equality sign (clrscode3e \isequal); styled by .ps-eq.
+  const IS_EQUAL = String.raw`\mathrel{\class{ps-eq}{=}\mkern1.8mu\class{ps-eq}{=}}`;
+  // CLRS assignment (clrscode \gets): `=` with 1pt more room on each side. Code only;
+  // in comments `=` is equality.
+  const GETS = String.raw`\mathrel{\mkern1.8mu{=}\mkern1.8mu}`;
+  const STARTS_WITH_OP = new RegExp(`^\\s*${EDGE_OP}`);
+
+  function splitConstants(tex, prose) {
+    const tokens = [];
+    let last = 0;
+    let previousConstant = false;
+    const pushMath = (piece, nextConstant) => {
+      let value = piece.trim();
+      if (!value) return;
+      if (previousConstant && STARTS_WITH_OP.test(value)) value = `{}${value}`;
+      if (nextConstant && ENDS_WITH_OP.test(value)) value = `${value}{}`;
+      if (!prose) value = value.replace(/(?<![=<>!:{])=(?![=}])/g, GETS);
+      tokens.push({ type: 'math', value: value.replace(/(?<![=<>!])==(?!=)/g, IS_EQUAL) });
+    };
+    CONSTANT_TEX.lastIndex = 0;
+    for (let match; (match = CONSTANT_TEX.exec(tex));) {
+      pushMath(tex.slice(last, match.index), true);
+      // \textsc{...} as written (\textsc{Evaluate} keeps its capital); legacy \text{NIL} → nil.
+      tokens.push({ type: 'constant', value: match[1] || match[2].toLowerCase() });
+      previousConstant = true;
+      last = match.index + match[0].length;
+    }
+    pushMath(tex.slice(last), false);
+    return tokens;
+  }
 
   function skipSpace(text, index) {
     let i = index;
@@ -82,7 +125,13 @@
       .replace(/\\textbf\{([^{}]*)\}/g, '\\mathbf{$1}')
       .replace(/\\textit\{([^{}]*)\}/g, '\\mathit{$1}');
     // Comments are prose: `$ab$` there is a product, not an identifier.
-    return (prose ? tex : PS.normalizeExpr(tex)).trim();
+    // MathJax spaces a bare `.` as punctuation (`x. key`); in TeX and CLRS the attribute
+    // dot is ordinary, so it goes in a group: `x{.}\mathit{key}`. Decimals are left alone.
+    return (prose ? tex : PS.normalizeExpr(tex))
+      .replace(/(?<=[A-Za-z0-9}\])])\.(?=\s*(?:[A-Za-z]|\\(?:math|text)))/g, '{.}')
+      // clrscode's \twodots: the range dots of A[1 . . n].
+      .replace(/\\twodots\b\s*/g, '\\mathinner{\\ldotp\\ldotp}')
+      .trim();
   }
 
   /**
@@ -109,7 +158,7 @@
         while (j < text.length && text[j] !== '$') j += text[j] === '\\' ? 2 : 1;
         if (j < text.length) {
           flush();
-          tokens.push({ type: 'math', value: normalizeMath(text.slice(i + 1, j), prose) });
+          tokens.push(...splitConstants(normalizeMath(text.slice(i + 1, j), prose), prose));
           i = j + 1;
           continue;
         }
@@ -150,6 +199,16 @@
             }
           }
 
+          if (name === 'textsc') {
+            const value = group(after);
+            if (value) {
+              flush();
+              tokens.push({ type: 'constant', value: value.value });
+              i = value.end;
+              continue;
+            }
+          }
+
           if (FONT_COMMANDS[name]) {
             const value = group(after);
             if (value) {
@@ -176,8 +235,40 @@
     return tokens;
   }
 
+  /*
+   * A math run cut off by a call (`\Call{Max}{$i$} $+ T(n)$`) starts or ends with a binary
+   * operator, which TeX would demote to unary and set tight. An empty group on that side keeps
+   * it binary; the space typed between call and math is then dropped so the gap is TeX's own.
+   */
+  const BIN_OP = String.raw`(?:[+\-*]|\\(?:pm|mp|cdot|times|div|land|lor|wedge|vee|cup|cap|setminus|circ|oplus|otimes)(?![A-Za-z]))`;
+  const LEADING_BIN = new RegExp(`^\\s*${BIN_OP}`);
+  const TRAILING_BIN = new RegExp(`${BIN_OP}\\s*$`);
+  const isCallToken = (token) => token && (token.type === 'call' || token.type === 'function' || token.type === 'constant');
+  const isBlank = (token) => token && token.type === 'text' && !token.value.trim();
+
+  function bridgeOperators(tokens) {
+    const out = tokens.slice();
+    for (let i = 0; i < out.length; i++) {
+      const token = out[i];
+      if (token.type !== 'math') continue;
+      let value = token.value;
+      const before = isBlank(out[i - 1]) ? i - 2 : i - 1;
+      if (isCallToken(out[before]) && LEADING_BIN.test(value)) {
+        value = `{}${value}`;
+        if (before === i - 2) { out.splice(i - 1, 1); i -= 1; }
+      }
+      const after = isBlank(out[i + 1]) ? i + 2 : i + 1;
+      if (isCallToken(out[after]) && TRAILING_BIN.test(value)) {
+        value = `${value}{}`;
+        if (after === i + 2) out.splice(i + 1, 1);
+      }
+      if (value !== token.value) out[i] = { ...token, value };
+    }
+    return out;
+  }
+
   function renderInline(container, source, prose) {
-    for (const token of parseInline(source, prose)) {
+    for (const token of bridgeOperators(parseInline(source, prose))) {
       switch (token.type) {
         case 'text':
           container.appendChild(document.createTextNode(token.value));
@@ -199,6 +290,9 @@
           container.appendChild(document.createTextNode('('));
           renderInline(container, token.args, prose);
           container.appendChild(document.createTextNode(')'));
+          break;
+        case 'constant':
+          container.appendChild(el('span', 'ps-const', token.value));
           break;
         case 'math': {
           const wrapper = el('span', 'ps-math', token.value);
@@ -254,14 +348,16 @@
         case 'if': {
           node.branches.forEach((branch, index) => {
             const comment = index === 0 ? node.comment || branch.comment : branch.comment;
-            row(`\\kw{${index === 0 ? 'if' : 'else if'}} ${expr(branch.cond, branch.condMath, true)}`, comment);
+            row(`\\kw{${index === 0 ? 'if' : 'elseif'}} ${expr(branch.cond, branch.condMath, true)}`, comment);
             body(branch.body);
           });
           if (node.elseBody) {
-            // CLRS style: a single plain statement joins the else line.
-            const only = node.elseBody.length === 1 ? node.elseBody[0] : null;
-            if (only && MERGEABLE.has(only.type) && !only.comment && !node.elseComment) {
-              row(`\\kw{else} ${simpleText(only)}`);
+            // CLRS: a plain first statement goes on the else line ("else x = x.right"),
+            // the rest of the branch below it.
+            const [first, ...rest] = node.elseBody;
+            if (first && MERGEABLE.has(first.type) && !(first.comment && node.elseComment)) {
+              row(`\\kw{else} ${simpleText(first)}`, node.elseComment || first.comment);
+              body(rest);
             } else {
               row('\\kw{else}', node.elseComment);
               body(node.elseBody);
@@ -278,12 +374,19 @@
         case 'for': {
           let head;
           if (node.all) {
-            const parts = String(node.init || '').split(/\s+in\s+/);
-            // A head already written with text commands (\texttt{child} of
-            // \texttt{u}) is prose; math mode would swallow its spaces.
-            head = parts.length === 2
-              ? `\\kw{for all} ${expr(parts[0], true)} \\kw{in} ${expr(parts[1], true)}`
-              : `\\kw{for all} ${expr(node.init, !/\\text(?:tt|rm|sf|up)?\{/.test(node.init || ''))}`;
+            // CLRS: "**for** each v ∈ G.V" (only "for" is bold). A head already written with text commands
+            // (\texttt{child} of \texttt{u}) is prose; math mode would swallow its spaces.
+            const parts = String(node.init || '').split(/\s+(?:in|\\in)\s+/);
+            if (parts.length === 2) {
+              const left = expr(parts[0], true);
+              const right = expr(parts[1], true);
+              const single = (value) => /^\$[^$]*\$$/.test(value);
+              head = single(left) && single(right)
+                ? `\\kw{for} each $${left.slice(1, -1)} \\in ${right.slice(1, -1)}$`
+                : `\\kw{for} each ${left} $\\in$ ${right}`;
+            } else {
+              head = `\\kw{for} each ${expr(node.init, !/\\text(?:tt|rm|sf|up)?\{/.test(node.init || ''))}`;
+            }
           } else {
             head = node.bound
               ? `\\kw{for} ${expr(node.init, node.initMath)} \\kw{${node.downto ? 'downto' : 'to'}} ${expr(node.bound, node.boundMath)}`
@@ -301,7 +404,8 @@
           break;
 
         case 'state':
-          if (!node.text && node.comment) row('', node.comment, false, { note: true });
+          // CLRS numbers comment lines too.
+          if (!node.text && node.comment) row('', node.comment, true, { note: true });
           else row(simpleText(node), node.comment);
           break;
 
@@ -313,7 +417,7 @@
         case 'comment': {
           const last = rows[rows.length - 1];
           if (last && !last.comment) last.comment = node.text || '';
-          else row('', node.text || '', false, { note: true });
+          else row('', node.text || '', true, { note: true });
           break;
         }
 
@@ -325,58 +429,88 @@
 
   /* ---------------- public renderer ---------------- */
 
-  function adoptRendered(span, holder) {
-    // MarkdownRenderer wraps inline content in a paragraph; keep its children.
-    const source = holder.childElementCount === 1 && holder.firstElementChild.tagName === 'P'
-      ? holder.firstElementChild
-      : holder;
-    span.replaceChildren(...source.childNodes);
+  /*
+   * Math typesetting. Obsidian's renderMath() is synchronous; the slow part is
+   * finishRenderMath() (~100 ms while MathJax refreshes its stylesheet), and a
+   * block stays hidden until it is done. Rendered formulas are cached by TeX,
+   * so re-renders (editing, mode switches, settings, the builder preview)
+   * clone them instead and never wait.
+   */
+  const MATH_CACHE_LIMIT = 4000;
+  const mathCache = new Map();
+  let mathJaxReady = null;
+
+  function cachedMath(tex) {
+    const hit = mathCache.get(tex);
+    if (!hit) return null;
+    mathCache.delete(tex); // keep recently used entries last
+    mathCache.set(tex, hit);
+    return hit.cloneNode(true);
   }
 
-  async function typesetOne(app, span, tex, sourcePath, component) {
+  function rememberMath(tex, node) {
+    mathCache.set(tex, node.cloneNode(true));
+    if (mathCache.size > MATH_CACHE_LIMIT) mathCache.delete(mathCache.keys().next().value);
+  }
+
+  /** Same markup Obsidian puts around inline math in a note. */
+  function mathElement(tex) {
+    const wrapper = document.createElement('span');
+    wrapper.className = 'math math-inline is-loaded';
+    wrapper.appendChild(renderMath(tex, false));
+    return wrapper;
+  }
+
+  /** Fallback: let a Markdown render do it. */
+  async function typesetViaMarkdown(app, span, tex, sourcePath, component) {
     const holder = document.createElement('div');
     try {
       await MarkdownRenderer.render(app, `$${tex}$`, holder, sourcePath, component);
-      adoptRendered(span, holder);
+      const math = holder.querySelector('.math');
+      if (!math) throw new Error('no math output');
+      span.replaceChildren(math);
+      rememberMath(tex, math);
     } catch (error) {
       span.classList.add('ps-math-error');
       span.textContent = `$${tex}$`;
     }
   }
 
-  /**
-   * Typeset every `.ps-math` span under root. Uses Obsidian's own Markdown
-   * math (so exports behave like normal notes) but in one render call per
-   * block: each formula becomes its own paragraph, mapped back by position.
-   */
+  /** Typeset every `.ps-math` span under root. */
   PS.typesetMath = async function typesetMath(app, root, sourcePath, component) {
-    const spans = Array.from(root.querySelectorAll('.ps-math[data-tex]'));
-    if (!spans.length) return;
-    const texts = spans.map((span) => {
+    const missing = [];
+    root.querySelectorAll('.ps-math[data-tex]').forEach((span) => {
       const tex = span.dataset.tex;
       delete span.dataset.tex;
-      return tex;
+      const hit = cachedMath(tex);
+      if (hit) span.replaceChildren(hit);
+      else missing.push({ span, tex });
     });
+    if (!missing.length) return;
 
-    let pending = spans.map((span, index) => index);
-    try {
-      const holder = document.createElement('div');
-      await MarkdownRenderer.render(app, texts.map((tex) => `$${tex}$`).join('\n\n'), holder, sourcePath, component);
-      const paragraphs = Array.from(holder.children);
-      if (paragraphs.length === spans.length) {
-        pending = pending.filter((index) => {
-          const paragraph = paragraphs[index];
-          const ok = paragraph.tagName === 'P' && paragraph.childElementCount === 1
-            && paragraph.firstElementChild.classList.contains('math')
-            && paragraph.textContent.trim() === paragraph.firstElementChild.textContent.trim();
-          if (ok) spans[index].replaceChildren(paragraph.firstElementChild);
-          return !ok;
+    let failed = missing;
+    if (typeof renderMath === 'function') {
+      try {
+        if (!mathJaxReady) mathJaxReady = typeof loadMathJax === 'function' ? loadMathJax() : Promise.resolve();
+        await mathJaxReady;
+        failed = missing.filter(({ span, tex }) => {
+          try {
+            span.replaceChildren(mathElement(tex));
+            return false;
+          } catch (error) {
+            return true;
+          }
         });
+        await finishRenderMath();
+        missing.forEach((item) => {
+          if (!failed.includes(item)) rememberMath(item.tex, item.span.firstChild);
+        });
+      } catch (error) {
+        mathJaxReady = null;
+        failed = missing.filter(({ span }) => !span.querySelector('mjx-container'));
       }
-    } catch (error) { /* fall back below */ }
-
-    // Anything the batch could not map is rendered on its own.
-    await Promise.all(pending.map((index) => typesetOne(app, spans[index], texts[index], sourcePath, component)));
+    }
+    await Promise.all(failed.map(({ span, tex }) => typesetViaMarkdown(app, span, tex, sourcePath, component)));
   };
 
   PS.buildRows = function buildRowsForModel(model) {
@@ -408,14 +542,23 @@
       rowEl.appendChild(el('span', 'ps-num', settings.lineNumbers && row.number != null ? String(row.number) : ''));
       // A comment-only line has no code cell: its comment starts at the code
       // column, at the line's indent, and runs to the right edge (CLRS).
+      // A procedure header without a comment spans the comment column too, so a long
+      // parameter list does not squeeze the comments of the lines below it.
+      const span = row.kind === 'function' && !row.comment;
       if (!row.note) {
-        const codeEl = el('span', 'ps-code');
+        const codeEl = el('span', span ? 'ps-code ps-span' : 'ps-code');
         renderInline(codeEl, row.text);
         rowEl.appendChild(codeEl);
       }
+      if (span) {
+        grid.appendChild(rowEl);
+        continue;
+      }
       const commentEl = el('span', row.note ? 'ps-comment ps-note' : 'ps-comment');
       if (row.comment) {
-        commentEl.appendChild(document.createTextNode(`${settings.commentDelimiter || '//'} `));
+        // clrscode \CommentSymbol: bold, tightly kerned slashes.
+        commentEl.appendChild(el('span', 'ps-comment-mark', settings.commentDelimiter || '//'));
+        commentEl.appendChild(document.createTextNode(' '));
         renderInline(commentEl, row.comment, true);
       }
       rowEl.appendChild(commentEl);
@@ -441,4 +584,5 @@
 
   PS.renderInline = renderInline;
   PS.parseInline = parseInline;
+  PS.bridgeOperators = bridgeOperators;
 })(PS);

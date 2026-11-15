@@ -72,31 +72,31 @@ If $\alpha \geq \beta$ holds for a node, there is no need to expand the node any
 
 ```pseudo
 \begin{algorithm}
-  \caption{Alpha-Beta Pruning}
-  \begin{algorithmic}
-    \Require{A node \texttt{u}, alpha bound \texttt{alph}, beta bound \texttt{beta}, a boolean \texttt{is\_max}, an evaluation function \texttt{Evaluate}}
-    \Function{AlphaBeta}{\texttt{u}, \texttt{alph}, \texttt{beta}, \texttt{is\_max}}
-      \If{\texttt{u} has no children}
-        \State \Return \texttt{Evaluate(u)}
-      \EndIf
-      \If{\texttt{is\_max} = true}
-        \ForAll{\texttt{child} of \texttt{u}}
-          \State \texttt{alph} $\gets$ $\max(\texttt{alph}, \texttt{AlphaBeta(child, alph, beta, false)})$
-          \If{\texttt{alph} $\ge$ \texttt{beta}}
-            \Break
-          \EndIf
-        \EndFor
-        \State \Return \texttt{alph}
-      \Else
-        \ForAll{\texttt{child} of \texttt{u}}
-          \State \texttt{beta} $\gets$ $\min(\texttt{beta}, \texttt{AlphaBeta(child, alph, beta, true)})$
-          \If{\texttt{alph} $\ge$ \texttt{beta}}
-            \Break
-          \EndIf
-        \EndFor
-        \State \Return \texttt{beta}
-      \EndIf
-    \EndFunction
-  \end{algorithmic}
+\caption{Alpha-Beta Pruning}
+\begin{algorithmic}
+  \Require a node $u$, an alpha bound $\alpha$, a beta bound $\beta$, a flag $\mathit{is}\text{-}\mathit{max}$, an evaluation function \textsc{Evaluate}
+  \Procedure{Alpha-Beta}{$u, \alpha, \beta, \mathit{is}\text{-}\mathit{max}$}
+    \If{$u$ has no children}
+      \Return \Call{Evaluate}{$u$}
+    \EndIf
+    \If{$\mathit{is}\text{-}\mathit{max}$}
+      \ForAll{$\mathrm{child}\ v\ \mathrm{of}\ u$}
+        \State $\alpha = \max(\alpha,$ \Call{Alpha-Beta}{$v, \alpha, \beta, \textsc{false}$}$)$
+        \If{$\alpha \ge \beta$}
+          \Break
+        \EndIf
+      \EndFor
+      \Return $\alpha$
+    \Else
+      \ForAll{$\mathrm{child}\ v\ \mathrm{of}\ u$}
+        \State $\beta = \min(\beta,$ \Call{Alpha-Beta}{$v, \alpha, \beta, \textsc{true}$}$)$
+        \If{$\alpha \ge \beta$}
+          \Break
+        \EndIf
+      \EndFor
+      \Return $\beta$
+    \EndIf
+  \EndProcedure
+\end{algorithmic}
 \end{algorithm}
 ```
