@@ -220,3 +220,142 @@ $$
 $$
 （第二个式子可以用求导或**错位相减**的方法求得）
 
+## 关系（Relation）
+
+二元关系（Binary Relation）：从集合 $A$ 到 $B$ 的一个二元关系，是它们笛卡尔积 $A\times B$ 的一个子集 $R$。用记号 $aRb$ 表示 $(a,b)\in R$，用记号 $a\not R b$ 表示 $(a,b)\notin R$。
+
+要表示一个关系：可以枚举出 $R$ 里面的所有有序对；也可以用图（箭头）来表示有序对，从而表示关系；也可以用表格/矩阵来表示（对应的分量为 1/0 表示这个有序对是否在关系中）。
+
+关系可以是一对多的。因此，函数都是关系；而关系不总是函数。
+
+定义集合 $A$ 上的关系（relation on a set $A$）为 $A$ 到 $A$ 的一个二元关系。若 $\lvert A \rvert=n$，那么集合 $A$ 上的关系有 $2^{n^{2}}$ 种。
+
+对于一个集合 $A$ 上的关系 $R$，它可能具有一些特别的性质：
+- **自反性（Reflexive）：** $(a,a)\in R \,\forall a\in A$。用矩阵表示，就是对角线上全 $1$。个数为 $2^{n^{2}-n}$ 种。
+- **反自反性（Irreflexive）：** $(a,a)\notin R\, \forall a\in A$。用矩阵表示，就是对角线上全 $0$。个数为 $2^{n^{2}-n}$ 种。
+- **对称性（Symmetric）：** $(a,b)\in R\to(b,a)\in R\, \forall a,b\in A$。用矩阵表示，就是对称矩阵。个数为 $2^{\frac{n^{2}+n}{2}}$。
+- **反对称性（Antisymmetric）：** $(a,b)\in R \land(b,a)\in R\to a=b \, \forall a,b\in A$。用矩阵表示，就是对于 $i\neq j$，$m_{ij}=1\to m_{ji}=0$。计数，主对角线上自由，所以是 $2^{n}$；其他，每组对称的位置一共有三种选法：$(1,0),(0,1),(0,0)$，一共有 $\frac{n^{2}-n}{2}$ 组，因此总的个数为 $2^{n}\cdot3^{\frac{n^{2}-n}{2}}$。
+- **传递性（Transitive）：** $(a,b)\in R\land(b,c)\in R\to(a,c)\in R \,\forall a,b,c\in A$。
+
+自反性+对称性+传递性 得到 **等价关系（Equivalence Relation）；**
+自反性+反对称性+传递性 得到 **偏序关系（Partial Ordering Relation）。**
+
+关系之间的运算：既然关系实际上是一个集合，那么集合之间的运算（并，交，差）可以作用到关系上。
+
+**复合关系（Composite of Relations）：** $R$ 从 $A$ 到 $B$；$S$ 从 $B$ 到 $C$，那么它们的复合 $S \circ R$ 定义为
+$$
+(a,b)\in R \land (b,c)\in S\to(a,c)\in S\circ R
+$$
+- 从 01 矩阵的表示方法看，这相当于矩阵乘法 $M_{R}M_{S}$（这里结果大于 $1$ 的设置为 $1$ 即可）
+
+定义**关系的幂（power relation）**：
+$$
+R^{1}=R,\quad R^{n+1}=R^{n} \circ R
+$$
+关于传递性，有**定理**：$A$ 上的关系 $R$ 具有传递性，当且仅当 $R^{n}\subseteq R\, \forall n=1,2,3, \dots$。
+证明：
+- “当”：令 $n=2$，那么有 $R^{2}\subseteq R$，按照定义，$R$ 具有传递性。
+- “仅当”：数学归纳法。
+  - Base Case： $n=1$ 时， $R^{1}\subseteq R$ 显然成立。
+  - I.H.：$\forall n\geq1, R^{n}\subseteq R$。
+  - I.S.：$R^{n+1}=R^{n}\circ R$。由定义，对于任意 $(a,b)\in R^{n+1}$，存在 $x$ 使得 $(a,x)\in R$，以及 $(x,b)\in R^{n}\subseteq R$。那么由 $R$ 的传递性，$(a,b)\in R$。于是 $R^{n+1}\subseteq R$。
+
+表示 $n$ 元关系的方式：
+- 用显式的列表/表格存它的元组。这就是一个关系数据库（Relational Database）。
+- 用一个从定义域到 $\{ T,F \}$ 上的函数表示。
+表示二元关系的方式：
+- 零一矩阵。
+- 有向图。
+![[Set and Function - 集合与函数-1.png|516]]
+### 闭包（Closures of Relations）
+
+**定义。** $S$ 是 $R$ 的**自反闭包**（Reflexive Closure of $R$），当：
+- $S$ 包含 $R$。
+- $S$ 是自反的。
+- $S$ 是最小的（对所有包含 $R$ 的自反关系 $Q$，有 $S\subseteq Q$）。
+
+对于其他性质，也可以类似地定义：
+- **对称闭包**（Symmetric Closure）
+- **传递闭包**（Transitive Closure）
+
+反自反和反对称不可以定义闭包，因为不能通过添加元素让性质满足。
+一般的，可以定义关系 $R$ 关于性质 $P$ 的闭包：最小的包含 $R$ 且满足性质 $P$ 的集合 $S$。
+
+自反闭包和对称闭包是容易找的，添加主对角线/对称位置缺失的部分即可。
+而传递闭包没那么直观，可以看有向图：找传递闭包，就相当于在有向图中，把所有连通的 pair 加进去。
+
+定义有向图中的路径（Path）是一系列边 $(x_{0},x_{1}),(x_{1},x_{2}), \dots, (x_{n-1},x_{n})$，其中 $n\geq0$。若$x_{0}=x_{n}$，那么说这个路径是一个回路（Circuit / Cycle）。
+**定理：** $R$ 是 $A$ 上的一个关系，那么存在一个从 $a$ 到 $b$ 的长度为 $n$ 的路径，当且仅当 $(a,b)\in R^{n}$。证明：
+- 数学归纳法。Base Case： $n=1$，根据定义，$(a,b)\in R$，当且仅当有路径 $a\to b$。
+- I.H.：$(a,b)\in R^{n}$ 当且仅当由路径 $\overbrace{a\to\dots\to b}^{n}$。
+- I.S.：$(a,b)\in R^{n+1}=R^{n}\circ R$ 当且仅当存在 $x$ 使得 $(a,x)\in R,(x,b)\in R^{n}$，那么根据归纳假设，这等价于存在路径 $\underbrace{a\to \overbrace{x\to\dots\to b}^{n}}_{n+1}$。
+
+定义 关系 $R$ 的 **连通关系（Connectivity Relation）：** 
+$$
+R^{*}= \bigcup _{k=1}^{\infty}R^{k}
+$$
+这也就是 $R$ 所有长度的所有路径的起终点组成的关系。
+
+**引理：** 若 $\lvert A \rvert=n$，那么，若存在一个 $a$ 到 $b$ （$a\neq b$）的路径，就会有一个长度 $\leq n-1$ 的路径。
+- 证明：把路径上的所有回路删掉，那么每个顶点最多被访问一次，只有 $n$ 个顶点，最长路径就只有 $n-1$。
+于是连通关系可以写成：
+$$
+R^{*}= \bigcup _{k=1}^{n} R^{k}
+$$
+**定理：** $R$ 的传递闭包（Transitive Closure）就是它的连通关系（Connectivity Relation） $R^{*}$。
+证明：需要分别考虑传递闭包的三条定义。
+- $R^{*}$ 显然包含 $R$。
+- $R^{*}$ 是传递的。
+  - 证明：对任意 $(a,b),(b,c)\in R^{*}$，我们知道 $a$ 到 $b$ 有一个路径，$b$ 到 $c$ 有一个路径，把路径连起来，就得到有一个 $a$ 到 $c$ 的路径，于是 $(a,c)\in R^{*}$。
+- $R^{*}\subseteq S$ 对任意包含 $R$ 的传递的关系 $S$。
+  - 证明：假设 $S$ 是一个包含 $R$ 的传递的关系。那么 $S^{n}$ 也是传递的，且 $S^{n}\subseteq S$。
+    - 证明：若 $(a,b),(b,c)\in S^{n}$，那么 $a$ 到 $b$ 和 $b$ 到 $c$ 各有一个长度为 $n$ 的路径。我们知道 $S^{n}\subseteq S$，那么容易构造一条 $a$ 到 $c$ 的长度为 $n$ 的路径，于是 $(a,c)\in S^{n}$.
+ - 于是 $R^{*}\subseteq S^{*}\subseteq S$。
+
+找传递闭包的算法：
+- 考虑零一矩阵 $\boldsymbol{M}_{R}$。
+- 那么传递闭包对应矩阵就是 $\boldsymbol{M}_{R}= \boldsymbol{M}_{R}\boldsymbol{M}_{R}^{[2]} \dots \boldsymbol{M}_{R}^{[n]}$。
+- 硬算是 $\Theta(n^{4})$ 的，若矩阵乘法视为 $\Theta(n^{3})$。
+- 改进的算法：Roy-Warshall（$\Theta(n^{3})$），类似于 Floyd，不断引入第 $k$ 个节点（$k=1,2, \dots n$），看能不能改善连通性（让更多的边连通），这样迭代到 $k$ 的时候就求出了只经过 $\leq k$ 的节点的连通性。
+```pseudo
+\begin{algorithm}
+\begin{algorithmic}
+  \Procedure{Roy-Warshall}{$\boldsymbol{M}_R$}
+    \State $W = \boldsymbol{M}_R$
+    \For{$k=1$ \To $n$}
+      \For{$i=1$ \To $n$}
+        \For{$j=1$ \To $n$}
+          \State $w_{\mathit{ij}}=w_{\mathit{ij}}\lor(w_{\mathit{ik}}\land w_{\mathit{kj}})$
+        \EndFor
+      \EndFor
+    \EndFor
+    \Return $W$
+  \EndProcedure
+\end{algorithmic}
+\end{algorithm}
+```
+
+### $n$ 元关系与数据库
+
+$R:A_{1},A_{2}, \dots, A_{n}$，定义为 $R\subseteq A_{1}\times A_{2}\times\dots \times A_{n}$。
+- $A_{i}$ 叫 $R$ 的定义域（Domains）
+- $R$ 的度（degree）为 $n$。
+- 若对于定义域 $A_{i}$ 中的任意元素 $a_{i}$，$R$ 包含至多一个 $n$ 元组 $(\dots,a_{i},\dots)$，那么称 $R$ 在定义域 $A_{i}$ 上是功能性的（Functional）。
+
+**主键（Primary Key）：** 若 $R$ 在 定义域 $A_{i}$ 上是功能性的，就说 $A_{i}$ 是主键。
+类似的，有**复合键（Composite Key）**： 把上面主键的定义，换成对一个定义域的集合 $\{ A_{i},A_{j}, \dots \}$，$R$ 包含至多一个 $n$ 元组 $(\dots, a_{i}, \dots, a_{j}, \dots)$。
+
+可以用 E-R 图表示关系数据库（Entity-Relation）![[Set and Function - 集合与函数-2.png|550]]若 $A=A_{1}\times A_{2}\times \dots \times A_{n}$ 上有一个关系 $R$，那么有一些运算符：
+- 选择（Selection Operator）：定义一个条件 $C:A\to \{ T,F \}$。那么选择就是选出关系中满足这个条件的一些行：
+$$
+s_{C}(R)=\{ a\in R \mid s_{C}(a)=T \}
+$$
+- 投影（Projection Operator）：令一系列 $1$ 到 $n$ 之间的下标 $\{ i_{k} \}=(i_{1},i_{2}, \dots, i_{m})$，那么投影就是保留这些下标对应的一些列：
+$$
+P_{\{ i_{k} \}}: A\to A_{i_{1}}\times A_{i_{2}}\times \dots A_{i_{m}}
+$$
+$$
+P_{\{ i_{k} \}}(a_{1},a_{2}, \dots, a_{n}) = (a_{i_{1}},a_{i_{2}},\dots,a_{i_{m}})
+$$
+- 合并（Join Operator）：若 $R_{1}$ 中有 $(A,B)$，$R_{2}$ 中有 $(B,C)$，那么合并的关系 $J(R_{1},R_{2})$ 中就有 $(A,B,C)$。
+

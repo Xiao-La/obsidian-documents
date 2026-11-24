@@ -1,9 +1,0 @@
-{
-  "id": "pseudocode-suite",
-  "name": "Pseudocode Suite",
-  "version": "2.1.0",
-  "minAppVersion": "1.4.0",
-  "description": "Pseudocode for Obsidian: CLRS flat rendering with a visual builder.",
-  "author": "joy",
-  "isDesktopOnly": false
-}
